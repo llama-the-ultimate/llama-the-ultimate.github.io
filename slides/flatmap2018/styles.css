@@ -1,0 +1,283 @@
+@media all {html {font-size: 30px;}}
+
+:root {
+  --main-bg: #FFFFFF;
+  --link-hover-bg: #F4F4F4;
+  --nav-bg: #F4F4F4;
+  --code-bg: #FDFDFD;
+  --hr-bg: #C0C0C0
+}
+
+
+html {
+  background-color: var(--main-bg);
+  overflow-y: scroll;
+}
+
+h1 {
+  /*font-variant: small-caps;*/
+  font-weight: normal;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  margin-top: 0rem;
+  margin-left: 0rem;
+}
+
+h2 {
+  /*font-variant: small-caps;*/
+  font-weight: normal;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  margin-top: 1rem;
+  margin-left: 0rem;
+}
+
+h3 {
+  /*font-variant: small-caps;*/
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 0rem;
+  margin-top: 0.5rem;
+  margin-left: 0rem;
+}
+
+body > * {
+  text-rendering: optimizeLegibility;
+  font-family: serif;
+  line-height: 1.25;
+  hyphens: manual;
+}
+
+a {
+  background-color: inherit;
+  color: inherit;
+  text-decoration: underline;
+
+  -moz-transition-duration: 0.2s;
+  -webkit-transition-duration: 0.2s;
+  transition-duration: 0.2s;
+}
+
+a:hover {
+  background-color: var(--link-hover-bg);
+}
+
+pre {
+  font-family: monospace;
+  overflow-x: auto;
+
+  margin-bottom: 0.7rem;
+  margin-top: 0.7rem;
+  margin-left: 0.5rem;
+  margin-right: 2rem;
+
+  background-color: var(--code-bg);
+}
+
+.listinfo {
+  font-style: italic;
+  font-size: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+
+.navinfo {
+  float: left;
+  margin-top: 0rem;
+  margin-left: 0rem;
+  display: block;
+  width: 2.5rem;
+}
+
+.nav {
+
+  float: right;
+  background-color: var(--nav-bg);
+  font-weight: normal;
+  font-size: 2rem;
+  text-align: center;
+  width: 2.5rem;
+
+  margin-top: 0rem;
+  margin-left: 0rem;
+  margin-right: 0rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.navlink {
+  margin-top: 0rem;
+  margin-left: 0rem;
+  margin-right: 0rem;
+  margin-bottom: 0rem;
+}
+
+a.navlink {
+  text-decoration: none;
+}
+
+.navlink:hover {
+  background-color: var(--main-bg);
+}
+
+.code {
+  font-family: monospace;
+  white-space: nowrap;
+  background-color: var(--code-bg);
+}
+
+.codew {
+  font-family: monospace;
+  white-space: nowrap;
+}
+
+.outer {
+  margin-top: 2rem;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+p {
+  margin-bottom: 0.5rem;
+  margin-top: 0rem;
+  margin-left: 0rem;
+  margin-right: auto;
+}
+
+.editor {
+  display: block;
+  white-space: pre;
+  font-family: monospace;
+  margin-bottom: 0.7rem;
+  margin-top: 0.7rem;
+  margin-left: 0.5rem;
+  margin-right: 2rem;
+  width: 100%;
+  height: 95vh;
+  border-style: solid;
+  border-color: lightgrey;
+  border-width: 1px;
+}
+
+
+ol {
+  margin-bottom: 0.5rem;
+  margin-top: 0rem;
+  margin-left: 0rem;
+  margin-right: auto;
+
+  -webkit-margin-before: 0rem;
+  -webkit-margin-after: 0.5rem;
+  -webkit-margin-start: 1.5rem;
+  -webkit-margin-end: 0rem;
+  -webkit-padding-start: 0rem;
+}
+
+ul {
+  margin-bottom: 0.5rem;
+  margin-top: 0rem;
+  margin-left: 0rem;
+  margin-right: auto;
+
+  -webkit-margin-before: 0rem;
+  -webkit-margin-after: 0.5rem;
+  -webkit-margin-start: 1.5rem;
+  -webkit-margin-end: 0rem;
+  -webkit-padding-start: 0rem;
+}
+
+li {
+  padding-left: 0rem;
+  margin-bottom: 0rem;
+  margin-top: 0rem;
+  margin-left: 0rem;
+  margin-right: auto;
+}
+
+.content {
+  width: 40rem;
+  margin-bottom: 0rem;
+  margin-top: 0rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hai {
+  margin-top: 5rem;
+  margin-left: 5rem;
+  line-height: 2rem;
+}
+
+.nothai {
+  margin-top: 2rem;
+  margin-left: 2rem;
+}
+
+.image {
+  overflow: auto;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.error {: red;
+  font-style: italic;
+}
+
+hr {
+  border: 0;
+  height: 0.1rem;
+  background: var(--hr-bg);
+
+  margin-bottom: 1.2rem;
+  margin-top: 1.5rem;
+  margin-left: 0.5rem;
+  margin-right: 2rem;
+}
+
+blockquote {
+  font-style: italic;
+  margin: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+blockquote cite {
+  font-size: 0.8rem;
+  display: block;
+}
+
+.slide {
+  width: 48rem;
+  min-height: 27rem;
+}
+
+.slidelink {
+}
+
+.slidelinkjs {
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+table, th, td {
+  border: none;
+}
+
+th, td {
+    padding-right: 1rem;
+}
+
+.clock {
+    font-size: 1.2rem;
+    font-family: monospace;
+    position: fixed;
+    top: 0;
+    right: 0;
+    margin-right: 0.5rem;
+    text-align: right;
+    width: 5rem;
+}

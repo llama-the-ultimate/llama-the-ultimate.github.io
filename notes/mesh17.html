@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Code Mesh and infinite llamas</title>
+    <link rel="stylesheet" href="./../style.css" />
+  </head>
+  <body class="all-content">
+    <div class="content">
+      <p><a href="./../index.html">Index</a></p><p>2017-11-08</p>
+      <h1>Code Mesh and infinite llamas</h1><p>Kind of a companion post for a Code Mesh talk we did:</p><p><a href="http://www.codemesh.io/codemesh2017/jonas-winje">Infinite Lambda Calculus</a></p><ul class="links"><li><a href="https://github.com/Glorp/lambs/tree/mesh17">The code we used for the talk</a></li><li><a href="https://github.com/Glorp/lambs/blob/mesh17/lambs/mesh.txt">The file we ended up with in the talk (it is what it is)</a></li></ul><p><a href="./lambs.html">Also there are some lambdas over here</a></p><hr><p>Maybe the talk has a main point or something. Goes like this:</p><ul><li>We wanna get something like infinite, or at least pretty infinite, loops.</li><li>Lambda calculus is Turing complete, but it kind of wasn’t supposed to be?</li><li>Turing complete things can probably do infinite loops,</li><li>Type systems tend to get rid of like accidental Turing completeness.</li></ul><p>We can come up with a recipe for making a loopy thing:</p><ul><li>Look for a tiny expression that wouldn't typecheck if we had a type system-and-checker (if the type system doesn’t like an expression, then maybe that expression has something to do with Turing completeness and leads to infinite loops)</li><li>Type checkers sure don’t like “λx.x x”</li><li>“(λx.x x) (λx.x x)” goes on and on. Maybe for forever.</li><li>Adding e.g. foo like so: “(λx.x x) (λx.foo (x x))” will give us as many foos as we want. Doing a few steps of evaluation will get us “foo (foo ((λx.foo (x x)) (λx.foo (x x))))”. If we do more steps we get more foos.</li><li>We can do this with any f, instead of just with foo, because lambda abstraction: “λf.(λx.x x) (λx.f (x x))”</li><li>One step of evaluation takes us from “λf.(λx.x x) (λx.f (x x))” to “λf.(λx.f (x x)) (λx.f (x x))”</li></ul><br><p>“λf.(λx.f (x x)) (λx.f (x x))” is the Y combinator :)</p>
+    </div>
+  </body>
+</html>

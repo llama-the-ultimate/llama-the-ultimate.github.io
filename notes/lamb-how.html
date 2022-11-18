@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>How do the lambdas?</title>
+    <link rel="stylesheet" href="./../style.css" /><link rel="stylesheet" href="./../lambs/cm/codemirror.css" />
+    <script src="./../lambs/cm/codemirror.js" defer></script>
+    <script src="./../lambs/match.js" defer></script>
+    <script src="./../lambs/maybe.js" defer></script>
+    <script src="./../lambs/exp.js" defer></script>
+    <script src="./../lambs/parse.js" defer></script>
+    <script src="./../lambs/unparse.js" defer></script>
+    <script src="./../lambs/path.js" defer></script>
+    <script src="./../lambs/redex.js" defer></script>
+    <script src="./../lambs/eval.js" defer></script>
+    <script src="./../lambs/repl.js" defer></script>
+    <script src="./../lambs/editor.js" defer></script>
+  </head>
+  <body class="all-content">
+    <div class="content">
+      <p><a href="./../index.html">Index</a></p><p>2017-07-12</p>
+      <h1>How do the lambdas?</h1><p>Assuming you're viewing this in a web browser with JavaScript and so on...</p><p>Some editors are readonly. Its content is evaluated when page loads or so. Mostly for adding definitions to toplevel so they can be used later in the post:</p><pre name="lambs" data-prelude="true">id ≜ λx.x
+0 ≜ λf.λx.x
+ω ≜ λx.x x
+</pre><hr><p>In the regular editors we can do stuff.</p><pre name="lambs">(can do stuff here)
+</pre><p>Normal text-editor-stuff should work. Also:</p><ul><li>ctrl+l inserts a λ (or you can use \ instead of λ)</li><li>ctrl+d inserts a ≜ (or you can use := instead of ≜)</li><li>ctrl+enter is used to add a definition to toplevel, or remove a definition, or do one step of evaluation</li><li>ctrl+shift+enter is used to do like a bunch of evaluation (stops when the term is on normal form, or after like a thousand steps of evaluation)</li><li>ctrl+r is used to replace the names used in toplevel definitions with terms from the definitions</li></ul><p>right-clicking within editor and selecting “Show definitions” prints all the current toplevel defintions in the editor.</p><p>ctrl+enter, ctrl+shift+enter and ctrl+r all work on the line the cursor is on. Results are printed on new line(s), after. (And the cursor moves to end of result.)</p><hr><p>So, normally, if we have written some term that uses some of the toplevel defintions, we do ctrl+r and then either ctrl+enter a few times, or ctrl+shift+enter once.</p><pre name="lambs">(λa.λb.b a) 0 ω 0
+</pre><p>Lines with ≜ (or := are for definitons). ctrl+enter on a line that goes like &lt;identifier&gt; ≜ &lt;term&gt; adds a definition.</p><pre name="lambs">S ≜ λn.λf.λx.f (n f x)
+</pre><p>(Most characters can be used in identifiers. But not whitespace ones, and not the ones that are used for other stuff: :, \, ≜, λ, ., (, ).)</p><p>The terms used in definitions can use the names of definitions that already exist. We can define 2 like this now, as long as we have defined 0 and S first: (ctrl+enter)</p><pre name="lambs">2 ≜ S (S 0)
+</pre><p>(We can evaluate it to check that the result looks reasonably twoish. Two applications of f is very two-like, so the result should look like “λf.λx.f (f x)”. (ctrl+r, then ctrl+shift+enter))</p><pre name="lambs">2
+</pre><p>If we wanna get rid of a definition we can do &lt;identifier&gt; ≜ :(, or just &lt;identifier&gt; ≜. We’ll remove ω (it’s scary): (ctrl+enter)</p><pre name="lambs">ω ≜ :(
+</pre><p>If we try to evaluate the thing we did earler, we won’t get the same result now, since ω will just be treated as some free variable... (ctrl+r, then ctrl+shift+enter)</p><pre name="lambs">(λa.λb.b a) 0 ω 0
+</pre><hr><p>That’s like more or less it. In posts like this it’s mostly enough to do ctrl+enter on definitions, and ctrl+r and then ctrl+shift+enter on other stuff...</p>
+    </div>
+  </body>
+</html>

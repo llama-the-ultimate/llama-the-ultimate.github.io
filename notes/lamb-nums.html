@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Some numbery functions</title>
+    <link rel="stylesheet" href="./../style.css" /><link rel="stylesheet" href="./../lambs/cm/codemirror.css" />
+    <script src="./../lambs/cm/codemirror.js" defer></script>
+    <script src="./../lambs/match.js" defer></script>
+    <script src="./../lambs/maybe.js" defer></script>
+    <script src="./../lambs/exp.js" defer></script>
+    <script src="./../lambs/parse.js" defer></script>
+    <script src="./../lambs/unparse.js" defer></script>
+    <script src="./../lambs/path.js" defer></script>
+    <script src="./../lambs/redex.js" defer></script>
+    <script src="./../lambs/eval.js" defer></script>
+    <script src="./../lambs/repl.js" defer></script>
+    <script src="./../lambs/editor.js" defer></script>
+  </head>
+  <body class="all-content">
+    <div class="content">
+      <p><a href="./../index.html">Index</a></p><p>2017-07-06</p>
+      <h1>Some numbery functions</h1><p>Somewhat a test-post, for to have not dead lambda calculus within post. If you're viewing this in a web browser and it runs the JavaScript and so on, it should be interactive.</p><p><a href="./../lambdas.html">(There’s also kind of a lambda playground over here.)</a></p><p>To try, put cursor on line below and do ctrl+enter couple of times:</p><pre name="lambs">(λx.λy.y x) bar foo
+</pre><p>If it works (if the ctrl+enter-business leads to a line that goes foo bar), we can make a few numbers... (ctrl+enter each line).</p><pre name="lambs">0 ≜ λf.λx.x
+1 ≜ λf.λx.f x
+2 ≜ λf.λx.f (f x)
+5 ≜ λf.λx.f (f (f (f (f x))))
+</pre><p>The idea, or at least one way to look at it, is that the number five is the function that does something five times. So, if we want to foo a bar five times, then we can... (ctrl+r to replace 5 with the lambdas from the definition we did above. Then ctrl+enter a couple of times.)</p><pre name="lambs">5 foo bar
+</pre><p>Which quite possibly evaluated to foo (foo (foo (foo (foo bar)))). Which is like five foos.</p><p>Okay. Addition is pretty numbery. Below is a function that takes arguments a and b. And gives back, uh, a λf.λx.-function. This function applies f to x and it will do that “b times.” And it will apply f to the result of that “a times.” Hopefully that amounts to f being applied to x  “a + b times.” (ctrl+enter on line below)</p><pre name="lambs">+ ≜ λa.λb.λf.λx.a f (b f x)
+</pre><p>If things seem fine so far, we can try to use it. ctrl+r on line below to replace the names of the things we’ve defined with their lambdas. Then ctrl+enter a bunch of times to evaluate. (Or ctrl+shift+enter one time.)</p><pre name="lambs">5 (+ 5 2)
+</pre><p>It’s maybe twelve! (Hopefully.)</p>
+    </div>
+  </body>
+</html>

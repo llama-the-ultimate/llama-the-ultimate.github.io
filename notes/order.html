@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Land of some other order</title>
+    <link rel="stylesheet" href="./../style.css" />
+  </head>
+  <body class="all-content">
+    <div class="content">
+      <p><a href="./../index.html">Index</a></p><p>2019-06-09</p>
+      <h1>Land of some other order</h1><p>We start with</p><pre>#lang racket
+</pre><p>or</p><pre>#lang lazy
+</pre><p>And make some natural and/or unnatural numbers:</p><pre>(struct zero () #:transparent)
+(struct succ (pred) #:transparent)
+
+(define one (succ (zero)))
+(define two (succ one))
+(define (inf) (succ (inf)))
+</pre><p>And a less-than-or-equal-to function:</p><pre>(define (&lt;= a b)
+  (cond
+    [(zero? a) #t]
+    [(zero? b) #f]
+    [else (&lt;= (succ-pred a) (succ-pred b))]))
+</pre><p>(&lt;= is a function with parameters a and b: If a is zero then true else if b is zero then false else try with one-less-than-a and one-less-than-b instead.)</p><p>Okay. We can try to apply the function to some arguments. The following are are fine and evaluate to #t and #f.</p><pre>(&lt;= one two)
+
+(&lt;= two one)
+</pre><p>If we started with “#lang racket” the next two will run forever and we won’t get values back. If we started with “#lang lazy” they’re fine and evaluate to #t and #f.</p><pre>(&lt;= two (inf))
+
+(&lt;= (inf) two)
+</pre><p>The next one will run forever in both “#lang racket” and “#lang lazy”.</p><pre>(&lt;= (inf) (inf))
+</pre><p>(Forever means until we are out of memory or something.)</p><p>Anyway. We can choose:</p><ul><li>If we want as many expressions as possible to give back values, we might prefer “#lang lazy”</li><li>If we want as many applications of &lt;= to give back values, we might prefer “#lang racket”</li></ul><p>(In “#lang racket” the forever happens when evaluating the (inf)-arguments before the &lt;=-function is applied. In “#lang lazy” we might have to decide: Is it the (inf) or the &lt;= that causes forever? Is it reasonably to expect there to be a base case?)</p>
+    </div>
+  </body>
+</html>

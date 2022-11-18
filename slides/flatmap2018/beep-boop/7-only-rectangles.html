@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Beep boop</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+  </head>
+  <body>
+    <div id="midi-status"></div>
+    <div id="voice-status"></div>
+    <div id="main"></div>
+    <script src="elm-beep-boop.js"></script>
+    <script type="text/javascript">
+      var node = document.getElementById('main');
+      var app = Elm.Main.embed(node, { view: "onlyRectangles"});
+    </script>
+    <script src="beep-boop.js"></script>
+    <script src="sounds.js"></script>
+    <script src="playback.js"></script>
+  </body>
+</html>
