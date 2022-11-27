@@ -20,13 +20,15 @@ nonfix ::
 val it = [1,2,3] : int list
 - foldr + 0 (:: (1, :: (2, :: (3, nil))));
 val it = 6 : int
-</pre><p>(We removed the infix thing from + and :: (the plus function and the list “cons”). They take tupled arguments. Infix 1 + 2 is nonfix + (1, 2), and so on.)</p><p>Here, I guess we can say that</p><pre>foldr + 0 (:: (1, :: (2, :: (3, nil))))
+</pre><p>(We removed the infix thing from <code>+</code> and <code>::</code> (the plus function and the list “cons”). They take tupled arguments. Infix <code>1 + 2</code> is nonfix <code>+ (1, 2)</code>, and so on.)</p><p>Here, I guess we can say that</p><pre>foldr + 0 (:: (1, :: (2, :: (3, nil))))
 </pre><p>is kind of equivalent to</p><pre>+ (1, + (2, + (3, 0))).
 </pre><p>And it is maybe more clear how</p><pre>+ (1, + (2, + (3, 0)))
 </pre><p>is similar to the list</p><pre>0 (:: (1, :: (2, :: (3, nil)))
-</pre><p>It is like the list we but with the list constructors, :: and nil, replaced with + and 0 (the first two values we gave to foldr).</p><p>Also maybe unsurprising that</p><pre>foldr :: nil (:: (1, :: (2, :: (3, nil))))
+</pre><p>It is like the list we but with the list constructors, <code>::</code> and <code>nil</code>, replaced with <code>+</code> and <code>0</code> (the first two values we gave to <code>foldr</code>).</p><p>Also maybe unsurprising that</p><pre>foldr :: nil (:: (1, :: (2, :: (3, nil))))
 </pre><p>will be equivalent to</p><pre>:: (1, :: (2, :: (3, nil)))
-</pre><p>and evaluate to a list that looks like the one we started with?</p><hr><p>(At least, more clear than when saying that<br>foldr (op +) 0 [1, 2, 3]<br>is equivalent to<br>1 + (2 + (3 + 0))?)</p><hr><p>And also like maybe not I dunno.</p>
+</pre><p>and evaluate to a list that looks like the one we started with?</p><hr><p>(At least, more clear than when saying that</p><pre>foldr (op +) 0 [1, 2, 3]
+</pre><p>is equivalent to</p><pre>1 + (2 + (3 + 0))?)
+</pre><hr><p>And also like maybe not I dunno.</p>
     </div>
   </body>
 </html>
