@@ -1,0 +1,6 @@
+# Manifesto for software development
+:date 2018-10-06
+
+Small over large.
+
+I value the item on the left more.
