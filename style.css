@@ -56,6 +56,13 @@ pre {
   font-family: monospace;
   font-size: 1rem;
 }
+
+code {
+  font-family: monospace;
+  font-size: 1rem;
+}
+
+
 ul {
   list-style-type: disc;
   list-style-position: inside;
