@@ -14,7 +14,7 @@ To try, put cursor on line below and do ctrl+enter couple of times:
 (λx.λy.y x) bar foo
 ```
 
-If it works (if the ctrl+enter-business leads to a line that goes foo bar), we can make a few numbers... (ctrl+enter each line).
+If it works (if the ctrl+enter-business leads to a line that goes `foo bar`), we can make a few numbers... (ctrl+enter each line).
 ``` repl
 0 ≜ λf.λx.x
 1 ≜ λf.λx.f x
