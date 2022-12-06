@@ -13,10 +13,23 @@ body {
   flex: 1;
 }
 
+.open-editors {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
 button.note-link {
   width: 100%;
   text-align: left;
 }
+
+.side {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
 ul.notes-list {
   list-style-type: none;
 }
@@ -36,20 +49,22 @@ textarea.editor {
   border-color: var(--editor-border-color);
   border-width: 1px;
   width: 30rem;
-
-  height: 15rem;
-  resize: both;
+  height: 100%;
+  resize: horizontal;
   overflow: auto;
 }
-
+.preview {
+  flex: 1;
+  overflow-y: auto;
+}
 input.editor {
-  resize: horizontal;
   overflow: auto;
 }
 
 .editor-and-preview {
   gap: 1rem;
   display: flex;
+  max-height: 90vh;
   flex-direction: row;
 }
 
@@ -65,9 +80,4 @@ input.editor {
 
 .half-item {
   flex: 0 0 50%;
-}
-
-pre, code {
-  font-family: monospace;
-  white-space: pre;
 }

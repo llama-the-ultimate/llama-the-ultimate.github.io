@@ -19,7 +19,7 @@
     const res = [];
     let current = [];
     for (const x of arr) {
-      if (x.rest.str === "") {
+      if (x.text.str === "") {
         res.push(current);
         current = [];
       } else {
@@ -30,7 +30,7 @@
     return res;
   };
 
-  const splitText = (arr) => {
+  const splitPara = (arr) => {
     const res = split(arr);
     if (res[res.length - 1].length === 0) {
       res.pop();
@@ -42,17 +42,17 @@
   };
 
   const renderLines = (arr) => {
-    let str = escapeHtml(arr[0].rest.str);
+    let str = textHtml(arr[0].text);
     for (let i = 1; i < arr.length; i++) {
       str += "<br>";
-      str += escapeHtml(arr[i].rest.str);
+      str += textHtml(arr[i].text);
     }
     return str;
   };
 
-  const renderText = (arr) => {
+  const renderPara = (arr) => {
     let str = "";
-    for (const a of splitText(arr)) {
+    for (const a of splitPara(arr)) {
       if (a.length === 0) {
         str += "<br>";
       } else {
@@ -63,15 +63,19 @@
   };
 
   const renderQuote = (arr) => {
-    const splitted = split(arr);
+    let splitted = split(arr);
 
-    const pars = splitted.reduce((res, a) => (a.length > 0 ? res + 1 : res), 0);
+    if (splitted.every(a =>  a.length === 0)) {
+      return `<blockquote>${"<br>".repeat(splitted.length - 1)}</blockquote>`;
+    };
+    
+    const pars = splitted.length > 1;
     let str = "<blockquote>";
     for (const a of splitted) {
       if (a.length === 0) {
         str += "<br>";
       } else {
-        str += pars > 1 ? `<p>${renderLines(a)}</p>` : renderLines(a);
+         str += pars ? `<p>${renderLines(a)}</p>` : renderLines(a);
       }
     }
     str += "</blockquote>";
@@ -95,34 +99,51 @@
     const urlPath = i === urlDir.length ? "" : `${urlDir.slice(i).join("/")}/`;
     return `./${parenting}${urlPath}${urlEnd}`;
   };
-
-  const baseLinker = (dirlist) => (token) => {
-    if (token.tag === "inlink") {
-      const type = token.args[0].str;
-      if (type === "img") {
-        return `<img src="${relify(token.args[1].str, dirlist)}" alt="${
-          token.rest.str
-        }">`;
+  
+  const textHtml = (text) => {
+    let res = "";
+    for (const x of text.list) {
+      const html =  escapeHtml(x.str);
+      if (x.open === "_") {
+        res += `<em>${html}</em>`;
+      } else if (x.open === "`") {
+        res += `<code>${html}</code>`;
       } else {
-        return renderError(token.full, `unknown type "${escapeHtml(type)}"`);
+        res += `${x.open}${html}${x.close}`;
       }
     }
-    if (token.tag === "link") {
-      const type = token.args[0].str;
-      const desc = token.rest.str;
-      const url = token.args[1].str;
-      const descStr = desc !== "" ? desc : url;
-      if (type === "gd") {
-        const withHtml = `${url.endsWith(".gd") ? url.slice(0, -3) : url}.html`;
+    return res;
+  }
+
+  const baseLinker = (dirlist) => (line) => {
+    const linkType = line.args[0].str;
+    if (line.type === "include") {
+      if (linkType === "img") {
+        return `<p><img src="${relify(line.args[1].str, dirlist)}" alt="${
+          line.text.str
+        }"></p>`;
+      } else {
+        return renderError(line.full, `unknown type "${escapeHtml(linkType)}"`);
+      }
+    }
+    if (line.type === "link") {
+
+      const descHtml = textHtml(line.text);
+      const url = line.args[1].str;
+      const descStr = descHtml !== "" ? descHtml : url;
+      if (linkType === "gd") {
+        const withHtml = `${url.endsWith(".txt") ? url.slice(0, -4) : url}.html`;
         const htmlUrl = relify(`/notes/${withHtml}`, dirlist);
         return `<a href="${htmlUrl}">${descStr}</a>`;
       }
-      if (type === "url") {
+      if (linkType === "url") {
         return `<a href="${relify(url, dirlist)}">${descStr}</a>`;
+      } else if (linkType === "me") {
+        return `<a rel="me" href="${relify(url, dirlist)}">${descStr}</a>`;
       }
-      return renderError(token.full, `unknown type "${escapeHtml(type)}"`);
+      return renderError(line.full, `unknown type "${escapeHtml(linkType)}"`);
     }
-    return renderError(token.full, `unkown link tag "${token.tag}"`);
+    return renderError(line.full, `unkown link type "${line.type}"`);
   };
 
   const renderLinks = (arr, linker) => {
@@ -140,7 +161,7 @@
   const renderLis = (arr) => {
     let str = "<ul>";
     for (const x of arr) {
-      str += `<li>${escapeHtml(x.rest.str)}</li>`;
+      str += `<li>${textHtml(x.text)}</li>`;
     }
     str += "</ul>";
     return str;
@@ -151,15 +172,15 @@
       content
     )}</pre>`;
 
-  const basePrextra = (alt) => alt === "" ? "" : ` title="${alt}"`;
+  const basePrextra = (alt) => alt.str === "" ? "" : ` title="${alt.str}"`;
   
   const renderPre = (arr, prextra) => {
-    let str = `<pre${prextra(arr[0].rest.str)}>`;
+    let str = `<pre${prextra(arr[0].text)}>`;
     const len =
-      arr[arr.length - 1].tag === "toggle" ? arr.length - 1 : arr.length;
+      arr[arr.length - 1].type === "toggle" ? arr.length - 1 : arr.length;
     for (let i = 1; i < len; i++) {
-      const token = arr[i];
-      str += `${escapeHtml(token.full)}\n`;
+      const line = arr[i];
+      str += `${escapeHtml(line.full)}\n`;
     }
     str += "</pre>";
     return str;
@@ -167,12 +188,12 @@
 
   const render = (arr, linker, prextra) => {
     let i;
-    const gather = (tag) => {
+    const gather = (type) => {
       const res = [arr[i]];
       let next;
       for (next = i + 1; next < arr.length; next++) {
-        const token = arr[next];
-        if (token.tag !== tag) {
+        const line = arr[next];
+        if (line.type !== type) {
           i = next - 1;
           return res;
         }
@@ -184,9 +205,9 @@
     const gatherPre = () => {
       const res = [arr[i]];
       for (i++; i < arr.length; i++) {
-        const token = arr[i];
+        const line = arr[i];
         res.push(arr[i]);
-        if (token.tag === "toggle") {
+        if (line.type === "toggle") {
           return res;
         }
       }
@@ -195,12 +216,12 @@
 
     let str = "";
     for (i = 0; i < arr.length; i++) {
-      const token = arr[i];
+      const line = arr[i];
 
       const nextStr = () => {
-        switch (token.tag) {
-          case "text":
-            return renderText(gather("text"));
+        switch (line.type) {
+          case "par":
+            return renderPara(gather("par"));
           case "quote":
             return renderQuote(gather("quote"));
           case "link":
@@ -212,15 +233,15 @@
           case "toggle":
             return renderPre(gatherPre(), prextra);
           case "h1":
-            return `<h1>${token.rest.str}</h1>`;
+            return `<h1>${textHtml(line.text)}</h1>`;
           case "h2":
-            return `<h2>${token.rest.str}</h2>`;
+            return `<h2>${textHtml(line.text)}</h2>`;
           case "h3":
-            return `<h3>${token.rest.str}</h3>`;
-          case "inlink":
-            return linker(token);
+            return `<h3>${textHtml(line.text)}</h3>`;
+          case "include":
+            return linker(line);
           case "error":
-            return renderError(token.line, token.description);
+            return renderError(line.line, line.description);
           case "keyval":
             return "";
           default:
@@ -235,6 +256,7 @@
 
   module.exports = {
     render: render,
+    textHtml: textHtml,
     linker: baseLinker,
     prextra: basePrextra,
     relify: relify,

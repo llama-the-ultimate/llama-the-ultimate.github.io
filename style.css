@@ -46,20 +46,19 @@ blockquote {
   border-left: 0.1rem solid #444444;
 }
 
-blockquote p:last-child {
+blockquote p:last-of-type {
   margin-bottom: 0;
 }
 
 pre {
   margin-left: 0.5rem;
   overflow-x: auto;
-  font-family: monospace;
-  font-size: 1rem;
 }
 
-code {
+pre, code {
   font-family: monospace;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  white-space: pre;
 }
 
 
