@@ -5,7 +5,7 @@ I think Einar said that if you want to blog you should write blog posts, not wri
 => url https://einarwh.wordpress.com/ Einar uses WordPress.
 => url https://einarwh.wordpress.com/2011/05/12/the-indispensable-idisposable/ So when Einar writes about weird DSL for writing HTML it is typically _not_ a description of how his blog works.
 
-So uh, new home-made markup language for my home-made blog engine.
+Anyway it’s a thing that makes sense. So here’s a new home-made markup language for my home-made blog engine.
 
 I’ve played around with making my own language for this a few times. I like the idea of having something where it’s so easy to implement tooling for it that, if I ever need or want to reimplement it, maybe in a different language/environment, it won’t be a big deal. Preferably not even much of a factor in deciding if I’m going to move to a different language or something. And also simple enough so that I can write (and read) posts in that format correctly without much help from specialized tools or something.
 
