@@ -71,14 +71,6 @@ Unlike in Gemtext there’s a different line type for stuff that should be inclu
 ```
 <= img https://placekitten.com/200/300
 
-### Horizontal rule/thematic change
-
-Not in Gemtext. Lines that start with `----`
-```
-----
-```
-----
-
 ### Key-value pairs
 
 Not in Gemtext. Mostly for metadata. Lines that start with `:`. If a line goes `:<argument><text>` then <argument> is the key and <text> is the value. E.g. this post has a line that goes:
@@ -88,3 +80,14 @@ Not in Gemtext. Mostly for metadata. Lines that start with `:`. If a line goes `
 :date 2022-12-06
 
 And then I have some blogging machinery that uses that date for displaying list of posts with their dates.
+
+### Horizontal rule/thematic change
+
+Not in Gemtext. Lines that start with `----`
+```
+----
+```
+
+----
+
+Blah blah. That’s mostly it.
