@@ -7,12 +7,13 @@ foreach  ($note in $stuff.notes) {
     Invoke-WebRequest "https://llama-the-ultimate.glitch.me/notes/$noext.html" -OutFile (New-Item -Type File -Path "./notes/$noext.html" -Force);
     Invoke-WebRequest "https://llama-the-ultimate.glitch.me/gd/notes/$noext.txt" -OutFile (New-Item -Type File -Path "./gd/notes/$noext.txt" -Force);
 }
-foreach ($staticFile in $stuff.static) {
-    Invoke-WebRequest "https://llama-the-ultimate.glitch.me/$staticFile" -OutFile (New-Item -Type File -Path "./$staticFile" -Force );
+foreach ($otherFile in $stuff.other) {
+    Invoke-WebRequest "https://llama-the-ultimate.glitch.me/$otherFile" -OutFile (New-Item -Type File -Path "./$otherFile" -Force );
 }
 
 $stuffFiles = $stuff.notes | % { $_.file }
 
+<#
 foreach ($file in Get-ChildItem "./gd/notes/") {
     if (!($stuffFiles -contains $file)) {
         $fname = $file.name;
@@ -23,6 +24,4 @@ foreach ($file in Get-ChildItem "./gd/notes/") {
         }
     }
 }
-
-Invoke-WebRequest "https://llama-the-ultimate.glitch.me/index.html" -OutFile (New-Item -Type File -Path "./index.html" -Force);
-Invoke-WebRequest "https://llama-the-ultimate.glitch.me/gd/index.txt" -OutFile (New-Item -Type File -Path "./gd/index.txt" -Force);
+#>
