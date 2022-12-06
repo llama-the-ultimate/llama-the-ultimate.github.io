@@ -24,7 +24,7 @@ Also it tends to look kind of like my plaintext-notes would look anyway. E.g. I 
 
 So I decided to steal ideas from Gemtext and make something with a lot less functionality than what I have attempted previously:
 
-=> url /glorpdown A Glorpdown editor.
+=> url /glorpdown.html A Glorpdown editor.
 => url /gd/notes/glorpdown.txt This post in Glorpdown.
 
 * A line usually goes like <start><arguments><text>. The line type (typically determined by the <start> of the line) decides how many arguments there are. E.g. a link (starts with `=>`) has two arguments, link type and path. A blockquote has no arguments, just a `>`-start and the text that goes in the quote.
