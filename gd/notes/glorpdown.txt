@@ -1,6 +1,11 @@
 # The dawn of glorp
 
-I think Einar said that if you want to blog you should write blog posts, not write blog engine. At least sometimes people say something like that. So uh, new home-made markup language for my home-made blog engine.
+I think Einar said that if you want to blog you should write blog posts, not write blog engine. At least sometimes people say something like that.
+
+=> url https://einarwh.wordpress.com/ Einar uses WordPress.
+=> url https://einarwh.wordpress.com/2011/05/12/the-indispensable-idisposable/ So when Einar writes about weird DSL for writing HTML it is typically _not_ a description of how his blog works.
+
+So uh, new home-made markup language for my home-made blog engine.
 
 I’ve played around with making my own language for this a few times. I like the idea of having something where it’s so easy to implement tooling for it that, if I ever need or want to reimplement it, maybe in a different language/environment, it won’t be a big deal. Preferably not even much of a factor in deciding if I’m going to move to a different language or something. And also simple enough so that I can write (and read) posts in that format correctly without much help from specialized tools or something.
 
@@ -27,10 +32,17 @@ So I decided to steal ideas from Gemtext and make something with a lot less func
 => url /glorpdown.html A Glorpdown editor.
 => url /gd/notes/glorpdown.txt This post in Glorpdown.
 
-* A line usually goes like <start><arguments><text>. The line type (typically determined by the <start> of the line) decides how many arguments there are. E.g. a link (starts with `=>`) has two arguments, link type and path. A blockquote has no arguments, just a `>`-start and the text that goes in the quote.
-* Preformatted text is turned on by a line that starts with `\`\`\``. Any non-whitespace characters directly after the `\`\`\`` are considered part of the <start> and must be matched by the start of a later line to turn it off again (so you can e.g. do four backticks for the <start> if you want to start a line of preformatted text with three backticks without that being a “turn off the preformatted text”-line).
-* Within <text> you can format text: Text between `_`-characters is _emphasized_. Text between `\``-characters is `code`.
-* Within text you can escape a character with a `\\`-character. Necessary for escaping formatting characters or having lines start with the <start> of a line type without being that line type.
+Some basics:
+
+* A line usually goes like <start><arguments><text>. The line type (typically determined by the <start> of the line) decides how many (whitespace-separated) arguments there are. E.g. a link (starts with `=>`) has two arguments, link type and path. A blockquote has no arguments, just a `>`-start and the text that goes in the quote.
+* Within the <text> you can format text: Text between `_`-characters is _emphasized_. Text between `\``-characters is `code`. You can’t nest/combine those things.
+* Within the <text> you can escape a character with a `\\`-character. Necessary for escaping formatting characters or for having regular text lines start with the <start> of another line type.
+
+Most of the things:
+
+### Regular text/paragraphs
+
+More or less like in Gemtext. The <start> of a regular text line is the empty string. Or: If the start of a line does not match the <start> of any of the other line types, it is a regular text. Should be empty lines between paragraphs. Line breaks within paragraphs are preserved when translating to HTML and such.
 
 ### Headings
 
@@ -71,9 +83,30 @@ Unlike in Gemtext there’s a different line type for stuff that should be inclu
 ```
 <= img https://placekitten.com/200/300
 
+### Preformatted text
+
+Same as in Gemtext, preformatted text is turned on by a line that starts with `\`\`\``. Not like in Gemtext, any non-whitespace characters directly after the `\`\`\`` are considered part of the <start> and must be matched by the start of a later line to turn it off again (so you can e.g. do four backticks for the <start> if you want to have a line of preformatted text start with three backticks without that being a “turn off the preformatted text”-line). No line types or text formatting or escaping characters within preformatted text.
+
+So:
+`````
+````
+code here
+```
+not turned off yet so things are still code
+````
+`````
+Becomes:
+````
+code here
+```
+not turned off yet so things are still code
+````
+
+Like in Gemtext you can write some stuff after the <start> of a line that turns preformatted text _on_ and have that be “alt text,” which is sometimes used for stuff.
+
 ### Key-value pairs
 
-Not in Gemtext. Mostly for metadata. Lines that start with `:`. If a line goes `:<argument><text>` then <argument> is the key and <text> is the value. E.g. this post has a line that goes:
+Not at all in Gemtext. Mostly for metadata. Lines that start with `:` are key-value lines. If a line goes `:<argument> <text>` then <argument> is the key and <text> is the value. E.g. this post has a line that goes:
 ```
 :date 2022-12-06
 ```
