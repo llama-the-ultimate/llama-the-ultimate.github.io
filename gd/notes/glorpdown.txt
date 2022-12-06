@@ -1,0 +1,90 @@
+# The dawn of glorp
+
+I think Einar said that if you want to blog you should write blog posts, not write blog engine. At least sometimes people say something like that. So uh, new home-made markup language for my home-made blog engine.
+
+I’ve played around with making my own language for this a few times. I like the idea of having something where it’s so easy to implement tooling for it that, if I ever need or want to reimplement it, maybe in a different language/environment, it won’t be a big deal. Preferably not even much of a factor in deciding if I’m going to move to a different language or something. And also simple enough so that I can write (and read) posts in that format correctly without much help from specialized tools or something.
+
+I tend to mess up and things tend to get too complicated.
+
+## Gemtext
+
+=> url https://gemini.circumlunar.space/docs/gemtext.gmi Gemtext
+
+I ran into Gemtext the other day. Gemtext takes a pretty straightforward approach to some things.
+> You get one kind of list and you can't nest them
+Which goes for most things. Like generally you can’t have <thing> within <other thing>. No quote within a list, or link within a heading, or whatever. Or, it’s very line-oriented, and you can’t like, nest lines.
+
+It’s not too hard to build a Gemtext-parser. It’s also really easy to write Gemtext in any text editor.
+
+Also it tends to look kind of like my plaintext-notes would look anyway. E.g. I tend to end up with stuff like paragraphs being long lines and use separate lines for links.
+
+(Also also I like how using a full line for a link tricks me into writing more self-contained link texts (instead of stuff like the link text being “here”). Which I’m told people using screen readers sometimes appreciate.)
+
+## Glorpdown
+
+So I decided to steal ideas from Gemtext and make something with a lot less functionality than what I have attempted previously:
+
+=> url /glorpdown A Glorpdown editor.
+=> url /gd/notes/glorpdown.txt This post in Glorpdown.
+
+* A line usually goes like <start><arguments><text>. The line type (typically determined by the <start> of the line) decides how many arguments there are. E.g. a link (starts with `=>`) has two arguments, link type and path. A blockquote has no arguments, just a `>`-start and the text that goes in the quote.
+* Preformatted text is turned on by a line that starts with `\`\`\``. Any non-whitespace characters directly after the `\`\`\`` are considered part of the <start> and must be matched by the start of a later line to turn it off again (so you can e.g. do four backticks for the <start> if you want to start a line of preformatted text with three backticks without that being a “turn off the preformatted text”-line).
+* Within <text> you can format text: Text between `_`-characters is _emphasized_. Text between `\``-characters is `code`.
+* Within text you can escape a character with a `\\`-character. Necessary for escaping formatting characters or having lines start with the <start> of a line type without being that line type.
+
+### Headings
+
+Same as in Gemtext, three levels: Lines that start with `#`, `##` or `###`. E.g. I do this for the following heading:
+```
+### Blockquotes
+```
+
+### Blockquotes
+
+Same as in Gemtext: Lines that start with `>`
+```
+> Hello.
+```
+> Hello.
+
+### Lists
+
+Same as in Gemtext: Lines that start with `*` are list items.
+```
+* Item one
+* Item two
+```
+* Item one
+* Item two
+
+### Linky bits
+
+Regular links are similar to the ones in Gemtext, but with a “type” argument before the path/url:
+```
+=> url https://placekitten.com/ Kittens
+```
+=> url https://placekitten.com/ Kittens
+
+Unlike in Gemtext there’s a different line type for stuff that should be included in, or viewed in context of, the document. Typically images:
+```
+<= img https://placekitten.com/200/300
+```
+<= img https://placekitten.com/200/300
+
+### Horizontal rule/thematic change
+
+Not in Gemtext. Lines that start with `----`
+```
+----
+```
+----
+
+### Key-value pairs
+
+Not in Gemtext. Mostly for metadata. Lines that start with `:`. If a line goes `:<argument><text>` then <argument> is the key and <text> is the value. E.g. this post has a line that goes:
+```
+:date 2022-12-06
+```
+:date 2022-12-06
+
+And then I have some blogging machinery that uses that date for displaying list of posts with their dates.

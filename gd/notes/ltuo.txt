@@ -1,0 +1,4 @@
+# Llama the ultimate object
+:date 2017-01-24
+
+It does extend animal.

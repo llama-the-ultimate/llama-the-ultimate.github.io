@@ -1,0 +1,9 @@
+# The 4 types of technical debt
+:date 2018-06-19
+
+I think this title is pretty thought leader because it sounds like fairly assertive and also has a number in it.
+
+* Technical debt
+* Not technical debt
+* Technical not debt
+* Not technical not debt
