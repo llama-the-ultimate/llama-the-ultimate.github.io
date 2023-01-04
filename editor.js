@@ -42,28 +42,26 @@
     div.className = "editor-and-preview";
     const editorDiv = elem(div, "div", { className: "editor-container" });
 
-    const toolbar = elem(editorDiv, "div", { className: "toolbar"});
+    const toolbar = elem(editorDiv, "div", { className: "toolbar" });
 
-    for (const arr of [
-      ["```", "```\n", "\n```"],
-      ["_ _", "_", "_"],
-      ["` `", "`", "`"],
-      ["“”", "“", "”"],
-      ["’", "’"],
-      ["—", "—"],
-    ]) {
-      const btn = elem(toolbar, "button", {
-        innerText: arr[0],
-        onclick: () => {
-          if (arr.length === 3) {
-            surroundSelection(arr[1], arr[2]);
-          } else {
-            replaceSelection(arr[1]);
-          }
-          editor.focus();
-        },
-      });
-    }
+    const btn = (name, start, stop) => elem(toolbar, "button", {
+      innerText: name,
+      onclick: () => {
+        if (stop === undefined) {
+          replaceSelection(start);
+        } else {
+          surroundSelection(start, stop);
+        }
+        editor.focus();
+      }
+    });
+    
+    btn("```", "```\n", "\n```");
+    btn("_ _", "_", "_");
+    btn("` `", "`", "`");
+    btn("“”", "“", "”");
+    btn("’", "’");
+    btn("—", "—");
 
     const editor = elem(editorDiv, "textarea", {
       className: "editor",
@@ -86,7 +84,7 @@
       soon(key, preview);
       div.dispatchEvent(new Event("changed"));
     };
-    
+
     const replaceSelection = (replacement) => {
       const str = editor.value;
       const before = str.substring(0, editor.selectionStart);

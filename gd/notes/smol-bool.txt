@@ -1,0 +1,11 @@
+# Smol bool
+
+A good blog post is Boolean Blindness:
+=> url https://existentialtype.wordpress.com/2011/03/15/boolean-blindness/ Boolean Blindness on Robert Harper’s blog.
+
+I run into this kind of thing pretty frequently:
+> The problem is computing the bit in the first place.  Having done so, you have blinded yourself by reducing the information you have at hand to a bit, and then trying to recover that information later by remembering the provenance of that bit.
+
+## Enterprise Software Engineering
+
+

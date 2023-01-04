@@ -48,7 +48,7 @@ textarea.editor {
   border-style: solid;
   border-color: var(--editor-border-color);
   border-width: 1px;
-  width: 30rem;
+  width: 40rem;
   height: 100%;
   resize: horizontal;
   overflow: auto;
@@ -64,7 +64,7 @@ input.editor {
 .editor-and-preview {
   gap: 1rem;
   display: flex;
-  max-height: 90vh;
+  height: 90vh;
   flex-direction: row;
 }
 

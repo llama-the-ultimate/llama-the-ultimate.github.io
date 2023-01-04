@@ -7,7 +7,7 @@ I think Einar said that if you want to blog you should write blog posts, not wri
 
 Anyway it’s a thing that makes sense. So here’s a new home-made markup language for my home-made blog engine.
 
-I’ve played around with making my own language for this a few times. I like the idea of having something where it’s so easy to implement tooling for it that, if I ever need or want to reimplement it, maybe in a different language/environment, it won’t be a big deal. Preferably not even much of a factor in deciding if I’m going to move to a different language or something. And also simple enough so that I can write (and read) posts in that format correctly without much help from specialized tools or something.
+I’ve played around with making my own language for this a few times. I like the idea of having something where it’s so easy to implement tooling for it that, if I ever need or want to reimplement it, maybe in a different language/environment, then that won’t be a big deal. Preferably not even much of a factor in deciding if I’m going to move to a different language or something. And also simple enough so that I can write (and read) posts in that format correctly without much help from specialized tools or something.
 
 I tend to mess up and things tend to get too complicated.
 
@@ -34,7 +34,7 @@ So I decided to steal ideas from Gemtext and make something with a lot less func
 
 Some basics:
 
-* A line usually goes like <start><arguments><text>. The line type (typically determined by the <start> of the line) decides how many (whitespace-separated) arguments there are. E.g. a link (starts with `=>`) has two arguments, link type and path. A blockquote has no arguments, just a `>`-start and the text that goes in the quote.
+* A line usually goes like <start><arguments><text>. The line type (typically determined by the <start> of the line) decides how many (whitespace-separated) arguments there are. E.g. a link (starts with `=>`) has two arguments, link type and path. A blockquote has no arguments, just a `>`-start followed by the text that goes in the quote.
 * Within the <text> you can format text: Text between `_`-characters is _emphasized_. Text between `\``-characters is `code`. You can’t nest/combine those things.
 * Within the <text> you can escape a character with a `\\`-character. Necessary for escaping formatting characters or for having regular text lines start with the <start> of another line type.
 
@@ -82,6 +82,8 @@ Unlike in Gemtext there’s a different line type for stuff that should be inclu
 <= img https://placekitten.com/200/300
 ```
 <= img https://placekitten.com/200/300
+
+(In my mind the way this makes sense is that the `=>`-arrow points to some thing that you can go to, while the `<=`-arrow is more like, the thing is moving into the current document.)
 
 ### Preformatted text
 
