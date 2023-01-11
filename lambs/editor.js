@@ -80,7 +80,7 @@ const Editor = (() => {
     return CodeMirror(elem, props);
   };
   window.addEventListener("load", (event) => {
-    for (const el of document.getElementsByName("lambs")) {
+    for (const el of document.getElementsByClassName("lambs")) {
       create(el);
     }
   });
