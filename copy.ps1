@@ -10,6 +10,7 @@ foreach  ($note in $stuff.notes) {
 foreach ($otherFile in $stuff.other) {
     Invoke-WebRequest "https://llama-the-ultimate.glitch.me/$otherFile" -OutFile (New-Item -Type File -Path "./$otherFile" -Force );
 }
+Invoke-WebRequest "https://llama-the-ultimate.glitch.me/feed.xml?url=https%3A%2F%2Fllama-the-ultimate.org" -OutFile (New-Item -Type File -Path "./feed.xml" -Force );
 
 $stuffFiles = $stuff.notes | % { $_.file }
 
