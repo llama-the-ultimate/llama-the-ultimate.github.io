@@ -1,4 +1,5 @@
 # What do the lambdas?
+:blurb Some lambda calculus syntax and semantics.
 :date 2017-07-24
 :special lambda
 
@@ -19,8 +20,6 @@ For example, can take a look at expression `(λa.a (foo a)) bar` and its sub-exp
 * `λa.a (foo a)` is a function abstraction with a parameter `x` and a body `a (foo a)`
 * `a (foo a)` is a function application with a function `a` and argument `foo a`
 * `foo a` is a function application with a function `foo` and argument `a`
-
-And we can do a little tree-drawing, maybe like this:
 
 <= img /assets/lambdatree.svg An expression tree for `(λa.a (foo a)) bar`
 

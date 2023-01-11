@@ -8,4 +8,5 @@ I run into this kind of thing pretty frequently:
 
 ## Enterprise Software Engineering
 
+### Bad error messages and validation errors in particular
 

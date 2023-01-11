@@ -1,4 +1,5 @@
 # Code Mesh and infinite llamas
+:blurb Y combinator.
 :date 2017-11-08
 
 Kind of a companion post for a Code Mesh talk we did:

@@ -1,4 +1,5 @@
 # Pairs
+:blurb It’s Real Programming if you can make getters.
 :date 2017-07-30
 :special lambda
 

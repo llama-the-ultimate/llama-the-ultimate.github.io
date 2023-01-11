@@ -1,4 +1,5 @@
 # Something, foldr, sugar
+:blurb foldr and constructor replacement.
 :date 2017-08-04
 
 I dunno. Does taking away some sugar and infixity make some things more clear?

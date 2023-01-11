@@ -1,4 +1,5 @@
 # The dawn of glorp
+:blurb A smol markup language for blog.
 
 I think Einar said that if you want to blog you should write blog posts, not write blog engine. At least sometimes people say something like that.
 

@@ -1,4 +1,5 @@
 # The 4 types of technical debt
+:blurb Tech, ni, cal and debt.
 :date 2018-06-19
 
 I think this title is pretty thought leader because it sounds like fairly assertive and also has a number in it.

@@ -1,4 +1,5 @@
 # Successor
+:blurb +1
 :date 2017-12-29
 :special lambda
 

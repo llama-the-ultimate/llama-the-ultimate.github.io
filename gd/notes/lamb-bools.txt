@@ -1,4 +1,5 @@
 # Some booly functions
+:blurb Business logic!
 :date 2017-07-27
 :special lambda
 

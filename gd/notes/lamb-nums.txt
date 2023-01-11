@@ -1,4 +1,5 @@
 # Some numbery functions
+:blurb Some lambda calculus.
 :date 2017-07-06
 :special lambda
 

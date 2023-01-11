@@ -115,11 +115,11 @@
     return res;
   }
 
-  const baseLinker = (dirlist) => (line) => {
+  const baseLinker = (relify) => (line) => {
     const linkType = line.args[0].str;
     if (line.type === "include") {
       if (linkType === "img") {
-        return `<p><img src="${relify(line.args[1].str, dirlist)}" alt="${
+        return `<p><img src="${relify(line.args[1].str)}" alt="${
           line.text.str
         }"></p>`;
       } else {
@@ -133,24 +133,24 @@
       const descStr = descHtml !== "" ? descHtml : url;
       if (linkType === "gd") {
         const withHtml = `${url.endsWith(".txt") ? url.slice(0, -4) : url}.html`;
-        const htmlUrl = relify(`/notes/${withHtml}`, dirlist);
+        const htmlUrl = relify(`/notes/${withHtml}`);
         return `<a href="${htmlUrl}">${descStr}</a>`;
       }
       if (linkType === "url") {
-        return `<a href="${relify(url, dirlist)}">${descStr}</a>`;
+        return `<a href="${relify(url)}">${descStr}</a>`;
       } else if (linkType === "me") {
-        return `<a rel="me" href="${relify(url, dirlist)}">${descStr}</a>`;
+        return `<a rel="me" href="${relify(url)}">${descStr}</a>`;
       }
       return renderError(line.full, `unknown type "${escapeHtml(linkType)}"`);
     }
     return renderError(line.full, `unkown link type "${line.type}"`);
   };
 
-  const renderLinks = (arr, linker) => {
+  const renderLinks = (arr, linker, plain) => {
     if (arr.length === 1) {
       return `<p>${linker(arr[0])}</p>`;
     }
-    let str = `<ul class="links">`;
+    let str = `<ul${plain ? "" : ` class="links"`}>` ;
     for (const x of arr) {
       str += `<li>${linker(x)}</li>`;
     }
@@ -167,7 +167,7 @@
     return str;
   };
 
-  const renderError = (content, description) =>
+  const renderError = (content, description, plain) => plain ? "" :
     `<pre class="error" title="${escapeHtml(description)}">${escapeHtml(
       content
     )}</pre>`;
@@ -186,7 +186,8 @@
     return str;
   };
 
-  const render = (arr, linker, prextra) => {
+  const render = (arr, linker, prextra, plainHtml) => {
+    const plain = plainHtml === true;
     let i;
     const gather = (type) => {
       const res = [arr[i]];
@@ -225,7 +226,7 @@
           case "quote":
             return renderQuote(gather("quote"));
           case "link":
-            return renderLinks(gather("link"), linker);
+            return renderLinks(gather("link"), linker, plain);
           case "li":
             return renderLis(gather("li"));
           case "hr":
@@ -241,7 +242,7 @@
           case "include":
             return linker(line);
           case "error":
-            return renderError(line.line, line.description);
+            return renderError(line.line, line.description, plain);
           case "keyval":
             return "";
           default:

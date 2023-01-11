@@ -1,4 +1,5 @@
 # Types of functions
+:blurb Functions are sometimes a useful way to think about things.
 :date 2018-06-09
 
 Blah. So functions are fun and for me they are often a useful way to think about programs.

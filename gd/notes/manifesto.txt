@@ -1,4 +1,5 @@
 # Manifesto for software development
+:blurb I like smol.
 :date 2018-10-06
 
 Small over large.

@@ -1,4 +1,5 @@
 # Land of some other order
+:blurb Order of evaluation-stuff.
 :date 2019-06-09
 
 We start with

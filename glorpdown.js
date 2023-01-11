@@ -4,7 +4,11 @@
 (() => {
   const render = require("./renderHtml.js");
   const myRender = (parsed, element) =>
-    (element.innerHTML = render.render(parsed, render.linker([]), render.prextra));
+    (element.innerHTML = render.render(
+      parsed,
+      render.linker((url) => render.relify(url, [])),
+      render.prextra
+    ));
   const editor = require("./editor.js").create(
     myRender,
     `# Test
@@ -45,5 +49,4 @@ No code, but:
   );
   const editors = document.getElementById("editors");
   editors.appendChild(editor);
-
 })();

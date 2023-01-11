@@ -1,0 +1,7 @@
+# Briefcases and libraries
+
+> Each of these projects contributed its own lessons, tools and techniques. Moore carried microfiche listings of all previous projects in his briefcase, and often referred to them to get the code for some unique primitive or driver from the past. Frequently used words might become a standard fixture of the system. Also, improved techniques for solving common problems were integrated into the system.
+
+=> url https://www.forth.com/resources/forth-programming-language/ The Evolution of Forth
+
+
