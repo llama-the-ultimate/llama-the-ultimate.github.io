@@ -10,7 +10,7 @@
   <body class="all-content">
     <div class="content">
       <p><a href="./../index.html">Index</a></p><p>2017-08-04</p>
-      <h1>Something, foldr, sugar</h1><p>I dunno. Does taking away some sugar and infixity make some things more clear?</p><p>Some Standard ML:</p><pre>- nonfix +;
+      <h1>Something, foldr, sugar</h1><p>I dunno. Does taking away some sugar and infixity make some things more clear?</p><p>Some Standard ML:</p><pre><code>- nonfix +;
 nonfix +
 - + (1, 2);
 val it = 3 : int
@@ -20,15 +20,15 @@ nonfix ::
 val it = [1,2,3] : int list
 - foldr + 0 (:: (1, :: (2, :: (3, nil))));
 val it = 6 : int
-</pre><p>(We removed the infix thing from <code>+</code> and <code>::</code> (the plus function and the list “cons”). They take tupled arguments. Infix <code>1 + 2</code> is nonfix <code>+ (1, 2)</code>, and so on.)</p><p>Here, I guess we can say that</p><pre>foldr + 0 (:: (1, :: (2, :: (3, nil))))
-</pre><p>is kind of equivalent to</p><pre>+ (1, + (2, + (3, 0))).
-</pre><p>And it is maybe more clear how</p><pre>+ (1, + (2, + (3, 0)))
-</pre><p>is similar to the list</p><pre>0 (:: (1, :: (2, :: (3, nil)))
-</pre><p>It is like the list we but with the list constructors, <code>::</code> and <code>nil</code>, replaced with <code>+</code> and <code>0</code> (the first two values we gave to <code>foldr</code>).</p><p>Also maybe unsurprising that</p><pre>foldr :: nil (:: (1, :: (2, :: (3, nil))))
-</pre><p>will be equivalent to</p><pre>:: (1, :: (2, :: (3, nil)))
-</pre><p>and evaluate to a list that looks like the one we started with?</p><hr><p>(At least, more clear than when saying that</p><pre>foldr (op +) 0 [1, 2, 3]
-</pre><p>is equivalent to</p><pre>1 + (2 + (3 + 0))?)
-</pre><hr><p>And also like maybe not I dunno.</p>
+</code></pre><p>(We removed the infix thing from <code>+</code> and <code>::</code> (the plus function and the list “cons”). They take tupled arguments. Infix <code>1 + 2</code> is nonfix <code>+ (1, 2)</code>, and so on.)</p><p>Here, I guess we can say that</p><pre><code>foldr + 0 (:: (1, :: (2, :: (3, nil))))
+</code></pre><p>is kind of equivalent to</p><pre><code>+ (1, + (2, + (3, 0))).
+</code></pre><p>And it is maybe more clear how</p><pre><code>+ (1, + (2, + (3, 0)))
+</code></pre><p>is similar to the list</p><pre><code>0 (:: (1, :: (2, :: (3, nil)))
+</code></pre><p>It is like the list we but with the list constructors, <code>::</code> and <code>nil</code>, replaced with <code>+</code> and <code>0</code> (the first two values we gave to <code>foldr</code>).</p><p>Also maybe unsurprising that</p><pre><code>foldr :: nil (:: (1, :: (2, :: (3, nil))))
+</code></pre><p>will be equivalent to</p><pre><code>:: (1, :: (2, :: (3, nil)))
+</code></pre><p>and evaluate to a list that looks like the one we started with?</p><hr><p>(At least, more clear than when saying that</p><pre><code>foldr (op +) 0 [1, 2, 3]
+</code></pre><p>is equivalent to</p><pre><code>1 + (2 + (3 + 0))?)
+</code></pre><hr><p>And also like maybe not I dunno.</p>
     </div>
   </body>
 </html>

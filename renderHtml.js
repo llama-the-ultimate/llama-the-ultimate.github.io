@@ -172,17 +172,17 @@
       content
     )}</pre>`;
 
-  const basePrextra = (alt) => alt.str === "" ? "" : ` title="${alt.str}"`;
+  const basePrextra = (alt) => alt.str === `` ? "" : ` title="${alt.str}"`;
   
   const renderPre = (arr, prextra) => {
-    let str = `<pre${prextra(arr[0].text)}>`;
+    let str = `<pre${prextra(arr[0].text)}><code>`;
     const len =
       arr[arr.length - 1].type === "toggle" ? arr.length - 1 : arr.length;
     for (let i = 1; i < len; i++) {
       const line = arr[i];
       str += `${escapeHtml(line.full)}\n`;
     }
-    str += "</pre>";
+    str += "</code></pre>";
     return str;
   };
 
