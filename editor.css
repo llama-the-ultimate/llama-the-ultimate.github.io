@@ -1,7 +1,3 @@
-:root {
-  --editor-bg-color: #f8f8f8;
-  --editor-border-color: #333333;
-}
 
 body {
   display: flex;
@@ -44,9 +40,7 @@ ul.notes-list {
 
 textarea.editor {
   white-space: break-spaces;
-  background-color: var(--editor-bg-color);
   border-style: solid;
-  border-color: var(--editor-border-color);
   border-width: 1px;
   width: 40rem;
   height: 100%;

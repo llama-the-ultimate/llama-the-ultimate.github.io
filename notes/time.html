@@ -7,10 +7,9 @@
     <link rel="icon" type="image/x-icon" href="./../assets/icon.png">
     <link rel="stylesheet" href="./../style.css">
   </head>
-  <body class="all-content">
-    <div class="content">
-      <p><a href="./../index.html">Index</a></p><p>2018-01-21</p>
-      <h1>Sculpting in java.time</h1><pre><code>public final class Instant
+  <body class="post">
+    <p><a href="./../index.html">Index</a></p><p>2018-01-21</p>
+    <h1>Sculpting in java.time</h1><pre><code>public final class Instant
 extends Object
 implements Temporal, TemporalAdjuster, Comparable&lt;Instant&gt;, Serializable
 </code></pre><p>This class models a single instantaneous point on the time-line. Time is one and undivided.</p><p>If you throw even a cursory glance into the past, at the life which lies behind you, not even recalling its most vivid moments, you are struck every time by the singularity of the events in which you took part, the unique individuality of the characters whom you met. This singularity is like the dominant note of every moment of existence; in each moment of life, the life principle itself is unique. To achieve this, the class stores a <code>long</code> representing epoch-seconds and an <code>int</code> representing nanosecond-of-second, which will always be between 0 and 999,999,999.</p><p>Life, constantly moving and changing, allows everyone to interpret and feel each separate moment in his own way; use of identity-sensitive operations (including reference equality (<code>==</code>), identity hash code, or synchronization) on instances of <code>Instant</code> may have unpredictable results and should be avoided.</p><hr><pre><code>public final class Duration
@@ -21,6 +20,5 @@ extends Object
 </code></pre><p>A clock providing access to the current instant, date and time using a time-zone.</p><p>In a certain sense the past is far more real, or at any rate more stable, more resilient than the present. The present slips and vanishes like sand between the fingers, acquiring material weight only in its recollection.</p><p>Best practice for applications is to pass a <code>Clock</code> into any method that requires the current instant.</p><hr><pre><code>public class DateTimeException
 extends RuntimeException
 </code></pre><p>Time can vanish without trace in our material world for it is a subjective, spiritual category. This exception is used to indicate problems with creating, querying and manipulating date-time objects.</p>
-    </div>
   </body>
 </html>

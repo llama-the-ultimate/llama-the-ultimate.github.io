@@ -1,14 +1,16 @@
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
+
 html {
   font-family: sans-serif;
 }
 
-.all-content {
+.post {
   max-width: 70rem;
   margin: 0 auto;
-}
-
-.content {
-  margin: 1rem;
 }
 
 p, pre, ul, blockquote, hr {
@@ -61,11 +63,11 @@ pre, code {
   white-space: pre;
 }
 
-
 ul {
   list-style-type: disc;
   list-style-position: inside;
 }
+
 ul.links {
   list-style-type: none;
 }

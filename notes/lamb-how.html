@@ -18,10 +18,9 @@
     <script src="./../lambs/repl.js" defer></script>
     <script src="./../lambs/editor.js" defer></script>
   </head>
-  <body class="all-content">
-    <div class="content">
-      <p><a href="./../index.html">Index</a></p><p>2017-07-12</p>
-      <h1>How do the lambdas?</h1><p><a href="./lambs.html">(There's a list with all the lambda notes here.)</a></p><p>Assuming you're viewing this in a web browser with JavaScript and so on...</p><p>Some editors are readonly. Its content is evaluated when page loads or so. Mostly for adding definitions to toplevel so they can be used later in the post:</p><pre class="lambs" data-prelude="true"><code>id ≜ λx.x
+  <body class="post">
+    <p><a href="./../index.html">Index</a></p><p>2017-07-12</p>
+    <h1>How do the lambdas?</h1><p><a href="./lambs.html">(There's a list with all the lambda notes here.)</a></p><p>Assuming you're viewing this in a web browser with JavaScript and so on...</p><p>Some editors are readonly. Its content is evaluated when page loads or so. Mostly for adding definitions to toplevel so they can be used later in the post:</p><pre class="lambs" data-prelude="true"><code>id ≜ λx.x
 0 ≜ λf.λx.x
 ω ≜ λx.x x
 </code></pre><hr><p>In the regular editors we can do stuff.</p><pre class="lambs"><code>(can do stuff here)
@@ -32,6 +31,5 @@
 </code></pre><p>If we wanna get rid of a definition we can do <code>&lt;identifier&gt; ≜ :(</code>, or just <code>&lt;identifier&gt; ≜</code>. We’ll remove <code>ω</code> (it’s scary): (ctrl+enter)</p><pre class="lambs"><code>ω ≜ :(
 </code></pre><p>If we try to evaluate the thing we did earler, we won’t get the same result now, since <code>ω</code> will just be treated as some free variable... (ctrl+r, then ctrl+shift+enter)</p><pre class="lambs"><code>(λa.λb.b a) 0 ω 0
 </code></pre><hr><p>That’s more or less it. In posts like this it’s mostly enough to do ctrl+enter on definitions, and ctrl+r and then ctrl+shift+enter on other stuff...</p>
-    </div>
   </body>
 </html>

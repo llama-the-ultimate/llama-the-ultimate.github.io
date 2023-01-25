@@ -7,10 +7,9 @@
     <link rel="icon" type="image/x-icon" href="./../assets/icon.png">
     <link rel="stylesheet" href="./../style.css">
   </head>
-  <body class="all-content">
-    <div class="content">
-      <p><a href="./../index.html">Index</a></p><p>2017-08-04</p>
-      <h1>Something, foldr, sugar</h1><p>I dunno. Does taking away some sugar and infixity make some things more clear?</p><p>Some Standard ML:</p><pre><code>- nonfix +;
+  <body class="post">
+    <p><a href="./../index.html">Index</a></p><p>2017-08-04</p>
+    <h1>Something, foldr, sugar</h1><p>I dunno. Does taking away some sugar and infixity make some things more clear?</p><p>Some Standard ML:</p><pre><code>- nonfix +;
 nonfix +
 - + (1, 2);
 val it = 3 : int
@@ -29,6 +28,5 @@ val it = 6 : int
 </code></pre><p>and evaluate to a list that looks like the one we started with?</p><hr><p>(At least, more clear than when saying that</p><pre><code>foldr (op +) 0 [1, 2, 3]
 </code></pre><p>is equivalent to</p><pre><code>1 + (2 + (3 + 0))?)
 </code></pre><hr><p>And also like maybe not I dunno.</p>
-    </div>
   </body>
 </html>

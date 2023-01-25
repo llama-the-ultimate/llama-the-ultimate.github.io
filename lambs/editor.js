@@ -79,9 +79,19 @@ const Editor = (() => {
 
     return CodeMirror(elem, props);
   };
+  const editors = [];
+  const updateTheme = () => {
+    const theme = (window.matchMedia('(prefers-color-scheme: dark)').matches) ? "night" : "default";
+    for (const editor of editors) {
+      editor.setOption("theme", theme);
+    }
+  };
   window.addEventListener("load", (event) => {
     for (const el of document.getElementsByClassName("lambs")) {
-      create(el);
+      editors.push(create(el));
     }
+    updateTheme();
   });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateTheme);
+  
 })();

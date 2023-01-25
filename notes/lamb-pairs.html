@@ -18,10 +18,9 @@
     <script src="./../lambs/repl.js" defer></script>
     <script src="./../lambs/editor.js" defer></script>
   </head>
-  <body class="all-content">
-    <div class="content">
-      <p><a href="./../index.html">Index</a></p><p>2017-07-30</p>
-      <h1>Pairs</h1><p><a href="./lambs.html">(There's a list with all the lambda notes here.)</a></p><p>Prelude. Some things we defined in earlier posts:</p><pre class="lambs" data-prelude="true"><code>0 ≜ λf.λx.x
+  <body class="post">
+    <p><a href="./../index.html">Index</a></p><p>2017-07-30</p>
+    <h1>Pairs</h1><p><a href="./lambs.html">(There's a list with all the lambda notes here.)</a></p><p>Prelude. Some things we defined in earlier posts:</p><pre class="lambs" data-prelude="true"><code>0 ≜ λf.λx.x
 1 ≜ λf.λx.f x
 2 ≜ λf.λx.f (f x)
 + ≜ λa.λb.λf.λx.a f (b f x)
@@ -47,6 +46,5 @@ useful-things ≜ compose useful-thing2 useful-thing1
 
 useful-things (+ 1 2)
 </code></pre><p>Woop.</p>
-    </div>
   </body>
 </html>

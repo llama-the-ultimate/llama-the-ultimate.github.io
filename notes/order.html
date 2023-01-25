@@ -7,10 +7,9 @@
     <link rel="icon" type="image/x-icon" href="./../assets/icon.png">
     <link rel="stylesheet" href="./../style.css">
   </head>
-  <body class="all-content">
-    <div class="content">
-      <p><a href="./../index.html">Index</a></p><p>2019-06-09</p>
-      <h1>Land of some other order</h1><p>We start with</p><pre><code>#lang racket
+  <body class="post">
+    <p><a href="./../index.html">Index</a></p><p>2019-06-09</p>
+    <h1>Land of some other order</h1><p>We start with</p><pre><code>#lang racket
 </code></pre><p>or</p><pre><code>#lang lazy
 </code></pre><p>And make some natural and/or unnatural numbers:</p><pre><code>(struct zero () #:transparent)
 (struct succ (pred) #:transparent)
@@ -31,6 +30,5 @@
 (&lt;= (inf) two)
 </code></pre><p>The next one will run forever in both <code>#lang racket</code> and <code>#lang lazy</code>.</p><pre><code>(&lt;= (inf) (inf))
 </code></pre><p>(Forever means until we are out of memory or something.)</p><p>Anyway. We can choose:</p><ul><li>If we want as many expressions as possible to give back values, we might prefer <code>#lang lazy</code></li><li>If we want as many applications as possible of <code>&lt;=</code> to give back values, we might prefer <code>#lang racket</code></li></ul><p>(In <code>#lang racket</code> the forever happens when evaluating the <code>(inf)</code>-arguments before the <code>&lt;=</code>-function is applied. In <code>#lang lazy</code> we might have to decide: Is it the <code>(inf)</code> or the <code>&lt;=</code> that causes forever? Is it reasonably to expect there to be a base case?)</p>
-    </div>
   </body>
 </html>
