@@ -2,15 +2,12 @@
 /* require */
 
 (() => {
-  const render = require("./renderHtml.js");
-  const myRender = (parsed, element) =>
-    (element.innerHTML = render.render(
-      parsed,
-      render.linker((url) => render.relify(url, [])),
-      render.prextra
-    ));
+  const renderHtml = require("./renderHtml.js");
+  const renderer = renderHtml.create(renderHtml.relify([]));
   const editor = require("./editor.js").create(
-    myRender,
+    (parsed, element) => {
+      element.innerHTML = renderHtml.render(renderer, parsed);
+    },
     `# Test
 
 Some text.

@@ -71,13 +71,12 @@ const Editor = (() => {
 
   const create = (elem) => {
     const str = elem.innerText;
-    elem.innerText = "";
     const props =
       elem.dataset.prelude === "true"
         ? preluditorProps(str)
         : editorProps(str);
 
-    return CodeMirror(elem, props);
+    return CodeMirror((el => elem.parentElement.replaceChild(el, elem)), props);
   };
   const editors = [];
   const updateTheme = () => {

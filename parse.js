@@ -11,7 +11,10 @@
     for (i = start; i < str.length && isWs(str[i]); i++) {}
     return str.substring(start, i);
   };
-  const start = (startString) => (str) => (!str.startsWith(startString)) ? null : strws(startString, ws(str, startString.length));
+  const start = (startString, type) => (str) =>
+    !str.startsWith(startString)
+      ? null
+      : { type: type, strws: strws(startString, ws(str, startString.length)) };
 
   const word = (str, start) => {
     let res = "";
@@ -32,8 +35,8 @@
       res.push(new syntax.Span(mode, mode, buf));
       mode = nextMode;
       buf = "";
-    }
-    
+    };
+
     let escape = false;
     for (let i = start; i < str.length; i++) {
       const c = str[i];
@@ -57,7 +60,7 @@
             buf += c;
           }
         } else {
-          buf += c;          
+          buf += c;
         }
       }
     }
@@ -65,11 +68,14 @@
     return new syntax.Text(res, ws);
   };
 
-  const parser = (type, start, args) => (str) => {
-    const first = start(str);
-    if (first === null) {
+  const parser = (typetest, args) => (str) => {
+    const res = typetest(str);
+    if (res === null) {
       return null;
     }
+    const type = res.type;
+    const first = res.strws;
+
     let pos = first.length;
     if (args === undefined) {
       return new syntax.Line(type, first, [], restText(str, pos));
@@ -85,27 +91,43 @@
     }
     return new syntax.Line(type, first, words, restText(str, pos));
   };
-  
-  const lparser = (type, startString, args) => parser(type, start(startString), args);
-    
+
+  const lparser = (type, startString, args) =>
+    parser(start(startString, type), args);
+
   const toggleStart = (str) => {
     if (!str.startsWith("```")) {
       return null;
-    } 
+    }
     let res = "```";
     for (let i = 3; i < str.length && !isWs(str[i]); i++) {
       res += str[i];
     }
-    return strws(res, ws(str, res.length));
+    return { type: "toggle", strws: strws(res, ws(str, res.length)) };
   };
-8
-  const toggleParser = parser("toggle", toggleStart);
-  const textParser = lparser("par", "");
+  
+  const quoteStart = (str) => {
+    if (!str.startsWith(">")) {
+      return null;
+    }
+    const rest = ws(str, 1);    
+    const type = (rest.length === str.length - 1) ? "quoteempty" : "quote";
+    return { type: type, strws: strws(">", rest) };
+  }
+  const textStart = (str) => {
+    const rest = ws(str, 0); 
+    const type = (rest.length === str.length) ? "empty" : "par";
+    return { type: type, strws: strws("", rest)};
+  }
+  
+  const toggleParser = parser(toggleStart);
+  const textParser = parser(textStart);
+  const quoteParser = parser(quoteStart);
   const parsers = [
     lparser("h3", "###"),
     lparser("h2", "##"),
     lparser("h1", "#"),
-    lparser("quote", ">"),
+    quoteParser,
     lparser("link", "=>", 2),
     lparser("include", "<=", 2),
     lparser("li", "*"),
@@ -153,7 +175,7 @@
           pre = null;
           push(tg);
         } else {
-          push(textParser(buf));
+          push(new syntax.PreLine(buf));
         }
       } else if (pre) {
         push(new syntax.PreLine(buf));
@@ -181,11 +203,11 @@
     return {
       parsed: res,
       title: title === null ? "untitled" : title,
-      meta: meta
+      meta: meta,
     };
   };
 
   module.exports = {
-    parse: parse
+    parse: parse,
   };
 })();

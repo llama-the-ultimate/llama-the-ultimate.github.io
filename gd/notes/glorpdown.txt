@@ -80,9 +80,9 @@ Regular links are similar to the ones in Gemtext, but with a “type” argument
 
 Unlike in Gemtext there’s a different line type for stuff that should be included in, or viewed in context of, the document. Typically images:
 ```
-<= img https://placekitten.com/200/300
+<= img https://placekitten.com/200/300 A kitten!
 ```
-<= img https://placekitten.com/200/300
+<= img https://placekitten.com/200/300 A kitten!
 
 (In my mind the way this makes sense is that the `=>`-arrow points to some thing that you can go to, while the `<=`-arrow is more like, the thing is moving into the current document.)
 

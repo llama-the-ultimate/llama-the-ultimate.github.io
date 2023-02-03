@@ -1,0 +1,45 @@
+# Markup for hypertext
+:blurb It is funny to capitalize the T in HyperText and it is funny that that’s done in “HTML.”
+:date 2023-02-03
+
+So I write posts in Glorpdown, but web browser support for Glorpdown is not spectacular. There exists a HyperText Markup Language that is sometimes used for marking up hypertext. And it is possible to convert Glorpdown to HTML and serve that instead. Many web browsers come with support for HTML :)
+
+=> url https://html.spec.whatwg.org/ HTML has a bunch of stuff in it.
+=> gd glorpdown.txt Glorpdown has less stuff in it.
+So when converting I get to choose which bits of HTML to use for what. I’ve learned some HTML and have ended up with something like this for now:
+
+## HTML
+
+Reasonably semantic. `h1`/`h2`/`h3`, `p`, `ul` and `li`, `figure` and `figcaption`, `blockquote`, `em` and `code` and `pre`. Stuff like that. No `div`s. Almost no CSS classes. No JavaScript for pages that are basically just text content. I use JavaScript when I have actually interactive content, like editors with REPL-functionality in the lambda calculus posts.
+
+For images I used to use an `img` tag and put any description in its `alt` attribute. Then I wanted the description to show up not just as an _alternative_ to the image so I also put it in the `title` attribute. I think that was a bad idea and that a screen reader would maybe read both the `title` and the `alt`, and also `title` seems a little awkward since you often have to like go look for it by hovering over the image or something. Now I put the `img` in a `figure`, leave the `alt` empty and put the description in a `figcaption` instead.
+=> url https://stackoverflow.com/a/58468470 This “`alt` and `figcaption`”-answer seems good.
+
+I _could_ add stuff like `nav` and `main` and maybe `header`. I haven’t bothered with it since there’d be so little stuff outside of `main` anyway, like the `nav` would contain only the index-link. But I dunno maybe I should.
+
+## Also CSS
+
+The HTML should be mostly fine on its own. It’d be nice if user style sheets were more of a thing and I could just give HTML and let it be styled according to the preferences of whoever was reading. But because circumstances, I apply some styling. I think my “philosophy” is that if I think that a piece of CSS is small and understandable and makes something look better, then okay fine. If something takes a lot of CSS and/or it feels like I’m fighting with it, then I won’t bother. I might look for an alternative solution or something, or maybe just decide that no actually I _want_ it to look the way it does without additional styling.
+
+I use one CSS `class` that I've called “page”. It sets `max-width` to 70rem, which seems to make for a line length that isn’t too bad. For the regular text content pages, I put the page-class on the `body`-element. Not styling the `body` directly here because I’m using the same CSS file for stuff like my Glorpdown editor, where I want to use more of the horizontal space (editor and preview side by side).
+
+For everything else I use element selectors, or `:root`. Like I apply some styling to the `p`s, not to some class I’m using for my paragraphs. I used to think I should use classes for styling. I don’t remember why. Maybe it appeared to be best practice or “more flexible” or something, or maybe it was just that I though that “classes are CSS stuff.” Either way, I don’t actually want to have like five different ways to style paragraphs and it’s less noisy without the classes :)
+
+So there’s stuff like:
+* `font-family: sans-serif`, because because.
+* `max-width` set to `100%` for `img` to keep them within the `70rem` thing. Also I let the images be links to the themselves, so if the image is too small and you don’t want to zoom in on the page you can click the image instead.
+* I mostly set `padding` to `0` and use `margin` instead. My impression is that the margin collapse thing makes sense for stuff like this. (Like, I want at least _this_ much space above a `h2`, but I don’t need to have it _in addition_ to the empty space that I want to have under the last `p` before the heading.)
+* Mostly `rem`-values for margins and font sizes.
+* I set `font-size` for the heading-elements and for `pre`/`code`. I think code/monospace and regular text next to each other looked a bit weird before I increased the font size for the code.
+* I add a border to the left of `blockquote`s. I’m a bit uncertain about that choice. Feels a little extravagant. Also `padding` to the left since the the `padding` (but not the `margin`) goes between the border and the text.
+* `color-scheme: light dark` for `:root:`. So if people want dark they get dark.
+
+I dunno. Okay.
+
+=> url /style.css The CSS I’m using is here. It’s like 60-70 lines these days, which seems okay to me.
+
+----
+
+I’ve remade this website a few times. One of the times I did that I thought I wanted to make it look good and I read some practical typography. I no longer want to make it look good. But like I guess it’s a nice book if you’re into that kind of thing:
+=> url https://practicaltypography.com/ Butterick’s Practical Typography
+I mean it’s _probably_ the only book on typography that has a section called “Why Racket? Why Lisp?”

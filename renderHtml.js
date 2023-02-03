@@ -1,5 +1,7 @@
 "use strict";
 (() => {
+  const syntax = require("./syntax.js");
+
   const escapeMap = new Map([
     ["&", "&amp;"],
     ["<", "&lt;"],
@@ -7,6 +9,7 @@
     ['"', "&quot;"],
     ["''", "&apos;"],
   ]);
+
   const escapeHtml = (str) => {
     let res = "";
     for (const c of str) {
@@ -15,74 +18,22 @@
     return res;
   };
 
-  const split = (arr) => {
-    const res = [];
-    let current = [];
-    for (const x of arr) {
-      if (x.text.str === "") {
-        res.push(current);
-        current = [];
+  const textHtml = (text) => {
+    let res = "";
+    for (const x of text.list) {
+      const html = escapeHtml(x.str);
+      if (x.open === "_") {
+        res += `<em>${html}</em>`;
+      } else if (x.open === "`") {
+        res += `<code>${html}</code>`;
       } else {
-        current.push(x);
+        res += `${x.open}${html}${x.close}`;
       }
-    }
-    res.push(current);
-    return res;
-  };
-
-  const splitPara = (arr) => {
-    const res = split(arr);
-    if (res[res.length - 1].length === 0) {
-      res.pop();
-    }
-    if (res.length > 0 && res[0].length === 0) {
-      res.shift();
     }
     return res;
   };
 
-  const renderLines = (arr) => {
-    let str = textHtml(arr[0].text);
-    for (let i = 1; i < arr.length; i++) {
-      str += "<br>";
-      str += textHtml(arr[i].text);
-    }
-    return str;
-  };
-
-  const renderPara = (arr) => {
-    let str = "";
-    for (const a of splitPara(arr)) {
-      if (a.length === 0) {
-        str += "<br>";
-      } else {
-        str += `<p>${renderLines(a)}</p>`;
-      }
-    }
-    return str;
-  };
-
-  const renderQuote = (arr) => {
-    let splitted = split(arr);
-
-    if (splitted.every(a =>  a.length === 0)) {
-      return `<blockquote>${"<br>".repeat(splitted.length - 1)}</blockquote>`;
-    };
-    
-    const pars = splitted.length > 1;
-    let str = "<blockquote>";
-    for (const a of splitted) {
-      if (a.length === 0) {
-        str += "<br>";
-      } else {
-         str += pars ? `<p>${renderLines(a)}</p>` : renderLines(a);
-      }
-    }
-    str += "</blockquote>";
-    return str;
-  };
-
-  const relify = (url, dirlist) => {
+  const baseRelify = (dirlist) => (url) => {
     if (url[0] !== "/") {
       return url;
     }
@@ -99,167 +50,194 @@
     const urlPath = i === urlDir.length ? "" : `${urlDir.slice(i).join("/")}/`;
     return `./${parenting}${urlPath}${urlEnd}`;
   };
-  
-  const textHtml = (text) => {
-    let res = "";
-    for (const x of text.list) {
-      const html =  escapeHtml(x.str);
-      if (x.open === "_") {
-        res += `<em>${html}</em>`;
-      } else if (x.open === "`") {
-        res += `<code>${html}</code>`;
-      } else {
-        res += `${x.open}${html}${x.close}`;
-      }
-    }
-    return res;
-  }
 
-  const baseLinker = (relify) => (line) => {
-    const linkType = line.args[0].str;
-    if (line.type === "include") {
-      if (linkType === "img") {
-        return `<p><img src="${relify(line.args[1].str)}" alt="${
-          line.text.str
-        }"></p>`;
-      } else {
-        return renderError(line.full, `unknown type "${escapeHtml(linkType)}"`);
-      }
-    }
-    if (line.type === "link") {
+  const create = (relify) => {
+    const myRelify = relify === undefined ? baseRelify([]) : relify;
+    const renderError = (content, description) =>
+      `<del title="${escapeHtml(description)}">${escapeHtml(content)}</del>`;
 
+    const renderLink = (line) => {
       const descHtml = textHtml(line.text);
+      const linkType = line.args[0].str;
       const url = line.args[1].str;
       const descStr = descHtml !== "" ? descHtml : url;
       if (linkType === "gd") {
-        const withHtml = `${url.endsWith(".txt") ? url.slice(0, -4) : url}.html`;
-        const htmlUrl = relify(`/notes/${withHtml}`);
-        return `<a href="${htmlUrl}">${descStr}</a>`;
+        const withHtml = `${
+          url.endsWith(".txt") ? url.slice(0, -4) : url
+        }.html`;
+        const htmlUrl = `/notes/${withHtml}`;
+        return `<a href="${myRelify(htmlUrl)}">${descStr}</a>`;
       }
       if (linkType === "url") {
-        return `<a href="${relify(url)}">${descStr}</a>`;
+        return `<a href="${myRelify(url)}">${descStr}</a>`;
       } else if (linkType === "me") {
-        return `<a rel="me" href="${relify(url)}">${descStr}</a>`;
+        return `<a rel="me" href="${myRelify(url)}">${descStr}</a>`;
       }
-      return renderError(line.full, `unknown type "${escapeHtml(linkType)}"`);
-    }
-    return renderError(line.full, `unkown link type "${line.type}"`);
-  };
-
-  const renderLinks = (arr, linker, plain) => {
-    if (arr.length === 1) {
-      return `<p>${linker(arr[0])}</p>`;
-    }
-    let str = `<ul${plain ? "" : ` class="links"`}>` ;
-    for (const x of arr) {
-      str += `<li>${linker(x)}</li>`;
-    }
-    str += "</ul>";
-    return str;
-  };
-
-  const renderLis = (arr) => {
-    let str = "<ul>";
-    for (const x of arr) {
-      str += `<li>${textHtml(x.text)}</li>`;
-    }
-    str += "</ul>";
-    return str;
-  };
-
-  const renderError = (content, description, plain) => plain ? "" :
-    `<pre class="error" title="${escapeHtml(description)}">${escapeHtml(
-      content
-    )}</pre>`;
-
-  const basePrextra = (alt) => alt.str === `` ? "" : ` title="${alt.str}"`;
-  
-  const renderPre = (arr, prextra) => {
-    let str = `<pre${prextra(arr[0].text)}><code>`;
-    const len =
-      arr[arr.length - 1].type === "toggle" ? arr.length - 1 : arr.length;
-    for (let i = 1; i < len; i++) {
-      const line = arr[i];
-      str += `${escapeHtml(line.full)}\n`;
-    }
-    str += "</code></pre>";
-    return str;
-  };
-
-  const render = (arr, linker, prextra, plainHtml) => {
-    const plain = plainHtml === true;
-    let i;
-    const gather = (type) => {
-      const res = [arr[i]];
-      let next;
-      for (next = i + 1; next < arr.length; next++) {
-        const line = arr[next];
-        if (line.type !== type) {
-          i = next - 1;
-          return res;
-        }
-        res.push(arr[next]);
-      }
-      i = next - 1;
-      return res;
-    };
-    const gatherPre = () => {
-      const res = [arr[i]];
-      for (i++; i < arr.length; i++) {
-        const line = arr[i];
-        res.push(arr[i]);
-        if (line.type === "toggle") {
-          return res;
-        }
-      }
-      return res;
+      return `<p>${renderError(
+        line.full,
+        `unknown type "${escapeHtml(linkType)}"`
+      )}</p>`;
     };
 
-    let str = "";
-    for (i = 0; i < arr.length; i++) {
-      const line = arr[i];
+    const captionFrom = (line) => {
+      const html = textHtml(line.text);
+      return html.length === "" ? "" : `<figcaption>${html}</figcaption>`;
+    };
+    const renderInclude = (line) => {
+      const includeType = line.args[0].str;
+      const url = myRelify(line.args[1].str);
+      if (includeType === "img") {
+        return `<figure><a href="${url}"><img src="${url}"></a>${captionFrom(
+          line
+        )}</figure>`;
+      }
+      return `<p>${renderError(
+        line.full,
+        `unknown type "${escapeHtml(includeType)}"`
+      )}</p>`;
+    };
 
-      const nextStr = () => {
+    const renderLine = (line) => {
+      switch (line.type) {
+        case "par":
+        case "quote":
+          return textHtml(line.text);
+        case "link":
+          return renderLink(line);
+        case "li":
+          return `<li>${textHtml(line.text)}</li>`;
+        case "hr":
+          return "<hr>";
+        case "h1":
+          return `<h1>${textHtml(line.text)}</h1>`;
+        case "h2":
+          return `<h2>${textHtml(line.text)}</h2>`;
+        case "h3":
+          return `<h3>${textHtml(line.text)}</h3>`;
+        case "include":
+          return renderInclude(line);
+        case "error":
+          return renderError(line.line, line.description);
+        default:
+          throw "oh no";
+      }
+    };
+
+    const text = (res) => (line) => {
+      switch (line.type) {
+        case "par":
+        case "link":
+        case "error":
+          return text(res + `<br>${renderLine(line)}`);
+        default:
+          return nothing(res + "</p>")(line);
+      }
+    };
+
+    const li = (res) => (line) =>
+      line.type === "li"
+        ? li(res + renderLine(line))
+        : nothing(res + "</ul>")(line);
+
+    const quoteempty = (res) => (line) => {
+      switch (line.type) {
+        case "quoteempty":
+          return quoteempty(res + "<br>");
+        case "quote":
+          return quote(res + `<p>${renderLine(line)}`);
+        default:
+          return nothing(res + "<br></blockquote>")(line);
+      }
+    };
+
+    const quote = (res) => (line) => {
+      switch (line.type) {
+        case "quoteempty":
+          return quoteempty(res + "</p>");
+        case "quote":
+          return quote(res + `<br>${renderLine(line)}`);
+        default:
+          return nothing(res + "</p></blockquote>")(line);
+      }
+    };
+
+    const emptyline = (res) => (line) =>
+      line.type === "empty" ? emptyline(res + "<br>") : nothing(res)(line);
+
+    const pre = (caption, startres) => {
+      const halp = (res) => (line) => {
         switch (line.type) {
-          case "par":
-            return renderPara(gather("par"));
-          case "quote":
-            return renderQuote(gather("quote"));
-          case "link":
-            return renderLinks(gather("link"), linker, plain);
-          case "li":
-            return renderLis(gather("li"));
-          case "hr":
-            return "<hr>";
+          case "pre":
+            return halp(res + `${escapeHtml(line.full)}\n`);
           case "toggle":
-            return renderPre(gatherPre(), prextra);
-          case "h1":
-            return `<h1>${textHtml(line.text)}</h1>`;
-          case "h2":
-            return `<h2>${textHtml(line.text)}</h2>`;
-          case "h3":
-            return `<h3>${textHtml(line.text)}</h3>`;
-          case "include":
-            return linker(line);
-          case "error":
-            return renderError(line.line, line.description, plain);
-          case "keyval":
-            return "";
+            return nothing((res += `</code></pre>${caption}</figure>`));
+          case "end":
+            return nothing((res += `</code></pre>${caption}</figure>`))(line);
           default:
             throw "oh no";
         }
       };
+      return halp(startres);
+    };
 
-      str += nextStr();
+    const nothing = (res) => (line) => {
+      switch (line.type) {
+        case "empty":
+          return emptyline(res);
+        case "par":
+        case "link":
+        case "error":
+          return text(res + `<p>${renderLine(line)}`);
+        case "quote":
+          return quote(res + `<blockquote><p>${renderLine(line)}`);
+        case "quoteempty":
+          return quote(res + "<blockquote><br>")(line);
+        case "li":
+          return li(res + "<ul>")(line);
+        case "hr":
+          return nothing(res + "<hr>");
+        case "toggle":
+          return pre(captionFrom(line), res + `<figure><pre><code>`);
+        case "h1":
+        case "h2":
+        case "h3":
+        case "include":
+          return nothing(res + renderLine(line));
+        case "keyval":
+          return nothing(res);
+        case "end":
+          return res;
+        case "insert":
+          if (line.level === "text") {
+            return text(res + `<p>${line.html}`);
+          }
+          if  (line.level === "outer") {
+            return nothing(res + line.html);
+          }
+          if (line.level === "end") {
+            return nothing(res + line.html)(syntax.End);
+          }
+          throw "oh no";
+        default:
+          throw "oh no";
+      }
+    };
+    return nothing("");
+  };
+
+  const render = (renderer, list) => {
+    let state = renderer;
+    for (const line of list) {
+      state = state(line);
     }
-    return str;
+    return state(syntax.end);
   };
 
   module.exports = {
-    render: render,
+    escapeHtml: escapeHtml,
     textHtml: textHtml,
-    linker: baseLinker,
-    prextra: basePrextra,
-    relify: relify,
+    create: create,
+    render: render,
+    relify: baseRelify,
   };
 })();

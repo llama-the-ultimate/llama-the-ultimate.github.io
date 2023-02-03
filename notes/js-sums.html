@@ -7,52 +7,52 @@
     <link rel="icon" type="image/x-icon" href="./../assets/icon.png">
     <link rel="stylesheet" href="./../style.css">
   </head>
-  <body class="post">
-    <p><a href="./../index.html">Index</a></p><p>2018-10-07</p>
-    <h1>A little JavaScript, a few sums</h1><ul class="links"><li><a href="https://gist.github.com/Glorp/4c7917ad351e1340b07b1cdeb827d62c">Standard ML code</a></li><li><a href="https://gist.github.com/Glorp/fc614dae2d91b79c4c7d4c96785da558">JavaScript code</a></li><li><a href="https://mitpress.mit.edu/books/little-mler">The Little MLer</a></li></ul><p>In chapter 6 of The Little MLer there is some stuff.</p><p>There is <code>fruit</code>:</p><pre><code>datatype fruit =
+  <body class="page">
+    <p><a href="./../index.html">Index</a></p><p><time>2018-10-07</time></p>
+    <h1>A little JavaScript, a few sums</h1><p><a href="https://gist.github.com/Glorp/4c7917ad351e1340b07b1cdeb827d62c">Standard ML code</a><br><a href="https://gist.github.com/Glorp/fc614dae2d91b79c4c7d4c96785da558">JavaScript code</a><br><a href="https://mitpress.mit.edu/books/little-mler">The Little MLer</a></p><p>In chapter 6 of The Little MLer there is some stuff.</p><p>There is <code>fruit</code>:</p><figure><pre><code>datatype fruit =
     Peach
   | Apple
   | Pear
   | Lemon
   | Fig
-</code></pre><p>There is <code>tree</code>:</p><pre><code>datatype tree =
+</code></pre><figcaption></figcaption></figure><p>There is <code>tree</code>:</p><figure><pre><code>datatype tree =
     Bud
   | Flat of fruit * tree
   | Split of tree * tree
-</code></pre><p>There is height, which looks <em>kind of</em> like this in the book:</p><pre><code>(* height : tree -&gt; int *)
+</code></pre><figcaption></figcaption></figure><p>There is height, which looks <em>kind of</em> like this in the book:</p><figure><pre><code>(* height : tree -&gt; int *)
 fun height Bud = 0
   | height (Flat(_,  t)) = 1 + height (t)
   | height (Split(s, t)) = 1 + Int.max (height(s), height(t))
-</code></pre><p>And some other stuff that we don’t want for this. Anyway we can make a couple of trees:</p><pre><code>val smol_tree = Split (Bud, Flat (Peach, Bud))
+</code></pre><figcaption></figcaption></figure><p>And some other stuff that we don’t want for this. Anyway we can make a couple of trees:</p><figure><pre><code>val smol_tree = Split (Bud, Flat (Peach, Bud))
 val larger_tree = Split (Flat (Apple, Flat (Lemon, Bud)), Flat (Peach, Bud))
-</code></pre><p>And so in a REPL:</p><pre><code>- height smol_tree;
+</code></pre><figcaption></figcaption></figure><p>And so in a REPL:</p><figure><pre><code>- height smol_tree;
 val it = 2 : int
 
 - height larger_tree;
 val it = 3 : int
-</code></pre><p>Okay.</p><hr><p>So JavaScript is a pretty nonstandard ML.</p><p>In the book we use sums for the tree-stuff. Sums are also sometimes called tagged unions. We will make a <code>tag</code>-function for tagging some stuff:</p><pre><code>const tag = t =&gt; (...args) =&gt; ({ tag: t, values: [...args] });
-</code></pre><p>We can try to use it:</p><pre><code>tag(&quot;label&quot;)(1, &quot;horse&quot;, [2,3]);
-</code></pre><p>Which gives us: an object</p><pre><code>{
+</code></pre><figcaption></figcaption></figure><p>Okay.</p><hr><p>So JavaScript is a pretty nonstandard ML.</p><p>In the book we use sums for the tree-stuff. Sums are also sometimes called tagged unions. We will make a <code>tag</code>-function for tagging some stuff:</p><figure><pre><code>const tag = t =&gt; (...args) =&gt; ({ tag: t, values: [...args] });
+</code></pre><figcaption></figcaption></figure><p>We can try to use it:</p><figure><pre><code>tag(&quot;label&quot;)(1, &quot;horse&quot;, [2,3]);
+</code></pre><figcaption></figcaption></figure><p>Which gives us: an object</p><figure><pre><code>{
   tag: &quot;label&quot;,
   values: [1, &quot;horse&quot;, [2, 3]],
 }
-</code></pre><p>It appears to have the tag and the stuff we passed in. Good. We can make constructors then.</p><p>Fruit:</p><pre><code>const Peach = tag(&quot;Peach&quot;)();
+</code></pre><figcaption></figcaption></figure><p>It appears to have the tag and the stuff we passed in. Good. We can make constructors then.</p><p>Fruit:</p><figure><pre><code>const Peach = tag(&quot;Peach&quot;)();
 const Apple = tag(&quot;Apple&quot;)();
 const Pear = tag(&quot;Pear&quot;)();
 const Lemon = tag(&quot;Lemon&quot;)();
 const Fig = tag(&quot;Fig&quot;)();
-</code></pre><p>Tree:</p><pre><code>const Bud = tag(&quot;Bud&quot;)();
+</code></pre><figcaption></figcaption></figure><p>Tree:</p><figure><pre><code>const Bud = tag(&quot;Bud&quot;)();
 const Flat = tag(&quot;Flat&quot;);
 const Split = tag(&quot;Split&quot;);
-</code></pre><p>(<code>Flat </code>and <code>Split </code>are constructor-functions that need additional stuff when we use them to construct stuff. The other ones are constructors that don’t need additional stuff, so we have like already passed in the no arguments to those.)</p><p>Now we can make the trees:</p><pre><code>smol_tree = Split(Bud, Flat(Peach, Bud));
+</code></pre><figcaption></figcaption></figure><p>(<code>Flat </code>and <code>Split </code>are constructor-functions that need additional stuff when we use them to construct stuff. The other ones are constructors that don’t need additional stuff, so we have like already passed in the no arguments to those.)</p><p>Now we can make the trees:</p><figure><pre><code>smol_tree = Split(Bud, Flat(Peach, Bud));
 const larger_tree = Split(Flat(Apple, Flat(Lemon, Bud)), Flat(Peach, Bud));
-</code></pre><p>So we have half the sum stuff now. We can construct. We want destruct.</p><p>Okay with sums it’s like, in order to construct a value you have to do <em>one of the things</em>. A fruit is a peach <em>or</em> an apple <em>or</em> one of the other ones. In order to construct one we only have to choose one of them.</p><p>But when we’re going to destruct a value, that value can be any one of the things, so we have to know how to deal with <em>all the things</em>. We have to know what to do if it is a peach <em>and</em> we have to know what to do if it is an apple <em>and</em> so on.</p><p>So if we have a product of all the things, like maybe an object along the lines of:</p><pre><code>{
+</code></pre><figcaption></figcaption></figure><p>So we have half the sum stuff now. We can construct. We want destruct.</p><p>Okay with sums it’s like, in order to construct a value you have to do <em>one of the things</em>. A fruit is a peach <em>or</em> an apple <em>or</em> one of the other ones. In order to construct one we only have to choose one of them.</p><p>But when we’re going to destruct a value, that value can be any one of the things, so we have to know how to deal with <em>all the things</em>. We have to know what to do if it is a peach <em>and</em> we have to know what to do if it is an apple <em>and</em> so on.</p><p>So if we have a product of all the things, like maybe an object along the lines of:</p><figure><pre><code>{
   Peach: // what to do if it is a peach
   Apple: // what to do if it is an apple
   // and so on...
 }
-</code></pre><p>Then we can use the tag from the sum-thing to look up the “what to do” in the product-thing. We will make a <code>match</code>-function for destructing sums:</p><pre><code>const match = cases =&gt; x =&gt; cases[x.tag](...x.values);
-</code></pre><p>We can try to make a function with match:</p><pre><code>const is_apple =
+</code></pre><figcaption></figcaption></figure><p>Then we can use the tag from the sum-thing to look up the “what to do” in the product-thing. We will make a <code>match</code>-function for destructing sums:</p><figure><pre><code>const match = cases =&gt; x =&gt; cases[x.tag](...x.values);
+</code></pre><figcaption></figcaption></figure><p>We can try to make a function with match:</p><figure><pre><code>const is_apple =
   match(
     {
       Peach: () =&gt; false,
@@ -62,9 +62,9 @@ const larger_tree = Split(Flat(Apple, Flat(Lemon, Bud)), Flat(Peach, Bud));
       Fig: () =&gt; false
     }
   );
-</code></pre><p>And then use it:</p><pre><code>is_apple(Apple);
+</code></pre><figcaption></figcaption></figure><p>And then use it:</p><figure><pre><code>is_apple(Apple);
 is_apple(Fig);
-</code></pre><p>That gives us <code>true</code> and <code>false</code>. Seems fine.</p><p><code>height</code> then:</p><pre><code>const height =
+</code></pre><figcaption></figcaption></figure><p>That gives us <code>true</code> and <code>false</code>. Seems fine.</p><p><code>height</code> then:</p><figure><pre><code>const height =
   match(
     {
       Bud: () =&gt; 0,
@@ -72,8 +72,8 @@ is_apple(Fig);
       Split: (a, b) =&gt; 1 + Math.max(height(a), height(b))
     }
   );
-</code></pre><p>Test:</p><pre><code>height(smol_tree);
+</code></pre><figcaption></figcaption></figure><p>Test:</p><figure><pre><code>height(smol_tree);
 height(larger_tree);
-</code></pre><p>Gives us 2 and 3. Okay.</p>
+</code></pre><figcaption></figcaption></figure><p>Gives us 2 and 3. Okay.</p>
   </body>
 </html>

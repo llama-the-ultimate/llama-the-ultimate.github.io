@@ -84,6 +84,14 @@
     }
   }
   
+  class Insert {
+    constructor(html, level) {
+      this.type = "insert";
+      this.html = html;
+      this.level = level === undefined ? "outer" : level;
+    }
+  }
+  
   module.exports = {
     StrWs: StrWs,
     modes: modes,
@@ -92,5 +100,7 @@
     Line: Line,
     PreLine: PreLine,
     ErrorLine: ErrorLine,
+    Insert: Insert,
+    end: { type: "end" },
   };
 })();
