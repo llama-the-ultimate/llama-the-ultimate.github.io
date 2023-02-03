@@ -76,7 +76,7 @@ const Editor = (() => {
         ? preluditorProps(str)
         : editorProps(str);
 
-    return CodeMirror((el => elem.parentElement.replaceChild(el, elem)), props);
+    return CodeMirror((editor => elem.parentElement.replaceChild(editor, elem)), props);
   };
   const editors = [];
   const updateTheme = () => {
@@ -86,7 +86,8 @@ const Editor = (() => {
     }
   };
   window.addEventListener("load", (event) => {
-    for (const el of document.getElementsByClassName("lambs")) {
+    const elems = [...document.getElementsByClassName("lambs")];
+    for (const el of elems) {
       editors.push(create(el));
     }
     updateTheme();
