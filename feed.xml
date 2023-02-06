@@ -12,6 +12,76 @@
       <link>https://llama-the-ultimate.org</link>
     </image>
     <item>
+      <title>Drawing a Sokoban level</title>
+      <link>https://llama-the-ultimate.org/notes/sokoboko-gfx.html</link>
+      <description>“imageSmoothingEnabled = false” is JavaScript for “tighten up”</description>
+      <pubDate>Mon, 06 Feb 2023 00:00:00 GMT</pubDate>
+      <guid>https://llama-the-ultimate.org/notes/sokoboko-gfx.html</guid>
+      <content:encoded><![CDATA[<h1>Drawing a Sokoban level</h1><p>JavaScript is not a Lisp and a web browser is not a Lisp machine. But, you know, definitely more Lisp machiney than most of the things that <em>everyone has installed</em>. I like how alive things are in them, and how lots of fun stuff is like very within reach if you’re in one :)</p><p><a href="https://llama-the-ultimate.orghttps://en.wikipedia.org/wiki/Sokoban">Sokoban is fun stuff.</a></p><p>Anyway, this is best viewed in a browser with JavaScript enabled. You can click the play/run-buttons to run the JavaScript in the embedded editors. It should behave mostly like running the same code in the JavaScript console. (Hitting F12 or something and finding the console might also be useful if you wanna look around and inspect stuff more or something.)</p><h2>A level</h2><p><a href="https://llama-the-ultimate.orghttp://www.sokobano.de/wiki/index.php?title=Level_format">Sokoban level format.</a></p><ul><li><code>#</code> is wall</li><li>space is empty floor</li><li><code>.</code> is goal square</li><li><code>@</code> is player, or <code>+</code> if the player is on a goal square</li><li><code>$</code> is box, or <code>*</code> if the box is on a goal square</li></ul><figure><pre><code>const levelString = `
+#########
+#  $ @..#
+# $ $   #
+#  ###  #
+# $     #
+##  ##..#
+#########
+`;
+const level = levelString.slice(1, -1).split(&quot;\n&quot;).map(x =&gt; x.split(&quot;&quot;));
+console.log(level);
+</code></pre><figcaption>repl</figcaption></figure><h2>Image onto a canvas</h2><p>We have a variable called <code>outElement</code> here. <code>outElement</code> is just some <code>div</code>, and like it’d also work to just do <code>document.body.appendChild(...)</code> or something, but <code>outElement</code> is automatically moved to where we’re at when we run some code:</p><figure><pre><code>const spriteSheet = outElement.appendChild(document.createElement(&quot;img&quot;));
+spriteSheet.src = &quot;/assets/soko-sprites.png&quot;
+spriteSheet.alt = &quot;sprite sheet&quot;;
+</code></pre><figcaption>repl</figcaption></figure><p>The sprite sheet is a set of 8 sprites. Each sprite is 16×16 pixels.</p><p>We’ll create a canvas and put it in the <code>outElement</code>.<br><a href="https://llama-the-ultimate.orghttps://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage">Then we can get a <code>CanvasRenderingContext2D</code> and use <code>drawImage</code> on that.</a><br>Also we turn off image smoothing because pixels. Also also, we multiply some numbers by 3, because more pixels.</p><figure><pre><code>const canvas = document.createElement(&quot;canvas&quot;);
+outElement.replaceChildren(canvas);
+const scale = 3;
+canvas.width = spriteSheet.width  * scale;
+canvas.height = spriteSheet.height * scale;
+const ctx = canvas.getContext(&quot;2d&quot;);
+ctx.imageSmoothingEnabled = false;
+
+ctx.drawImage(
+  spriteSheet,
+  0,
+  0,
+  spriteSheet.width * scale,
+  spriteSheet.height * scale
+);
+</code></pre><figcaption>repl</figcaption></figure><h2>Drawing one square</h2><p>We’re going to need objects with <code>x</code> and <code>y</code> properties for a bunch of stuff. First for positions of sprites. Later for positions in the level and also for directions the player can move in. We make a <code>vector</code> data structure:</p><figure><pre><code>const vector = (x, y) =&gt; ({ x: x, y: y });
+console.log(vector(4, 2));
+</code></pre><figcaption>repl</figcaption></figure><p>We’ll create an object for keeping track of where in the sprite sheet the different sprites are. Then, by passing a bunch of arguments to <code>drawImage</code> we can specify coordinates and width/height both for the part of the source image we want to draw and for the destination in the canvas. (The last 4 arguments are “destination” arguments. The ones that are multiplied by <code>scale</code>.)</p><figure><pre><code>const sprites = {
+  &quot; &quot;: vector(0, 0), // top left is empty floor
+  &quot;#&quot;: vector(1, 0), // top right is wall
+  &quot;@&quot;: vector(0, 1), // middle left is player
+  &quot;+&quot;: vector(0, 1), // same sprite for player on goal square
+  &quot;$&quot;: vector(1, 1), // middle right is “box”
+  &quot;.&quot;: vector(0, 2), // bottom left is goal square
+  &quot;*&quot;: vector(1, 2), // middle left is “box” on a goal square
+};
+
+const drawSquare = (square, position) =&gt; {
+  const sprite = sprites[square];
+  ctx.drawImage(
+    spriteSheet,
+    sprite.x * 16,
+    sprite.y * 16,
+    16,
+    16,
+    position.x * 16 * scale,
+    position.y * 16 * scale,
+    16 * scale,
+    16 * scale
+  );
+};
+
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+drawSquare(&quot;@&quot;, vector(1, 2));
+</code></pre><figcaption>repl</figcaption></figure><h2>Drawing the level</h2><figure><pre><code>canvas.width = level[0].length * 16 * scale;
+canvas.height = level.length * 16 * scale;
+ctx.imageSmoothingEnabled = false;
+level.forEach((row, y) =&gt; row.forEach((square, x) =&gt; drawSquare(square, vector(x, y))));
+</code></pre><figcaption>repl</figcaption></figure><p>Is level.</p>]]></content:encoded>
+    </item>
+    <item>
       <title>Markup for hypertext</title>
       <link>https://llama-the-ultimate.org/notes/html.html</link>
       <description>It is funny to capitalize the T in HyperText and it is funny that that’s done in “HTML.”</description>
@@ -106,29 +176,32 @@ val it = 2 : int
 
 - height larger_tree;
 val it = 3 : int
-</code></pre><figcaption></figcaption></figure><p>Okay.</p><hr><p>So JavaScript is a pretty nonstandard ML.</p><p>In the book we use sums for the tree-stuff. Sums are also sometimes called tagged unions. We will make a <code>tag</code>-function for tagging some stuff:</p><figure><pre><code>const tag = t =&gt; (...args) =&gt; ({ tag: t, values: [...args] });
-</code></pre><figcaption></figcaption></figure><p>We can try to use it:</p><figure><pre><code>tag(&quot;label&quot;)(1, &quot;horse&quot;, [2,3]);
-</code></pre><figcaption></figcaption></figure><p>Which gives us: an object</p><figure><pre><code>{
-  tag: &quot;label&quot;,
-  values: [1, &quot;horse&quot;, [2, 3]],
-}
-</code></pre><figcaption></figcaption></figure><p>It appears to have the tag and the stuff we passed in. Good. We can make constructors then.</p><p>Fruit:</p><figure><pre><code>const Peach = tag(&quot;Peach&quot;)();
+</code></pre><figcaption></figcaption></figure><p>Okay.</p><hr><p>So JavaScript is a pretty nonstandard ML. If you view this in a web browser you should be able to click the play/run buttons to run the JavaScript.</p><p>In the book we use sums for the tree-stuff. Sums are also sometimes called tagged unions. We will make a <code>tag</code>-function for tagging some stuff and then try to tag something:</p><figure><pre><code>const tag = t =&gt; (...args) =&gt; ({ tag: t, values: [...args] });
+console.log(tag(&quot;label&quot;)(1, &quot;horse&quot;, [2,3]));
+</code></pre><figcaption>repl</figcaption></figure><p>Which gives us an object with <code>&quot;label&quot;</code> for its <code>tag</code> and <code>[1, &quot;horse&quot;, [2, 3]]</code> for its <code>values</code>. That is the tag and the stuff we passed in. Good. We can make constructors and some trees now:</p><figure><pre><code>// fruit constructors:
+const Peach = tag(&quot;Peach&quot;)();
 const Apple = tag(&quot;Apple&quot;)();
 const Pear = tag(&quot;Pear&quot;)();
 const Lemon = tag(&quot;Lemon&quot;)();
 const Fig = tag(&quot;Fig&quot;)();
-</code></pre><figcaption></figcaption></figure><p>Tree:</p><figure><pre><code>const Bud = tag(&quot;Bud&quot;)();
+
+// tree constructors:
+const Bud = tag(&quot;Bud&quot;)();
 const Flat = tag(&quot;Flat&quot;);
 const Split = tag(&quot;Split&quot;);
-</code></pre><figcaption></figcaption></figure><p>(<code>Flat </code>and <code>Split </code>are constructor-functions that need additional stuff when we use them to construct stuff. The other ones are constructors that don’t need additional stuff, so we have like already passed in the no arguments to those.)</p><p>Now we can make the trees:</p><figure><pre><code>smol_tree = Split(Bud, Flat(Peach, Bud));
+
+smol_tree = Split(Bud, Flat(Peach, Bud));
 const larger_tree = Split(Flat(Apple, Flat(Lemon, Bud)), Flat(Peach, Bud));
-</code></pre><figcaption></figcaption></figure><p>So we have half the sum stuff now. We can construct. We want destruct.</p><p>Okay with sums it’s like, in order to construct a value you have to do <em>one of the things</em>. A fruit is a peach <em>or</em> an apple <em>or</em> one of the other ones. In order to construct one we only have to choose one of them.</p><p>But when we’re going to destruct a value, that value can be any one of the things, so we have to know how to deal with <em>all the things</em>. We have to know what to do if it is a peach <em>and</em> we have to know what to do if it is an apple <em>and</em> so on.</p><p>So if we have a product of all the things, like maybe an object along the lines of:</p><figure><pre><code>{
+
+console.log(smol_tree);
+</code></pre><figcaption>repl</figcaption></figure><p>So we have half the sum stuff now. We can construct. We want destruct.</p><p>Okay with sums it’s like, in order to construct a value you have to do <em>one of the things</em>. A fruit is a peach <em>or</em> an apple <em>or</em> one of the other ones. In order to construct one we only have to choose one of them.</p><p>But when we’re going to destruct a value, that value can be any one of the things, so we have to know how to deal with <em>all the things</em>. We have to know what to do if it is a peach <em>and</em> we have to know what to do if it is an apple <em>and</em> so on.</p><p>So if we have a product of all the things, like maybe an object along the lines of:</p><figure><pre><code>{
   Peach: // what to do if it is a peach
   Apple: // what to do if it is an apple
   // and so on...
 }
 </code></pre><figcaption></figcaption></figure><p>Then we can use the tag from the sum-thing to look up the “what to do” in the product-thing. We will make a <code>match</code>-function for destructing sums:</p><figure><pre><code>const match = cases =&gt; x =&gt; cases[x.tag](...x.values);
-</code></pre><figcaption></figcaption></figure><p>We can try to make a function with match:</p><figure><pre><code>const is_apple =
+
+const is_apple =
   match(
     {
       Peach: () =&gt; false,
@@ -138,9 +211,10 @@ const larger_tree = Split(Flat(Apple, Flat(Lemon, Bud)), Flat(Peach, Bud));
       Fig: () =&gt; false
     }
   );
-</code></pre><figcaption></figcaption></figure><p>And then use it:</p><figure><pre><code>is_apple(Apple);
-is_apple(Fig);
-</code></pre><figcaption></figcaption></figure><p>That gives us <code>true</code> and <code>false</code>. Seems fine.</p><p><code>height</code> then:</p><figure><pre><code>const height =
+
+console.log(is_apple(Apple));
+console.log(is_apple(Fig));
+</code></pre><figcaption>repl</figcaption></figure><p>Gives us <code>true</code> and <code>false</code>. Seems fine.</p><p><code>height</code> then:</p><figure><pre><code>const height =
   match(
     {
       Bud: () =&gt; 0,
@@ -148,9 +222,10 @@ is_apple(Fig);
       Split: (a, b) =&gt; 1 + Math.max(height(a), height(b))
     }
   );
-</code></pre><figcaption></figcaption></figure><p>Test:</p><figure><pre><code>height(smol_tree);
-height(larger_tree);
-</code></pre><figcaption></figcaption></figure><p>Gives us 2 and 3. Okay.</p>]]></content:encoded>
+
+console.log(height(smol_tree));
+console.log(height(larger_tree));
+</code></pre><figcaption>repl</figcaption></figure><p>Gives us 2 and 3. Okay.</p>]]></content:encoded>
     </item>
     <item>
       <title>Manifesto for software development</title>

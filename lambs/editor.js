@@ -86,7 +86,7 @@ const Editor = (() => {
     }
   };
   window.addEventListener("load", (event) => {
-    const elems = [...document.getElementsByClassName("lambs")];
+    const elems = [...document.getElementsByClassName("repl")];
     for (const el of elems) {
       editors.push(create(el));
     }
