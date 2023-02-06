@@ -37,7 +37,7 @@ We have a variable called `outElement` here. `outElement` is just some `div`, an
 
 ``` repl
 const spriteSheet = outElement.appendChild(document.createElement("img"));
-spriteSheet.src = "/assets/soko-sprites.png"
+spriteSheet.src = "./../assets/soko-sprites.png"
 spriteSheet.alt = "sprite sheet";
 ```
 

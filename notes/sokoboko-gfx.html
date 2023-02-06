@@ -23,7 +23,7 @@
 const level = levelString.slice(1, -1).split(&quot;\n&quot;).map(x =&gt; x.split(&quot;&quot;));
 console.log(level);
 </code></pre></figure><h2>Image onto a canvas</h2><p>We have a variable called <code>outElement</code> here. <code>outElement</code> is just some <code>div</code>, and like it’d also work to just do <code>document.body.appendChild(...)</code> or something, but <code>outElement</code> is automatically moved to where we’re at when we run some code:</p><figure class="repl"><pre><code>const spriteSheet = outElement.appendChild(document.createElement(&quot;img&quot;));
-spriteSheet.src = &quot;/assets/soko-sprites.png&quot;
+spriteSheet.src = &quot;./../assets/soko-sprites.png&quot;
 spriteSheet.alt = &quot;sprite sheet&quot;;
 </code></pre></figure><p>The sprite sheet is a set of 8 sprites. Each sprite is 16×16 pixels.</p><p>We’ll create a canvas and put it in the <code>outElement</code>.<br><a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage">Then we can get a <code>CanvasRenderingContext2D</code> and use <code>drawImage</code> on that.</a><br>Also we turn off image smoothing because pixels. Also also, we multiply some numbers by 3, because more pixels.</p><figure class="repl"><pre><code>const canvas = document.createElement(&quot;canvas&quot;);
 outElement.replaceChildren(canvas);
