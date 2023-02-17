@@ -1,6 +1,7 @@
 $urls = ConvertFrom-Json((Invoke-WebRequest "https://llama-the-ultimate.glitch.me/rpc/links?url=https%3A%2F%2Fllama-the-ultimate.org").Content);
 foreach  ($url in $urls) {
   $path = ".$(([uri]$url).AbsolutePath)";
+  Write-Host $uri;
   Invoke-WebRequest $url -OutFile (New-Item -Type File -Path $path -Force);
 }
 
