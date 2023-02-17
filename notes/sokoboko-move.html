@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sokoban: Making cat move</title>
+    <link rel="icon" type="image/x-icon" href="./../assets/icon.png">
+    <link rel="stylesheet" href="./../style.css">
+    <link rel="stylesheet" href="./../js-editor.css">
+    <script src="./../js-editor.js" defer></script>
+  </head>
+  <body class="page"><p><a href="./../index.html">Index</a></p><h1>Sokoban: Making cat move</h1><p><a href="./sokoboko-gfx.html">In previous post we drew a level.</a></p><p>We ended up with almost this code:</p><figure class="repl"><pre><code>const level = `
+#########
+#  $ @..#
+# $ $   #
+#  ###  #
+# $     #
+##  ##..#
+#########
+`.slice(1, -1).split(&quot;\n&quot;).map(x =&gt; x.split(&quot;&quot;));
+
+const spriteSheet = outElement.appendChild(document.createElement(&quot;img&quot;));
+spriteSheet.src = &quot;./../assets/soko-sprites.png&quot;
+spriteSheet.alt = &quot;sprite sheet&quot;;
+
+const canvas = document.createElement(&quot;canvas&quot;);
+outElement.replaceChildren(canvas);
+const scale = 3;
+canvas.width = level[0].length * 16 * scale;
+canvas.height = level.length * 16 * scale;
+
+const ctx = canvas.getContext(&quot;2d&quot;);
+ctx.imageSmoothingEnabled = false;
+
+const vector = (x, y) =&gt; ({ x: x, y: y });
+
+const sprites = {
+  &quot; &quot;: vector(0, 0), // top left is empty floor
+  &quot;#&quot;: vector(1, 0), // top right is wall
+  &quot;@&quot;: vector(0, 1), // middle left is player
+  &quot;+&quot;: vector(0, 1), // same sprite for player on goal square
+  &quot;$&quot;: vector(1, 1), // middle right is “box”
+  &quot;.&quot;: vector(0, 2), // bottom left is goal square
+  &quot;*&quot;: vector(1, 2), // middle left is “box” on a goal square
+};
+
+const drawSquare = (square, position) =&gt; {
+  const sprite = sprites[square];
+  ctx.drawImage(
+    spriteSheet,
+    sprite.x * 16,
+    sprite.y * 16,
+    16,
+    16,
+    position.x * 16 * scale,
+    position.y * 16 * scale,
+    16 * scale,
+    16 * scale
+  );
+};
+
+const drawLevel = () =&gt; {
+  level.forEach((row, y) =&gt; row.forEach((square, x) =&gt; drawSquare(square, vector(x, y))));
+};
+
+spriteSheet.onload = () =&gt; drawLevel();
+</code></pre></figure><h2>Positioning</h2><p>We want to move the cat. We can make a function that returns it position, so that we know where to move it from. (Cats tend to move from where they are.)</p><figure class="repl"><pre><code>const playerPosition = () =&gt; {
+  for ([y, row] of level.entries()) {
+    for ([x, square] of row.entries()) {
+      if (square === &quot;@&quot; || square === &quot;+&quot;) {
+        return vector(x, y);
+      }
+    }
+  }
+};
+
+console.log(playerPosition());
+</code></pre></figure><p><a href="http://www.sokobano.de/wiki/index.php?title=Level_format#Solution">A Sokoban solution is like a string where each character corresponds to one move made.</a></p><p>We will make vectors for the directions the cat can move in, and a plus-function that we can use for adding a direction to a position. We’ll use the (lowercase) letters that are used in Sokoban solutions as property names.</p><figure class="repl"><pre><code>const directions = {
+  u: vector(0, -1),
+  d: vector(0, 1),
+  l: vector(-1, 0),
+  r: vector(1, 0),  
+};
+
+const plus = (a, b) =&gt; vector(a.x + b.x, a.y + b.y);
+
+console.log(plus(playerPosition(), directions.l));
+</code></pre></figure><p>Should be the position of the square just to the left of the cat.</p><h2>Being stupid</h2><p>Okay the array with the arrays with the characters is not a <em>great</em> way to model things. I like using the symbols from the level format but it <em>is</em> awkward having more than one symbol for one thing. Something that takes different “collision layers” or something into account probably makes it easier to implement some things.</p><p><a href="https://www.puzzlescript.net/">PuzzleScript is cool btw.</a></p><p>Also, instead of one move being a functional update of the game state or something like that, we’ll just mutate the arrays. I think there’s a fun and side-effecty way to do the movement. Also it’s fun to like recklessly mutate state and then trust that we can implement undo-functionality in order to restore the state we destroyed :)</p></body>
+</html>

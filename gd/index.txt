@@ -9,6 +9,6 @@ Blah blah. I’m a Jonas
 
 => url /feed.xml RSS feed
 
-=> gd lambs.txt List of lambda calculus stuff
+=> gd lambs List of lambda calculus stuff
 
 Posts:

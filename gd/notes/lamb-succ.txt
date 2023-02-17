@@ -3,7 +3,7 @@
 :date 2017-12-29
 :special lambda
 
-=> gd lambs.txt (There's a list with all the lambda notes here.)
+=> gd lambs (There's a list with all the lambda notes here.)
 
 We have made some numbers and some functions for working with numbers. Also some other datatypes.
 

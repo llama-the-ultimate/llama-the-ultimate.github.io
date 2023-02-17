@@ -3,7 +3,7 @@
 :date 2017-07-06
 :special lambda
 
-=> gd lambs.txt (There's a list with all the lambda notes here.)
+=> gd lambs (There's a list with all the lambda notes here.)
 
 Somewhat a test-post, for having not-dead lambda calculus within a post. If you're viewing this in a web browser and it runs the JavaScript and so on, it should be interactive.
 

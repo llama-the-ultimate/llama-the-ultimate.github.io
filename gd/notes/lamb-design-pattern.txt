@@ -3,9 +3,9 @@
 :date 2018-01-14
 :special lambda
 
-=> gd lambs.txt (There's a list with all the lambda notes here.)
+=> gd lambs (There's a list with all the lambda notes here.)
 
-=> gd lamb-succ.txt Previously we made zero and successor:
+=> gd lamb-succ Previously we made zero and successor:
 ``` prelude
 0 ≜ λf.λx.x
 

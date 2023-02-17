@@ -5,7 +5,7 @@
 So I write posts in Glorpdown, but web browser support for Glorpdown is not spectacular. There exists a HyperText Markup Language that is sometimes used for marking up hypertext. And it is possible to convert Glorpdown to HTML and serve that instead. Many web browsers come with support for HTML :)
 
 => url https://html.spec.whatwg.org/ HTML has a bunch of stuff in it.
-=> gd glorpdown.txt Glorpdown has less stuff in it.
+=> gd glorpdown Glorpdown has less stuff in it.
 So when converting I get to choose which bits of HTML to use for what. I’ve learned some HTML and have ended up with something like this for now:
 
 ## HTML

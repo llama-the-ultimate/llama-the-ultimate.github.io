@@ -1,9 +1,20 @@
 
-body {
+input:invalid {
+  border-color: red;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.row {
   display: flex;
   flex-direction: row;
   gap: 1rem;
 }
+
 
 .editors {
   flex: 1;
@@ -43,8 +54,8 @@ textarea.editor {
   border-style: solid;
   border-width: 1px;
   width: 40rem;
-  height: 100%;
-  resize: horizontal;
+  height: 40rem;
+  resize: both;
   overflow: auto;
 }
 .preview {
@@ -58,7 +69,6 @@ input.editor {
 .editor-and-preview {
   gap: 1rem;
   display: flex;
-  height: 90vh;
   flex-direction: row;
 }
 
@@ -74,4 +84,8 @@ input.editor {
 
 .half-item {
   flex: 0 0 50%;
+}
+
+summary {
+  margin: 1rem 0 1rem 0;
 }

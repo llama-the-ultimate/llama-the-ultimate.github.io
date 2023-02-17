@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Some booly functions</title>
     <link rel="icon" type="image/x-icon" href="./../assets/icon.png">
     <link rel="stylesheet" href="./../style.css">
@@ -19,9 +19,7 @@
     <script src="./../lambs/repl.js" defer></script>
     <script src="./../lambs/editor.js" defer></script>
   </head>
-  <body class="page">
-    <p><a href="./../index.html">Index</a></p><p><time>2017-07-27</time></p>
-    <h1>Some booly functions</h1><p><a href="./lambs.html">(There's a list with all the lambda notes here.)</a></p><p>Bit of prelude first.</p><p><a href="./lamb-nums.html">Some stuff from an earlier numbery post:</a></p><figure class="repl" data-prelude="true"><pre><code>0 ≜ λf.λx.x
+  <body class="page"><p><a href="./../index.html">Index</a></p><p><time>2017-07-27</time></p><h1>Some booly functions</h1><p><a href="./lambs.html">(There's a list with all the lambda notes here.)</a></p><p>Bit of prelude first.</p><p><a href="./lamb-nums.html">Some stuff from an earlier numbery post:</a></p><figure class="repl" data-prelude="true"><pre><code>0 ≜ λf.λx.x
 1 ≜ λf.λx.f x
 2 ≜ λf.λx.f (f x)
 5 ≜ λf.λx.f (f (f (f (f x))))
@@ -55,6 +53,5 @@ zero? 2
 do-business 2 5
 
 do-business 2 0
-</code></pre></figure><p>That’s a lot of business.</p><hr><p>(Oh. If we cared about side effects or performance or something, we could worry about stuff like: Will the else-stuff be evaluated even if the boolean is true and we really only want the then-stuff? We don’t really care, since it’s going to correctly return the stuff we want either way. But if we cared: We’re evaluating things in normal order, and will give the then-stuff and the else-stuff to the boolean first, before we “step into” any of the then-stuff or else-stuff. So in the case of true the else-stuff will disappear before we do anything with it.)</p>
-  </body>
+</code></pre></figure><p>That’s a lot of business.</p><hr><p>(Oh. If we cared about side effects or performance or something, we could worry about stuff like: Will the else-stuff be evaluated even if the boolean is true and we really only want the then-stuff? We don’t really care, since it’s going to correctly return the stuff we want either way. But if we cared: We’re evaluating things in normal order, and will give the then-stuff and the else-stuff to the boolean first, before we “step into” any of the then-stuff or else-stuff. So in the case of true the else-stuff will disappear before we do anything with it.)</p></body>
 </html>

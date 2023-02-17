@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Land of some other order</title>
     <link rel="icon" type="image/x-icon" href="./../assets/icon.png">
     <link rel="stylesheet" href="./../style.css">
   </head>
-  <body class="page">
-    <p><a href="./../index.html">Index</a></p><p><time>2019-06-09</time></p>
-    <h1>Land of some other order</h1><p>We start with</p><figure><pre><code>#lang racket
+  <body class="page"><p><a href="./../index.html">Index</a></p><p><time>2019-06-09</time></p><h1>Land of some other order</h1><p>We start with</p><figure><pre><code>#lang racket
 </code></pre><figcaption></figcaption></figure><p>or</p><figure><pre><code>#lang lazy
 </code></pre><figcaption></figcaption></figure><p>And make some natural and/or unnatural numbers:</p><figure><pre><code>(struct zero () #:transparent)
 (struct succ (pred) #:transparent)
@@ -29,6 +27,5 @@
 
 (&lt;= (inf) two)
 </code></pre><figcaption></figcaption></figure><p>The next one will run forever in both <code>#lang racket</code> and <code>#lang lazy</code>.</p><figure><pre><code>(&lt;= (inf) (inf))
-</code></pre><figcaption></figcaption></figure><p>(Forever means until we are out of memory or something.)</p><p>Anyway. We can choose:</p><ul><li>If we want as many expressions as possible to give back values, we might prefer <code>#lang lazy</code></li><li>If we want as many applications as possible of <code>&lt;=</code> to give back values, we might prefer <code>#lang racket</code></li></ul><p>(In <code>#lang racket</code> the forever happens when evaluating the <code>(inf)</code>-arguments before the <code>&lt;=</code>-function is applied. In <code>#lang lazy</code> we might have to decide: Is it the <code>(inf)</code> or the <code>&lt;=</code> that causes forever? Is it reasonably to expect there to be a base case?)</p>
-  </body>
+</code></pre><figcaption></figcaption></figure><p>(Forever means until we are out of memory or something.)</p><p>Anyway. We can choose:</p><ul><li>If we want as many expressions as possible to give back values, we might prefer <code>#lang lazy</code></li><li>If we want as many applications as possible of <code>&lt;=</code> to give back values, we might prefer <code>#lang racket</code></li></ul><p>(In <code>#lang racket</code> the forever happens when evaluating the <code>(inf)</code>-arguments before the <code>&lt;=</code>-function is applied. In <code>#lang lazy</code> we might have to decide: Is it the <code>(inf)</code> or the <code>&lt;=</code> that causes forever? Is it reasonably to expect there to be a base case?)</p></body>
 </html>

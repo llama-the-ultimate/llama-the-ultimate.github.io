@@ -3,7 +3,7 @@
 :date 2017-07-12
 :special lambda
 
-=> gd lambs.txt (There's a list with all the lambda notes here.)
+=> gd lambs (There's a list with all the lambda notes here.)
 
 Assuming you're viewing this in a web browser with JavaScript and so on...
 

@@ -10,7 +10,7 @@ After looking into dark mode stuff, I have this in my CSS:
 Which should “opt the entire page into the user's color scheme preferences.”
 => url https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme color-scheme - CSS: Cascading Style Sheets | MDN
 
-It’s nice to support dark mode stuff, but it’s particularly nice that if I throw that in everything just works _except the parts where I have tried too hard to make things look good_.
+It’s nice to support dark mode stuff and I that bit of copypasting probably means I’m pretty talented. But it’s particularly nice that if I throw that in everything just works _except the parts where I have tried too hard to make things look good_.
 
 After putting that in and turning on dark mode in the browser, I couldn’t see the text in the editor I use for writing Glorpdown. The text was now white and I had at some point decided to use like a slightly darker white than default as background colour for that `textarea`. So white text on white-but-not-exactly-as-white-as-the-other-white background. Of course, even in light mode, the background colour I had chosen made little difference and didn’t actually look better than the default or anything. It was just a case of me “adjusting things” and then thinking I was a genius because I had done _something_.
 

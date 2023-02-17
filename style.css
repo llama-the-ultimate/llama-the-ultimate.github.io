@@ -10,6 +10,10 @@ html {
   max-width: 70rem;
   margin: 1rem auto 0 auto;
 }
+body {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
 
 p, pre, ul, hr {
   margin: 1rem 0 1rem 0;

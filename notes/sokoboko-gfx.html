@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Drawing a Sokoban level</title>
     <link rel="icon" type="image/x-icon" href="./../assets/icon.png">
     <link rel="stylesheet" href="./../style.css">
     <link rel="stylesheet" href="./../js-editor.css">
     <script src="./../js-editor.js" defer></script>
   </head>
-  <body class="page">
-    <p><a href="./../index.html">Index</a></p><p><time>2023-02-06</time></p>
-    <h1>Drawing a Sokoban level</h1><p>JavaScript is not a Lisp and a web browser is not a Lisp machine. But, you know, definitely more Lisp machiney than most of the things that <em>everyone has installed</em>. I like how alive things are in them, and how lots of fun stuff is like very within reach if you’re in one :)</p><p><a href="https://en.wikipedia.org/wiki/Sokoban">Sokoban is fun stuff.</a></p><p>Anyway, this is best viewed in a browser with JavaScript enabled. You can click the play/run-buttons to run the JavaScript in the embedded editors. It should behave mostly like running the same code in the JavaScript console. (Hitting F12 or something and finding the console might also be useful if you wanna look around and inspect stuff more or something.)</p><h2>A level</h2><p><a href="http://www.sokobano.de/wiki/index.php?title=Level_format">Sokoban level format.</a></p><ul><li><code>#</code> is wall</li><li>space is empty floor</li><li><code>.</code> is goal square</li><li><code>@</code> is player, or <code>+</code> if the player is on a goal square</li><li><code>$</code> is box, or <code>*</code> if the box is on a goal square</li></ul><figure class="repl"><pre><code>const levelString = `
+  <body class="page"><p><a href="./../index.html">Index</a></p><p><time>2023-02-06</time></p><h1>Drawing a Sokoban level</h1><p>JavaScript is not a Lisp and a web browser is not a Lisp machine. But, you know, definitely more Lisp machiney than most of the things that <em>everyone has installed</em>. I like how alive things are in them, and how lots of fun stuff is like very within reach if you’re in one :)</p><p><a href="https://en.wikipedia.org/wiki/Sokoban">Sokoban is fun stuff.</a></p><p>Anyway, this is best viewed in a browser with JavaScript enabled. You can click the play/run-buttons to run the JavaScript in the embedded editors. It should behave mostly like running the same code in the JavaScript console. (Hitting F12 or something and finding the console might also be useful if you wanna look around and inspect stuff more or something.)</p><h2>A level</h2><p><a href="http://www.sokobano.de/wiki/index.php?title=Level_format">Sokoban level format.</a></p><ul><li><code>#</code> is wall</li><li>space is empty floor</li><li><code>.</code> is goal square</li><li><code>@</code> is player, or <code>+</code> if the player is on a goal square</li><li><code>$</code> is box, or <code>*</code> if the box is on a goal square</li></ul><figure class="repl"><pre><code>const levelString = `
 #########
 #  $ @..#
 # $ $   #
@@ -73,6 +71,5 @@ drawSquare(&quot;@&quot;, vector(1, 2));
 canvas.height = level.length * 16 * scale;
 ctx.imageSmoothingEnabled = false;
 level.forEach((row, y) =&gt; row.forEach((square, x) =&gt; drawSquare(square, vector(x, y))));
-</code></pre></figure><p>Is level.</p>
-  </body>
+</code></pre></figure><p>Is level.</p></body>
 </html>

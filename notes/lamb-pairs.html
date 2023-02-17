@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Pairs</title>
     <link rel="icon" type="image/x-icon" href="./../assets/icon.png">
     <link rel="stylesheet" href="./../style.css">
@@ -19,9 +19,7 @@
     <script src="./../lambs/repl.js" defer></script>
     <script src="./../lambs/editor.js" defer></script>
   </head>
-  <body class="page">
-    <p><a href="./../index.html">Index</a></p><p><time>2017-07-30</time></p>
-    <h1>Pairs</h1><p><a href="./lambs.html">(There's a list with all the lambda notes here.)</a></p><p>Prelude. Some things we defined in earlier posts:</p><figure class="repl" data-prelude="true"><pre><code>0 ≜ λf.λx.x
+  <body class="page"><p><a href="./../index.html">Index</a></p><p><time>2017-07-30</time></p><h1>Pairs</h1><p><a href="./lambs.html">(There's a list with all the lambda notes here.)</a></p><p>Prelude. Some things we defined in earlier posts:</p><figure class="repl" data-prelude="true"><pre><code>0 ≜ λf.λx.x
 1 ≜ λf.λx.f x
 2 ≜ λf.λx.f (f x)
 + ≜ λa.λb.λf.λx.a f (b f x)
@@ -46,6 +44,5 @@ compose ≜ λf.λg.λx.f (g x)
 useful-things ≜ compose useful-thing2 useful-thing1
 
 useful-things (+ 1 2)
-</code></pre></figure><p>Woop.</p>
-  </body>
+</code></pre></figure><p>Woop.</p></body>
 </html>

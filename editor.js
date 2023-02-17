@@ -1,5 +1,8 @@
 "use strict";
+
 (() => {
+  const gd = require("./glorpdown.js");
+  
   const setProps = (elem, props) => {
     for (const prop in props) {
       elem[prop] = props[prop];
@@ -34,28 +37,28 @@
     return el;
   };
 
-  const parse = require("./parse.js").parse;
-
-  const create = (render, str) => {
+  const create = (editor) => {
     let previewDirty = true;
     const div = document.createElement("div");
     div.className = "editor-and-preview";
+    const parent = editor.parentElement;
     const editorDiv = elem(div, "div", { className: "editor-container" });
 
     const toolbar = elem(editorDiv, "div", { className: "toolbar" });
 
-    const btn = (name, start, stop) => elem(toolbar, "button", {
-      innerText: name,
-      onclick: () => {
-        if (stop === undefined) {
-          replaceSelection(start);
-        } else {
-          surroundSelection(start, stop);
-        }
-        editor.focus();
-      }
-    });
-    
+    const btn = (name, start, stop) =>
+      elem(toolbar, "button", {
+        innerText: name,
+        onclick: () => {
+          if (stop === undefined) {
+            replaceSelection(start);
+          } else {
+            surroundSelection(start, stop);
+          }
+          editor.focus();
+        },
+      });
+
     btn("```", "```\n", "\n```");
     btn("_ _", "_", "_");
     btn("` `", "`", "`");
@@ -63,21 +66,18 @@
     btn("’", "’");
     btn("—", "—");
 
-    const editor = elem(editorDiv, "textarea", {
-      className: "editor",
-      wrap: "off",
-      value: str,
-    });
-    const previewEl = elem(div, "div", { className: "preview" });
+    parent.replaceChild(div, editor);
+    editorDiv.appendChild(editor);
 
+    const previewEl = document.getElementById(editor.dataset.preview);
+    const renderer = gd.html.renderer((url) => url);
     const preview = () => {
-      if (previewDirty) {
-        const parsed = parse(editor.value).parsed;
-        render(parsed, previewEl);
+      if (previewEl !== null && previewDirty) {
+        const parsed = gd.parse(editor.value).parsed;
+        previewEl.innerHTML = gd.html.render(renderer, parsed);
         previewDirty = false;
       }
     };
-
     const key = Symbol("key");
     const changed = () => {
       previewDirty = true;
@@ -125,5 +125,5 @@
     div.textFocus = () => editor.focus();
     return div;
   };
-  module.exports = { create: create };
+  [...document.getElementsByClassName("editor")].forEach(create);
 })();

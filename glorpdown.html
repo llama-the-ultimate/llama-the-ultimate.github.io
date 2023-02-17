@@ -1,25 +1,55 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
   <head>
-
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Glorpdown</title>
     <script src="./require.js" defer></script>
-    <script src="./syntax.js" defer></script>
-    <script src="./parse.js" defer></script>
-    <script src="./renderHtml.js" defer></script>
-    <script src="./editor.js" defer></script>
     <script src="./glorpdown.js" defer></script>
+    <script src="./editor.js" defer></script>
     <link rel="icon" type="image/x-icon" href="./assets/icon.png">
     <link rel="stylesheet" href="./style.css" />
     <link rel="stylesheet" href="./editor.css" />
   </head>
-  <body>
+  <body class="row">
     <div>
       Glorpdown :)
     </div>
-    <div id="editors" class="editors">
-    </div>
+    <textarea class="editor" data-preview="preview"># Test
+
+Some text.
+More text after a linebreak.
+
+New paragraph.
+
+&lt;= img https://placekitten.com/g/320/200 A kitten.
+
+=&gt; url https://placekitten.com A link to the kitten place.
+
+## Stuff
+
+A list of some upcoming stuff:
+* Racket stuff
+* Something else
+
+### Racket stuff
+
+Bla bla you know in _Racket_, with the \`a\`s and the \`b\`s and that:
+\`\`\`
+#lang racket
+(define b 4)
+(for ([a (range 10)])
+  (printf "~a is ~amore than ~a~n"
+          a
+          (if (&gt; a b) "" "not ")
+          b))
+\`\`\`
+
+### Something else
+
+No code, but:
+&gt; Something someone said about something else sometime.
+</textarea>
+    <div id="preview"></div>
   </body>
 </html>

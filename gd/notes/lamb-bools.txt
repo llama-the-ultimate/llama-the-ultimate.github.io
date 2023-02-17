@@ -3,11 +3,11 @@
 :date 2017-07-27
 :special lambda
 
-=> gd lambs.txt (There's a list with all the lambda notes here.)
+=> gd lambs (There's a list with all the lambda notes here.)
 
 Bit of prelude first.
 
-=> gd lamb-nums.txt Some stuff from an earlier numbery post:
+=> gd lamb-nums Some stuff from an earlier numbery post:
 
 ``` prelude
 0 ≜ λf.λx.x

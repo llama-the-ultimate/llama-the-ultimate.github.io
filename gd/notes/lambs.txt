@@ -4,12 +4,12 @@ Bla blah. This is a collection of notes with lambda calculus stuff. The posts te
 
 The ones called “How/What do the lambdas?” are more introductiony than the others, with stuff about syntax and semantics and how the editors work and such.
 
-=> gd lamb-nums.txt Some numbery functions
-=> gd lamb-how.txt How do the lambdas?
-=> gd lamb-what.txt What do the lambdas?
-=> gd lamb-bools.txt Some booly functions
-=> gd lamb-pairs.txt Pairs
-=> gd lamb-succ.txt Successor
-=> gd lamb-design-pattern.txt A design pattern?
+=> gd lamb-nums Some numbery functions
+=> gd lamb-how How do the lambdas?
+=> gd lamb-what What do the lambdas?
+=> gd lamb-bools Some booly functions
+=> gd lamb-pairs Pairs
+=> gd lamb-succ Successor
+=> gd lamb-design-pattern A design pattern?
 
 => url /lambdas.html Also there's a lambda-playground over here
