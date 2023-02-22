@@ -15,7 +15,7 @@
       <title>Sokoban: Making cat move</title>
       <link>https://llama-the-ultimate.org/notes/sokoboko-move.html</link>
       <description>It’s a pushycat.</description>
-      <pubDate>Thu, 23 Feb 2023 00:00:00 GMT</pubDate>
+      <pubDate>Wed, 22 Feb 2023 00:00:00 GMT</pubDate>
       <guid>https://llama-the-ultimate.org/notes/sokoboko-move.html</guid>
       <content:encoded><![CDATA[<h1>Sokoban: Making cat move</h1><p>(Best viewed in a browser with JavaScript enabled. You can click the play/run-buttons to run the JavaScript in the embedded editors. It should behave mostly like running the same code in the JavaScript console. (Hitting F12 or something and finding the console might also be useful if you wanna look around and inspect stuff more or something.))</p><p><a href="https://llama-the-ultimate.org/notes/sokoboko-gfx.html">In previous post we drew a level.</a></p><p>We ended up with almost this code:</p><figure><pre><code>const canvas = outElement.appendChild(document.createElement(&quot;canvas&quot;));
 const scale = 3;

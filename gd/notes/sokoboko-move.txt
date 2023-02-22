@@ -1,6 +1,6 @@
 # Sokoban: Making cat move
 :blurb It’s a pushycat.
-:date 2023-02-23
+:date 2023-02-22
 :special js
 
 (Best viewed in a browser with JavaScript enabled. You can click the play/run-buttons to run the JavaScript in the embedded editors. It should behave mostly like running the same code in the JavaScript console. (Hitting F12 or something and finding the console might also be useful if you wanna look around and inspect stuff more or something.))
