@@ -78,6 +78,11 @@
         previewDirty = false;
       }
     };
+    if (previewEl !== null) {
+      const matchSize = () => previewEl.style.maxHeight = `${div.offsetHeight}px`;
+      new ResizeObserver(matchSize).observe(div);
+      matchSize();
+    }
     const key = Symbol("key");
     const changed = () => {
       previewDirty = true;
@@ -118,11 +123,6 @@
     };
     editor.oninput = changed;
     preview();
-
-    div.getValue = () => editor.value;
-    div.toolbar = toolbar;
-    div.preview = preview;
-    div.textFocus = () => editor.focus();
     return div;
   };
   [...document.getElementsByClassName("editor")].forEach(create);

@@ -12,6 +12,183 @@
       <link>https://llama-the-ultimate.org</link>
     </image>
     <item>
+      <title>Sokoban: Making cat move</title>
+      <link>https://llama-the-ultimate.org/notes/sokoboko-move.html</link>
+      <description>It’s a pushycat.</description>
+      <pubDate>Thu, 23 Feb 2023 00:00:00 GMT</pubDate>
+      <guid>https://llama-the-ultimate.org/notes/sokoboko-move.html</guid>
+      <content:encoded><![CDATA[<h1>Sokoban: Making cat move</h1><p>(Best viewed in a browser with JavaScript enabled. You can click the play/run-buttons to run the JavaScript in the embedded editors. It should behave mostly like running the same code in the JavaScript console. (Hitting F12 or something and finding the console might also be useful if you wanna look around and inspect stuff more or something.))</p><p><a href="https://llama-the-ultimate.org/notes/sokoboko-gfx.html">In previous post we drew a level.</a></p><p>We ended up with almost this code:</p><figure><pre><code>const canvas = outElement.appendChild(document.createElement(&quot;canvas&quot;));
+const scale = 3;
+const ctx = canvas.getContext(&quot;2d&quot;);
+
+let level;
+let moveList;
+
+const moveListP = outElement.appendChild(document.createElement(&quot;p&quot;));
+
+const setLevel = (str) =&gt; {
+  level = str.split(&quot;\n&quot;).map((x) =&gt; x.split(&quot;&quot;));
+  if (level[0].every((x) =&gt; x === &quot; &quot;)) {
+    level.shift();
+  }
+  if (level[level.length - 1].every((x) =&gt; x === &quot; &quot;)) {
+    level.pop();
+  }
+  moveList = &quot;&quot;;
+  canvas.width = level[0].length * 16 * scale;
+  canvas.height = level.length * 16 * scale;
+  ctx.imageSmoothingEnabled = false;
+  drawLevel();
+};
+const level1 = `
+#########
+#  $ @..#
+# $ $   #
+#  ###  #
+# $     #
+##  ##..#
+#########
+`;
+
+const spriteSheet = document.createElement(&quot;img&quot;);
+spriteSheet.src = &quot;./../assets/soko-sprites.png&quot;
+spriteSheet.alt = &quot;sprite sheet&quot;;
+
+const vector = (x, y) =&gt; ({ x: x, y: y });
+
+const sprites = {
+  &quot; &quot;: vector(0, 0), // top left is empty floor
+  &quot;#&quot;: vector(1, 0), // top right is wall
+  &quot;@&quot;: vector(0, 1), // middle left is player
+  &quot;+&quot;: vector(0, 1), // same sprite for player on goal square
+  &quot;$&quot;: vector(1, 1), // middle right is “box”
+  &quot;.&quot;: vector(0, 2), // bottom left is goal square
+  &quot;*&quot;: vector(1, 2), // middle left is “bosdx” on a goal square
+};
+
+const drawSquare = (square, position) =&gt; {
+  const sprite = sprites[square];
+  ctx.drawImage(
+    spriteSheet,
+    sprite.x * 16,
+    sprite.y * 16,
+    16,
+    16,
+    position.x * 16 * scale,
+    position.y * 16 * scale,
+    16 * scale,
+    16 * scale
+  );
+};
+
+const drawLevel = () =&gt; {
+  level.forEach((row, y) =&gt; row.forEach((square, x) =&gt; drawSquare(square, vector(x, y))));
+  moveListP.innerText = moveList;
+};
+
+spriteSheet.onload = () =&gt; setLevel(level1);
+</code></pre><figcaption>repl</figcaption></figure><h2>Some vectors</h2><p>We want to move the cat. We can make a function that returns its position, so that we know where to move it from. (Cats tend to move from where they are.)</p><figure><pre><code>const playerPosition = () =&gt; {
+  for ([y, row] of level.entries()) {
+    for ([x, square] of row.entries()) {
+      if (square === &quot;@&quot; || square === &quot;+&quot;) {
+        return vector(x, y);
+      }
+    }
+  }
+};
+
+console.log(playerPosition());
+</code></pre><figcaption>repl</figcaption></figure><p><a href="https://llama-the-ultimate.orghttp://www.sokobano.de/wiki/index.php?title=Level_format#Solution">A Sokoban solution is like a string where each character corresponds to one move made.</a></p><p>We will make vectors for the directions the cat can move in, and a plus-function that we can use for adding a direction to a position. We’ll use the (lowercase) letters that are used in Sokoban solutions as property names.</p><figure><pre><code>const directions = {
+  u: vector(0, -1),
+  d: vector(0, 1),
+  l: vector(-1, 0),
+  r: vector(1, 0),  
+};
+
+const plus = (a, b) =&gt; vector(a.x + b.x, a.y + b.y);
+
+console.log(plus(playerPosition(), directions.l));
+</code></pre><figcaption>repl</figcaption></figure><p>Should be the position of the square to the left of the cat.</p><h2>Stupid is fun</h2><p>Okay the array with the arrays with the characters is not a <em>great</em> way to model things, but I like using the symbols from the level format. Like this is fun:</p><figure><pre><code>console.log(level.map(x =&gt; x.join(&quot;&quot;)).join(&quot;\n&quot;));
+</code></pre><figcaption>repl</figcaption></figure><p>But it <em>is</em> awkward having more than one symbol for one thing (it’s the player if it’s a <code>@</code> <em>or</em> a <code>+</code>, and so on). Something that takes different “collision layers” or something into account probably makes it easier to implement some things.</p><p><a href="https://llama-the-ultimate.orghttps://www.puzzlescript.net/">PuzzleScript is cool btw.</a></p><p>Also, instead of one move being a functional update of the game state or something like that, we’ll just mutate the arrays. I dunno I just think the side-effecty way to do the movement is somehow neat. And it’s fun to kind of recklessly mutate state and then trust that we can implement undo-functionality in order to restore the state we destroyed :)</p><h2>Moving one thing</h2><figure><pre><code>const levelGet = (position) =&gt; level[position.y][position.x];
+const levelSet = (position, value) =&gt; level[position.y][position.x] = value;
+
+const player = [&quot;@&quot;, &quot;+&quot;];
+const box = [&quot;$&quot;, &quot;*&quot;];
+const floor = [&quot; &quot;, &quot;.&quot;];
+
+const move = (thing, from, direction) =&gt; {
+  const fromIdx = thing.indexOf(levelGet(from));
+  if (fromIdx &lt; 0) {
+    return false;
+  }
+  const to = plus(from, direction);
+  const toIdx = floor.indexOf(levelGet(to));
+  if (toIdx &lt; 0) {
+    return false;
+  }
+  levelSet(from, floor[fromIdx]);
+  levelSet(to, thing[toIdx]);
+  return true;
+};
+
+console.log(move(box, vector(3, 1), directions.l));
+console.log(move(player, playerPosition(), directions.l));
+console.log(move(player, playerPosition(), directions.l));
+console.log(move(player, playerPosition(), directions.l));
+drawLevel();
+</code></pre><figcaption>repl</figcaption></figure><p>So I think is at least mildly stupid-clever, what with the arrays and the indexes, but kind of fun. We use <code>indexOf</code> to check if the <code>from</code>-square is the expected <code>thing</code> (player or box), and to check that the <code>to</code>-square is floor. <code>indexOf</code> also finds out if a square has a goal on it:</p><ul><li>If <code>fromIdx</code> is <code>0</code> the <code>to</code>-square has the expected <code>thing</code> and its on empty floor.</li><li>If it is <code>1</code> the square has the expected <code>thing</code> on a goal square.</li><li>If it is less than <code>0</code> the expected <code>thing</code> is not on the square and we can’t make the move.</li></ul><p>Same with <code>toIdx</code> but for floor: <code>0</code> is empty floor, <code>1</code> is goal square with nothing on it. Less than <code>0</code> means it’s blocked (wall or a floor/goal square with something on it).</p><p>And then we use those indexes to choose the correct characters for the two squares when making the moves. If the <code>to</code>-square was a goal square then we choose the “on goal” character from <code>thing</code>, and so on.</p><h2>Pushing a box</h2><p>Anyway: We attempted to move things four times. First the box near the top one move to the left. Then the player to the left, three times. The last player-move didn’t go through since the <code>to</code>-square was blocked by the box. When moving the player we want to attempt to move any box on the <code>to</code>-square first, in the same direction. Then we can add the move to the move list by checking which moves went through:</p><ul><li>If the player didn’t move, no move was made.</li><li>If the player moved and a box was moved we add the direction letter in uppercase.</li><li>If the player moved and no box was moved we add the direction letter in lowercase.</li><li>It can’t be the case that a box was moved and the player did not move. If a box was moved that must have made room for the player to make its move too.</li></ul><figure><pre><code>
+const movePlayer = (directionLetter) =&gt; () =&gt; {
+  const direction = directions[directionLetter];
+  const position = playerPosition();
+  const movedBox = move(box, plus(position, direction), direction);
+  const movedPlayer = move(player, position, direction);
+  if (!movedPlayer) {
+    return false;
+  }
+  moveList += movedBox ? directionLetter.toUpperCase() : directionLetter;
+  return true;
+};
+
+console.log(movePlayer(&quot;l&quot;)());
+console.log(movePlayer(&quot;d&quot;)());
+console.log(movePlayer(&quot;l&quot;)());
+console.log(movePlayer(&quot;l&quot;)());
+drawLevel();
+</code></pre><figcaption>repl</figcaption></figure><p>The movelist says <code>LDl</code>: We pushed a box to the left, then pushed a box down, then moved to the left. (Then tried to move to the left again. But wall.)</p><h2>Controls</h2><p>That’s pretty much it for movement. If we make so we can push some buttons to call the <code>movePlayer</code> function things will be pretty gamelike:</p><figure><pre><code>const commands = new Map([
+  [&quot;w&quot;, movePlayer(&quot;u&quot;)],
+  [&quot;a&quot;, movePlayer(&quot;l&quot;)],
+  [&quot;s&quot;, movePlayer(&quot;d&quot;)],
+  [&quot;d&quot;, movePlayer(&quot;r&quot;)]
+]);
+
+const doCommand = (key) =&gt; {
+  if (commands.has(key)) {
+    commands.get(key)();
+    drawLevel();
+  }
+};
+canvas.tabIndex = 0;
+canvas.onkeydown = event =&gt; doCommand(event.key.toLowerCase());
+
+const button = (key) =&gt; {
+  const element= outElement.appendChild(document.createElement(&quot;button&quot;));
+  element.innerText = key;
+  element.style.fontSize = &quot;2rem&quot;;
+  element.style.width = &quot;3rem&quot;;
+  element.onclick = () =&gt; doCommand(key);
+};
+
+const space = outElement.appendChild(document.createElement(&quot;div&quot;));
+space.style.float = &quot;left&quot;;
+space.style.height = &quot;1px&quot;;
+space.style.width = &quot;3rem&quot;;
+button(&quot;w&quot;);
+outElement.appendChild(document.createElement(&quot;br&quot;));
+&quot;asd&quot;.split(&quot;&quot;).forEach(button);
+</code></pre><figcaption>repl</figcaption></figure><p>The <code>tabIndex</code> thing makes it so that the canvas can have focus and send <code>keydown</code> events. So you should be able to click the level and then move the cat with wasd. Also buttons. Maybe you can click on them if you don’t have a keyboard.</p><p>Can restart with <code>setLevel</code>:</p><figure><pre><code>setLevel(level1);
+</code></pre><figcaption>repl</figcaption></figure><p>Okay that’s it for now. Boop.</p>]]></content:encoded>
+    </item>
+    <item>
       <title>Drawing a Sokoban level</title>
       <link>https://llama-the-ultimate.org/notes/sokoboko-gfx.html</link>
       <description>“imageSmoothingEnabled = false” is JavaScript for “tighten up”</description>

@@ -86,7 +86,7 @@ const thingToString = (level) => (thing) => {
       return `{ ${list.join(", ")} }`;
     }
   }
-  if (typeof thing === "string") {
+  if (typeof thing === "string" && level > 0) {
     return JSON.stringify(thing);
   }
   return `${thing}`;

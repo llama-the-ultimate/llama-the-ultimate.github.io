@@ -32,3 +32,8 @@
 .output {
   margin: 0 0 0 0.3rem;
 }
+
+button {
+  font-size: 1.5rem;
+  min-width: 2.5rem;
+}

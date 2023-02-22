@@ -1,12 +1,39 @@
 # Sokoban: Making cat move
+:blurb It’s a pushycat.
+:date 2023-02-23
 :special js
+
+(Best viewed in a browser with JavaScript enabled. You can click the play/run-buttons to run the JavaScript in the embedded editors. It should behave mostly like running the same code in the JavaScript console. (Hitting F12 or something and finding the console might also be useful if you wanna look around and inspect stuff more or something.))
 
 => gd sokoboko-gfx In previous post we drew a level.
 
 We ended up with almost this code:
 
 ``` repl
-const level = `
+const canvas = outElement.appendChild(document.createElement("canvas"));
+const scale = 3;
+const ctx = canvas.getContext("2d");
+
+let level;
+let moveList;
+
+const moveListP = outElement.appendChild(document.createElement("p"));
+
+const setLevel = (str) => {
+  level = str.split("\n").map((x) => x.split(""));
+  if (level[0].every((x) => x === " ")) {
+    level.shift();
+  }
+  if (level[level.length - 1].every((x) => x === " ")) {
+    level.pop();
+  }
+  moveList = "";
+  canvas.width = level[0].length * 16 * scale;
+  canvas.height = level.length * 16 * scale;
+  ctx.imageSmoothingEnabled = false;
+  drawLevel();
+};
+const level1 = `
 #########
 #  $ @..#
 # $ $   #
@@ -14,20 +41,11 @@ const level = `
 # $     #
 ##  ##..#
 #########
-`.slice(1, -1).split("\n").map(x => x.split(""));
+`;
 
-const spriteSheet = outElement.appendChild(document.createElement("img"));
+const spriteSheet = document.createElement("img");
 spriteSheet.src = "./../assets/soko-sprites.png"
 spriteSheet.alt = "sprite sheet";
-
-const canvas = document.createElement("canvas");
-outElement.replaceChildren(canvas);
-const scale = 3;
-canvas.width = level[0].length * 16 * scale;
-canvas.height = level.length * 16 * scale;
-
-const ctx = canvas.getContext("2d");
-ctx.imageSmoothingEnabled = false;
 
 const vector = (x, y) => ({ x: x, y: y });
 
@@ -38,7 +56,7 @@ const sprites = {
   "+": vector(0, 1), // same sprite for player on goal square
   "$": vector(1, 1), // middle right is “box”
   ".": vector(0, 2), // bottom left is goal square
-  "*": vector(1, 2), // middle left is “box” on a goal square
+  "*": vector(1, 2), // middle left is “bosdx” on a goal square
 };
 
 const drawSquare = (square, position) => {
@@ -58,14 +76,15 @@ const drawSquare = (square, position) => {
 
 const drawLevel = () => {
   level.forEach((row, y) => row.forEach((square, x) => drawSquare(square, vector(x, y))));
+  moveListP.innerText = moveList;
 };
 
-spriteSheet.onload = () => drawLevel();
+spriteSheet.onload = () => setLevel(level1);
 ```
 
-## Positioning
+## Some vectors
 
-We want to move the cat. We can make a function that returns it position, so that we know where to move it from. (Cats tend to move from where they are.)
+We want to move the cat. We can make a function that returns its position, so that we know where to move it from. (Cats tend to move from where they are.)
 
 ``` repl
 const playerPosition = () => {
@@ -98,12 +117,137 @@ const plus = (a, b) => vector(a.x + b.x, a.y + b.y);
 console.log(plus(playerPosition(), directions.l));
 ```
 
-Should be the position of the square just to the left of the cat.
+Should be the position of the square to the left of the cat.
 
-## Being stupid
+## Stupid is fun
 
-Okay the array with the arrays with the characters is not a _great_ way to model things. I like using the symbols from the level format but it _is_ awkward having more than one symbol for one thing. Something that takes different “collision layers” or something into account probably makes it easier to implement some things.
+Okay the array with the arrays with the characters is not a _great_ way to model things, but I like using the symbols from the level format. Like this is fun:
+``` repl
+console.log(level.map(x => x.join("")).join("\n"));
+```
+But it _is_ awkward having more than one symbol for one thing (it’s the player if it’s a `@` _or_ a `+`, and so on). Something that takes different “collision layers” or something into account probably makes it easier to implement some things.
 
 => url https://www.puzzlescript.net/ PuzzleScript is cool btw.
 
-Also, instead of one move being a functional update of the game state or something like that, we’ll just mutate the arrays. I think there’s a fun and side-effecty way to do the movement. Also it’s fun to like recklessly mutate state and then trust that we can implement undo-functionality in order to restore the state we destroyed :)
+Also, instead of one move being a functional update of the game state or something like that, we’ll just mutate the arrays. I dunno I just think the side-effecty way to do the movement is somehow neat. And it’s fun to kind of recklessly mutate state and then trust that we can implement undo-functionality in order to restore the state we destroyed :)
+
+## Moving one thing
+
+``` repl
+const levelGet = (position) => level[position.y][position.x];
+const levelSet = (position, value) => level[position.y][position.x] = value;
+
+const player = ["@", "+"];
+const box = ["$", "*"];
+const floor = [" ", "."];
+
+const move = (thing, from, direction) => {
+  const fromIdx = thing.indexOf(levelGet(from));
+  if (fromIdx < 0) {
+    return false;
+  }
+  const to = plus(from, direction);
+  const toIdx = floor.indexOf(levelGet(to));
+  if (toIdx < 0) {
+    return false;
+  }
+  levelSet(from, floor[fromIdx]);
+  levelSet(to, thing[toIdx]);
+  return true;
+};
+
+console.log(move(box, vector(3, 1), directions.l));
+console.log(move(player, playerPosition(), directions.l));
+console.log(move(player, playerPosition(), directions.l));
+console.log(move(player, playerPosition(), directions.l));
+drawLevel();
+```
+
+So I think is at least mildly stupid-clever, what with the arrays and the indexes, but kind of fun. We use `indexOf` to check if the `from`-square is the expected `thing` (player or box), and to check that the `to`-square is floor. `indexOf` also finds out if a square has a goal on it:
+
+* If `fromIdx` is `0` the `to`-square has the expected `thing` and its on empty floor.
+* If it is `1` the square has the expected `thing` on a goal square.
+* If it is less than `0` the expected `thing` is not on the square and we can’t make the move.
+
+Same with `toIdx` but for floor: `0` is empty floor, `1` is goal square with nothing on it. Less than `0` means it’s blocked (wall or a floor/goal square with something on it).
+
+And then we use those indexes to choose the correct characters for the two squares when making the moves. If the `to`-square was a goal square then we choose the “on goal” character from `thing`, and so on.
+
+## Pushing a box
+
+Anyway: We attempted to move things four times. First the box near the top one move to the left. Then the player to the left, three times. The last player-move didn’t go through since the `to`-square was blocked by the box. When moving the player we want to attempt to move any box on the `to`-square first, in the same direction. Then we can add the move to the move list by checking which moves went through:
+* If the player didn’t move, no move was made.
+* If the player moved and a box was moved we add the direction letter in uppercase.
+* If the player moved and no box was moved we add the direction letter in lowercase.
+* It can’t be the case that a box was moved and the player did not move. If a box was moved that must have made room for the player to make its move too.
+
+``` repl
+
+const movePlayer = (directionLetter) => () => {
+  const direction = directions[directionLetter];
+  const position = playerPosition();
+  const movedBox = move(box, plus(position, direction), direction);
+  const movedPlayer = move(player, position, direction);
+  if (!movedPlayer) {
+    return false;
+  }
+  moveList += movedBox ? directionLetter.toUpperCase() : directionLetter;
+  return true;
+};
+
+console.log(movePlayer("l")());
+console.log(movePlayer("d")());
+console.log(movePlayer("l")());
+console.log(movePlayer("l")());
+drawLevel();
+```
+
+The movelist says `LDl`: We pushed a box to the left, then pushed a box down, then moved to the left. (Then tried to move to the left again. But wall.)
+
+## Controls
+
+That’s pretty much it for movement. If we make so we can push some buttons to call the `movePlayer` function things will be pretty gamelike:
+
+``` repl
+const commands = new Map([
+  ["w", movePlayer("u")],
+  ["a", movePlayer("l")],
+  ["s", movePlayer("d")],
+  ["d", movePlayer("r")]
+]);
+
+const doCommand = (key) => {
+  if (commands.has(key)) {
+    commands.get(key)();
+    drawLevel();
+  }
+};
+canvas.tabIndex = 0;
+canvas.onkeydown = event => doCommand(event.key.toLowerCase());
+
+const button = (key) => {
+  const element= outElement.appendChild(document.createElement("button"));
+  element.innerText = key;
+  element.style.fontSize = "2rem";
+  element.style.width = "3rem";
+  element.onclick = () => doCommand(key);
+};
+
+const space = outElement.appendChild(document.createElement("div"));
+space.style.float = "left";
+space.style.height = "1px";
+space.style.width = "3rem";
+button("w");
+outElement.appendChild(document.createElement("br"));
+"asd".split("").forEach(button);
+```
+
+The `tabIndex` thing makes it so that the canvas can have focus and send `keydown` events. So you should be able to click the level and then move the cat with wasd. Also buttons. Maybe you can click on them if you don’t have a keyboard.
+
+Can restart with `setLevel`:
+
+``` repl
+setLevel(level1);
+```
+
+Okay that’s it for now. Boop.
