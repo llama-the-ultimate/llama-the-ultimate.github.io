@@ -1,13 +1,6 @@
 "use strict";
-
 (() => {
   const gd = require("./glorpdown.js");
-  
-  const setProps = (elem, props) => {
-    for (const prop in props) {
-      elem[prop] = props[prop];
-    }
-  };
 
   const soon = (() => {
     const tasks = new Map();
@@ -28,36 +21,56 @@
     return (key, thunk) => tasks.set(key, { time: 10, thunk: thunk });
   })();
 
-  const elem = (parent, type, props) => {
+  const elem = (type, props, ...children) => {
     const el = document.createElement(type);
-    parent.appendChild(el);
-    if (props !== undefined) {
-      setProps(el, props);
-    }
+    Object.assign(el, props);
+    el.replaceChildren(...children);
     return el;
   };
 
   const create = (editor) => {
-    let previewDirty = true;
-    const div = document.createElement("div");
-    div.className = "editor-and-preview";
+    const div = elem("div", { className: "editor-and-preview" });
+    const changed = () => div.dispatchEvent(new Event("changed"));
     const parent = editor.parentElement;
-    const editorDiv = elem(div, "div", { className: "editor-container" });
+    const editorDiv = div.appendChild(
+      elem("div", { className: "editor-container" })
+    );
 
-    const toolbar = elem(editorDiv, "div", { className: "toolbar" });
+    const toolbar = editorDiv.appendChild(
+      elem("div", { className: "toolbar" })
+    );
 
-    const btn = (name, start, stop) =>
-      elem(toolbar, "button", {
-        innerText: name,
-        onclick: () => {
-          if (stop === undefined) {
-            replaceSelection(start);
-          } else {
-            surroundSelection(start, stop);
-          }
-          editor.focus();
-        },
-      });
+    const btn = (name, start, end) =>
+      toolbar.appendChild(
+        elem(
+          "button",
+          {
+            onclick: () => {
+              if (end === undefined) {
+                editor.setRangeText(start);
+              } else {
+                const selStart = editor.selectionStart;
+                const selEnd = editor.selectionEnd;
+                const dir = editor.selectionDirection;
+                editor.setRangeText(start, selStart, selStart);
+                editor.setRangeText(
+                  end,
+                  selEnd + start.length,
+                  selEnd + start.length
+                );
+                editor.setSelectionRange(
+                  selStart + start.length,
+                  selEnd + start.length,
+                  dir
+                );
+              }
+              changed();
+              editor.focus();
+            },
+          },
+          name
+        )
+      );
 
     btn("```", "```\n", "\n```");
     btn("_ _", "_", "_");
@@ -70,59 +83,28 @@
     editorDiv.appendChild(editor);
 
     const previewEl = document.getElementById(editor.dataset.preview);
-    const renderer = gd.html.renderer((url) => url);
-    const preview = () => {
-      if (previewEl !== null && previewDirty) {
-        const parsed = gd.parse(editor.value).parsed;
-        previewEl.innerHTML = gd.html.render(renderer, parsed);
-        previewDirty = false;
-      }
-    };
     if (previewEl !== null) {
-      const matchSize = () => previewEl.style.maxHeight = `${div.offsetHeight}px`;
+      const key = Symbol("key");
+      let previewDirty = true;
+      const preview = () => {
+        if (previewDirty) {
+          previewEl.innerHTML = gd.html.render(gd.parse(editor.value).parsed);
+          previewDirty = false;
+        }
+      };
+      div.addEventListener("changed", () => {
+        previewDirty = true;
+        soon(key, preview);
+      });
+      preview();
+      
+      const matchSize = () =>
+        (previewEl.style.maxHeight = `${div.offsetHeight}px`);
       new ResizeObserver(matchSize).observe(div);
       matchSize();
     }
-    const key = Symbol("key");
-    const changed = () => {
-      previewDirty = true;
-      soon(key, preview);
-      div.dispatchEvent(new Event("changed"));
-    };
 
-    const replaceSelection = (replacement) => {
-      const str = editor.value;
-      const before = str.substring(0, editor.selectionStart);
-      const after = str.substring(editor.selectionEnd);
-      const dir = editor.selectionDirection;
-      editor.value = `${before}${replacement}${after}`;
-      editor.setSelectionRange(
-        before.length + replacement.length,
-        before.length + replacement.length,
-        dir
-      );
-      changed();
-    };
-
-    const surroundSelection = (open, close) => {
-      const str = editor.value;
-      const before = str.substring(0, editor.selectionStart);
-      const selected = str.substring(
-        editor.selectionStart,
-        editor.selectionEnd
-      );
-      const after = str.substring(editor.selectionEnd);
-      const dir = editor.selectionDirection;
-      editor.value = `${before}${open}${selected}${close}${after}`;
-      editor.setSelectionRange(
-        before.length + open.length,
-        before.length + open.length + selected.length,
-        dir
-      );
-      changed();
-    };
     editor.oninput = changed;
-    preview();
     return div;
   };
   [...document.getElementsByClassName("editor")].forEach(create);

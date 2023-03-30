@@ -240,6 +240,7 @@
       lparser("li", "*"),
       lparser("hr", "----"),
       lparser("keyval", ":", 1),
+      lparser("details", "+++"),
       textParser,
     ];
 
@@ -350,7 +351,7 @@
       return res;
     };
 
-    const baseRelify = (dirlist) => (url) => {
+    const relify = (dirlist) => (url) => {
       if (url[0] !== "/") {
         return url;
       }
@@ -369,182 +370,191 @@
       return `./${parenting}${urlPath}${urlEnd}`;
     };
 
-    const renderer = (relify) => {
-      const myRelify = relify === undefined ? baseRelify([]) : relify;
-      const renderError = (content, description) =>
-        `<del title="${escapeHtml(description)}">${escapeHtml(content)}</del>`;
+    const renderError = (content, description) =>
+      `<del title="${escapeHtml(description)}">${escapeHtml(content)}</del>`;
 
-      const renderLink = (line) => {
-        const descHtml = textHtml(line.text);
-        const linkType = line.args[0].str;
-        const url = line.args[1].str;
-        const descStr = descHtml !== "" ? descHtml : url;
-        if (linkType === "gd") {
-          const withHtml = `${
-            url.endsWith(".txt") ? url.slice(0, -4) : url
-          }.html`;
-          const htmlUrl = `/notes/${withHtml}`;
-          return `<a href="${myRelify(htmlUrl)}">${descStr}</a>`;
-        }
-        if (linkType === "url") {
-          return `<a href="${myRelify(url)}">${descStr}</a>`;
-        } else if (linkType === "me") {
-          return `<a rel="me" href="${myRelify(url)}">${descStr}</a>`;
-        }
-        return `<p>${renderError(
-          line.full,
-          `unknown type "${escapeHtml(linkType)}"`
-        )}</p>`;
-      };
-
-      const captionFrom = (line) => {
-        const html = textHtml(line.text);
-        return html.length === "" ? "" : `<figcaption>${html}</figcaption>`;
-      };
-      const renderInclude = (line) => {
-        const includeType = line.args[0].str;
-        const url = myRelify(line.args[1].str);
-        if (includeType === "img") {
-          return `<figure><a href="${url}"><img src="${url}"></a>${captionFrom(
-            line
-          )}</figure>`;
-        }
-        return `<p>${renderError(
-          line.full,
-          `unknown type "${escapeHtml(includeType)}"`
-        )}</p>`;
-      };
-
-      const renderLine = (line) => {
-        switch (line.type) {
-          case "par":
-          case "quote":
-            return textHtml(line.text);
-          case "link":
-            return renderLink(line);
-          case "li":
-            return `<li>${textHtml(line.text)}</li>`;
-          case "hr":
-            return "<hr>";
-          case "h1":
-            return `<h1>${textHtml(line.text)}</h1>`;
-          case "h2":
-            return `<h2>${textHtml(line.text)}</h2>`;
-          case "h3":
-            return `<h3>${textHtml(line.text)}</h3>`;
-          case "include":
-            return renderInclude(line);
-          case "error":
-            return renderError(line.line, line.description);
-          default:
-            throw "oh no";
-        }
-      };
-
-      const text = (res) => (line) => {
-        switch (line.type) {
-          case "par":
-          case "link":
-          case "error":
-            return text(res + `<br>${renderLine(line)}`);
-          default:
-            return nothing(res + "</p>")(line);
-        }
-      };
-
-      const li = (res) => (line) =>
-        line.type === "li"
-          ? li(res + renderLine(line))
-          : nothing(res + "</ul>")(line);
-
-      const quoteempty = (res) => (line) => {
-        switch (line.type) {
-          case "quoteempty":
-            return quoteempty(res + "<br>");
-          case "quote":
-            return quote(res + `<p>${renderLine(line)}`);
-          default:
-            return nothing(res + "<br></blockquote>")(line);
-        }
-      };
-
-      const quote = (res) => (line) => {
-        switch (line.type) {
-          case "quoteempty":
-            return quoteempty(res + "</p>");
-          case "quote":
-            return quote(res + `<br>${renderLine(line)}`);
-          default:
-            return nothing(res + "</p></blockquote>")(line);
-        }
-      };
-
-      const emptyline = (res) => (line) =>
-        line.type === "empty" ? emptyline(res + "<br>") : nothing(res)(line);
-
-      const pre = (caption, startres) => {
-        const halp = (res) => (line) => {
-          switch (line.type) {
-            case "pre":
-              return halp(res + `${escapeHtml(line.full)}\n`);
-            case "toggle":
-              return nothing((res += `</code></pre>${caption}</figure>`));
-            case "end":
-              return nothing((res += `</code></pre>${caption}</figure>`))(line);
-            default:
-              throw "oh no";
-          }
-        };
-        return halp(startres);
-      };
-
-      const nothing = (res) => (line) => {
-        switch (line.type) {
-          case "empty":
-            return emptyline(res);
-          case "par":
-          case "link":
-          case "error":
-            return text(res + `<p>${renderLine(line)}`);
-          case "quote":
-            return quote(res + `<blockquote><p>${renderLine(line)}`);
-          case "quoteempty":
-            return quote(res + "<blockquote><br>")(line);
-          case "li":
-            return li(res + "<ul>")(line);
-          case "hr":
-            return nothing(res + "<hr>");
-          case "toggle":
-            return pre(captionFrom(line), res + `<figure><pre><code>`);
-          case "h1":
-          case "h2":
-          case "h3":
-          case "include":
-            return nothing(res + renderLine(line));
-          case "keyval":
-            return nothing(res);
-          case "end":
-            return res;
-          case "insert":
-            if (line.level === "text") {
-              return text(res + `<p>${line.html}`);
-            }
-            if (line.level === "outer") {
-              return nothing(res + line.html);
-            }
-            if (line.level === "end") {
-              return nothing(res + line.html)(syntax.End);
-            }
-            throw "oh no";
-          default:
-            throw "oh no";
-        }
-      };
-      return nothing("");
+    const renderLink = (data, line) => {
+      const descHtml = textHtml(line.text);
+      const linkType = line.args[0].str;
+      const url = line.args[1].str;
+      const descStr = descHtml !== "" ? descHtml : url;
+      if (linkType === "gd") {
+        const withHtml = `${
+          url.endsWith(".txt") ? url.slice(0, -4) : url
+        }.html`;
+        const htmlUrl = `/notes/${withHtml}`;
+        return `<a href="${data.url(htmlUrl)}">${descStr}</a>`;
+      }
+      if (linkType === "url") {
+        return `<a href="${data.url(url)}">${descStr}</a>`;
+      } else if (linkType === "me") {
+        return `<a rel="me" href="${data.url(url)}">${descStr}</a>`;
+      }
+      return `<p>${renderError(
+        line.full,
+        `unknown type "${escapeHtml(linkType)}"`
+      )}</p>`;
     };
 
-    const render = (renderer, list) => {
-      let state = renderer;
+    const captionFrom = (line) => {
+      const html = textHtml(line.text);
+      return html.length === 0 ? "" : `<figcaption>${html}</figcaption>`;
+    };
+    const summaryFrom = (data, line) => {
+      const html = textHtml(line.text);
+      return `<summary>${html.length === 0 ? data.defaultSummary : html}</summary>`;
+    };
+
+    const renderInclude = (data, line) => {
+      const includeType = line.args[0].str;
+      const url = data.url(line.args[1].str);
+      if (includeType === "img") {
+        return `<figure><a href="${url}"><img src="${url}"></a>${captionFrom(
+          line
+        )}</figure>`;
+      }
+      return `<p>${renderError(
+        line.full,
+        `unknown type "${escapeHtml(includeType)}"`
+      )}</p>`;
+    };
+
+    const renderLine = (data, line) => {
+      switch (line.type) {
+        case "par":
+        case "quote":
+          return textHtml(line.text);
+        case "link":
+          return renderLink(data, line);
+        case "li":
+          return `<li>${textHtml(line.text)}</li>`;
+        case "hr":
+          return "<hr>";
+        case "h1":
+          return `<h1>${textHtml(line.text)}</h1>`;
+        case "h2":
+          return `<h2>${textHtml(line.text)}</h2>`;
+        case "h3":
+          return `<h3>${textHtml(line.text)}</h3>`;
+        case "include":
+          return renderInclude(data, line);
+        case "error":
+          return renderError(line.line, line.description);
+        default:
+          throw "oh no";
+      }
+    };
+
+    const text = (data, res) => (line) => {
+      switch (line.type) {
+        case "par":
+        case "link":
+        case "error":
+          return text(data, res + `<br>${renderLine(data, line)}`);
+        default:
+          return nothing(data, res + "</p>")(line);
+      }
+    };
+
+    const li = (data, res) => (line) =>
+      line.type === "li"
+        ? li(data, res + renderLine(data, line))
+        : nothing(data, res + "</ul>")(line);
+
+    const quoteempty = (data, res) => (line) => {
+      switch (line.type) {
+        case "quoteempty":
+          return quoteempty(data, res + "<br>");
+        case "quote":
+          return quote(data, res + `<p>${renderLine(data, line)}`);
+        default:
+          return nothing(data, res + "<br></blockquote>")(line);
+      }
+    };
+
+    const quote = (data, res) => (line) => {
+      switch (line.type) {
+        case "quoteempty":
+          return quoteempty(data, res + "</p>");
+        case "quote":
+          return quote(data, res + `<br>${renderLine(data, line)}`);
+        default:
+          return nothing(data, res + "</p></blockquote>")(line);
+      }
+    };
+
+    const emptyline = (data, res) => (line) =>
+      line.type === "empty"
+        ? emptyline(data, res + "<br>")
+        : nothing(data, res)(line);
+
+    const pre = (data, end, res) => (line) => {
+      switch (line.type) {
+        case "pre":
+          return pre(data, end, res + `${escapeHtml(line.full)}\n`);
+        case "toggle":
+          return nothing(
+            data,
+            res + end(captionFrom(line))
+          );
+        case "end":
+          return nothing(data, end, res + end(""))(line);
+        default:
+          throw "oh no";
+      }
+    };
+
+    const nothing = (data, res) => (line) => {
+      switch (line.type) {
+        case "empty":
+          return emptyline(data, res);
+        case "par":
+        case "link":
+        case "error":
+          return text(data, res + `<p>${renderLine(data, line)}`);
+        case "quote":
+          return quote(data, res + `<blockquote><p>${renderLine(data, line)}`);
+        case "quoteempty":
+          return quote(data, res + "<blockquote><br>")(line);
+        case "li":
+          return li(data, res + "<ul>")(line);
+        case "hr":
+          return nothing(data, res + "<hr>");
+        case "toggle":
+          const alts = line.text.str.split(/\s+/).filter((s) => s.length > 0);
+          const classes = alts.filter((s) => s !== "details");
+          const [start, end] = data.preHtml(line.text.str);
+          return pre(data, end, res + start);
+        case "details":
+          const newData = Object.assign({}, data, { details: !data.details });
+          const str = newData.details
+            ? `<details>${summaryFrom(data, line)}`
+            : "</details>";
+          return nothing(newData, res + str);
+        case "h1":
+        case "h2":
+        case "h3":
+        case "include":
+          return nothing(data, res + renderLine(data, line));
+        case "keyval":
+          return nothing(data, res);
+        case "end":
+          return data.details ? res + "</details>" : res;
+        default:
+          throw "oh no";
+      }
+    };
+
+    const preHtml =  str => [`<figure><pre><code>`, caption => `</code></pre>${caption}</figure>`];
+    
+    const render = (list, config) => {
+      let state = nothing(
+        Object.assign(
+          { url: (url) => url, preHtml: preHtml, details: false , defaultSummary: "Details" },
+          config
+        ),
+        ""
+      );
       for (const line of list) {
         state = state(line);
       }
@@ -554,9 +564,9 @@
     return {
       escapeHtml: escapeHtml,
       textHtml: textHtml,
-      renderer: renderer,
       render: render,
-      relify: baseRelify,
+      preHtml: preHtml,
+      relify: relify,
     };
   })();
 

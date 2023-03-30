@@ -1,3 +1,4 @@
+"use strict";
 const elem = (type, props, ...children) => {
   const el = document.createElement(type);
   Object.assign(el, props);
@@ -17,48 +18,63 @@ window.addEventListener("error", (event) => {
 
 const outElement = elem("div");
 
-const create = (element) => {
+const create = (element, prelude) => {
+  const placeholder = elem("div", {});
+  element.parentElement.replaceChild(placeholder, element);
+  document.body.appendChild(element);
+  
   const ta = elem("textarea", {
     className: "editor",
+    readOnly: prelude,
     value: element.innerText,
   });
-  const play = elem(
-    "button",
-    {
-      className: "toolbar-button",
-      title: "Run",
-      onclick: (e) => {
-        currentOut = out;
-        div.appendChild(outElement);
-        const script = elem("script", {}, ta.value);
-        document.head.appendChild(script);
-        script.remove();
-        currentOut = null;
-      },
-    },
-    "▶"
-  );
-  const clear = elem(
-    "button",
-    {
-      className: "toolbar-button",
-      title: "Clear output",
-      onclick: (e) => {
-        out.replaceChildren();
-      },
-    },
-    "⎚"
-  );
+  element.remove();
+  const run = (e) => {
+    currentOut = out;
+    div.appendChild(outElement);
+    const script = elem("script", {}, ta.value);
+    document.head.appendChild(script);
+    script.remove();
+    currentOut = null;
+  };
+  const buttons = prelude
+    ? []
+    : [
+        elem(
+          "button",
+          {
+            className: "toolbar-button",
+            title: "Run",
+            onclick: run,
+          },
+          "▶"
+        ),
+        elem(
+          "button",
+          {
+            className: "toolbar-button",
+            title: "Clear output",
+            onclick: (e) => {
+              out.replaceChildren();
+            },
+          },
+          "⎚"
+        ),
+      ];
   const out = elem("pre", { className: "output" });
   const div = elem(
     "div",
     { className: "editor-container" },
     ta,
-    elem("div", { className: "toolbar" }, play, clear, out)
+    elem("div", { className: "toolbar" }, ...buttons, out)
   );
-  element.parentElement.replaceChild(div, element);
+  document.body.appendChild(div);
   ta.setAttribute("style", "height: 0;");
   ta.setAttribute("style", `height: ${ta.scrollHeight}px;`);
+  placeholder.parentElement.replaceChild(div, placeholder);
+  if (prelude) {
+    run();
+  }
 };
 
 const thingToString = (level) => (thing) => {
@@ -103,9 +119,10 @@ window.addEventListener("load", (e) => {
       );
     }
   };
-
-  const elems = [...document.getElementsByClassName("repl")];
-  for (const el of elems) {
-    create(el);
+  for (const el of [...document.querySelectorAll(".prelude")]) {
+    create(el, true);
+  }
+  for (const el of [...document.querySelectorAll(".repl")]) {
+    create(el, false);
   }
 });

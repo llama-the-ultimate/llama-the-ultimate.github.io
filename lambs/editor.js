@@ -72,7 +72,7 @@ const Editor = (() => {
   const create = (elem) => {
     const str = elem.innerText;
     const props =
-      elem.dataset.prelude === "true"
+      elem.classList.contains("prelude")
         ? preluditorProps(str)
         : editorProps(str);
 
@@ -86,8 +86,7 @@ const Editor = (() => {
     }
   };
   window.addEventListener("load", (event) => {
-    const elems = [...document.getElementsByClassName("repl")];
-    for (const el of elems) {
+    for (const el of [...document.querySelectorAll(".prelude,.repl")]) {
       editors.push(create(el));
     }
     updateTheme();

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Successor</title>
     <link rel="icon" type="image/x-icon" href="./../assets/icon.png">
     <link rel="stylesheet" href="./../style.css">
@@ -19,9 +19,9 @@
     <script src="./../lambs/repl.js" defer></script>
     <script src="./../lambs/editor.js" defer></script>
   </head>
-  <body class="page"><p><a href="./../index.html">Index</a></p><p><time>2017-12-29</time></p><h1>Successor</h1><p><a href="./lambs.html">(There's a list with all the lambda notes here.)</a></p><p>We have made some numbers and some functions for working with numbers. Also some other datatypes.</p><p>We haven’t really done so here, but sometimes when we define numbers we fuss more about how they are constructed, about what the constructors are. We say things like: “A natural number is zero or it is the successor of a natural number.” (In a Standard ML we might say: <code>datatype nat = Zero | Succ of nat</code>)</p><p>We can do something similar but with the lambdas.</p><p>---</p><p>We already know what zero looks like:</p><figure class="repl"><pre><code>0 ≜ λf.λx.x
-</code></pre></figure><p>We do not know that successor looks like:</p><figure class="repl"><pre><code>S ≜ λn.λf.λx.f (n f x)
-</code></pre></figure><p>It takes a number, <code>n</code>, as its argument. <code>S</code> applied to <code>n</code> should return a number that is one larger than <code>n</code>.</p><p>(Remember: The number <code>n</code> is a function that, if given two arguments, applies the first argument <code>n</code> times to the second.)</p><p>So, <code>S</code> takes a number, <code>n</code>, as its argument, and returns one of those <code>λf.λx.</code>-functions. Within that function we do <code>n f x</code> (we apply <code>n</code> to <code>f</code> and <code>x</code>). This should amount to applying <code>f</code> “<code>n</code> times” to <code>x</code>. And then we apply <code>f</code> to the result of <code>n f x”, so that in total </code>f<code> should be applied “</code>n<code>+1 times” to </code>x<code>.</code></p><p>We can test it some and see if it looks right:</p><figure class="repl"><pre><code>S 0
+  <body class="page"><p><a href="./../index.html">Index</a></p><p><time>2017-12-29</time></p><h1>Successor</h1><p><a href="./lambs.html">(There's a list with all the lambda notes here.)</a></p><p>We have made some numbers and some functions for working with numbers. Also some other datatypes.</p><p>We haven’t really done so here, but sometimes when we define numbers we fuss more about how they are constructed, about what the constructors are. We say things like: “A natural number is zero or it is the successor of a natural number.” (In a Standard ML we might say: <code>datatype nat = Zero | Succ of nat</code>)</p><p>We can do something similar but with the lambdas.</p><p>---</p><p>We already know what zero looks like:</p><figure><pre class="repl"><code>0 ≜ λf.λx.x
+</code></pre></figure><p>We do not know that successor looks like:</p><figure><pre class="repl"><code>S ≜ λn.λf.λx.f (n f x)
+</code></pre></figure><p>It takes a number, <code>n</code>, as its argument. <code>S</code> applied to <code>n</code> should return a number that is one larger than <code>n</code>.</p><p>(Remember: The number <code>n</code> is a function that, if given two arguments, applies the first argument <code>n</code> times to the second.)</p><p>So, <code>S</code> takes a number, <code>n</code>, as its argument, and returns one of those <code>λf.λx.</code>-functions. Within that function we do <code>n f x</code> (we apply <code>n</code> to <code>f</code> and <code>x</code>). This should amount to applying <code>f</code> “<code>n</code> times” to <code>x</code>. And then we apply <code>f</code> to the result of <code>n f x”, so that in total </code>f<code> should be applied “</code>n<code>+1 times” to </code>x<code>.</code></p><p>We can test it some and see if it looks right:</p><figure><pre class="repl"><code>S 0
 
 S (S 0)
 

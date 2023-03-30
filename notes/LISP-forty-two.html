@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Solving a number problem using idiomatic LISP</title>
     <link rel="icon" type="image/x-icon" href="./../assets/icon.png">
     <link rel="stylesheet" href="./../style.css">
   </head>
   <body class="page"><p><a href="./../index.html">Index</a></p><p><time>2017-03-26</time></p><h1>Solving a number problem using idiomatic LISP</h1><p>Hi okay one time I ran into a number problem that went something like this: “How many (natural) numbers less than or equal to one million are there whose digits add up to forty-two?”</p><p>Okay let’s solve this using Racket. Racket is a maybe a LISP. In LISP, pretty much the only thing that matters is you have to use parentheses.</p><blockquote><p>Parentheses essentially are the basis of computation.</p></blockquote><p><a href="https://www.youtube.com/watch?v=OubXOd0Twl4">―Robert Constable, 8 minutes or so into this OPLSS 2015 lecture</a></p><p>Anyway we can stare at this problem for a while and then notice three things.</p><ul><li>One thing is that the digits in one million do not add up to forty-two.</li><li>Another thing is that the numbers less than one million all have six digits (or they might as well have, and can be padded with leading zeroes).</li><li>Anothother thing is that forty-two divided by six equals seven.</li></ul><p>So. We only need to care about numbers that have six digits, and if every digit is seven they add up to forty-two. More, if the digits in a number are “balanced around seven” they also add up to forty-two. (A six can be made up for by an eight, a three by two nines, and so on.)</p><p>Okay so that’s extremely good to know. We pretty much just wanna balance stuff. And parentheses are like incredibly good things to balance.</p><hr><p>Racket comes with a read-procedure. read reads an expression from something, and it makes sure parentheses are balanced. Problem solved, then, more or less...</p><figure><pre><code>#lang racket
-</code></pre><figcaption></figcaption></figure><p>We need some halp. <code>read-string</code> will <code>read</code> a string until its end. If any parentheses are out of balance, read will throw and the <code>with-handlers-bit</code> will catch and make it so that we return the number zero. Otherwise one.</p><figure><pre><code>(define (read-string s)
+</code></pre></figure><p>We need some halp. <code>read-string</code> will <code>read</code> a string until its end. If any parentheses are out of balance, read will throw and the <code>with-handlers-bit</code> will catch and make it so that we return the number zero. Otherwise one.</p><figure><pre><code>(define (read-string s)
   (with-handlers
       ([(λ (_) #t) (λ (_) 0)])
     (define in (open-input-string s))
@@ -16,11 +16,11 @@
       (unless (eof-object? (read in))
         (loop)))
     1))
-</code></pre><figcaption></figcaption></figure><p>Woop woop. We can use <code>read-string</code> to kind of check if a string has balanced parentheses. If we can turn numbers into strings, so that a string only has balanced parentheses in it if the digits in the number add up to forty-two, then stuff.</p><p><code>number-&gt;chars</code> will turn a number into a list of characters, maybe padded with some zeroes:</p><figure><pre><code>(define (number-&gt;chars n)
+</code></pre></figure><p>Woop woop. We can use <code>read-string</code> to kind of check if a string has balanced parentheses. If we can turn numbers into strings, so that a string only has balanced parentheses in it if the digits in the number add up to forty-two, then stuff.</p><p><code>number-&gt;chars</code> will turn a number into a list of characters, maybe padded with some zeroes:</p><figure><pre><code>(define (number-&gt;chars n)
   (string-&gt;list (~a n
                     #:min-width 6
                     #:pad-string &quot;0&quot;)))
-</code></pre><figcaption></figcaption></figure><p>Now we can have one character for every digit in a number. We make a <code>char-&gt;string</code>-function that will turn a character like that into a string. The string will have parentheses that are just as much balanced as the digit was balanced around seven:</p><figure><pre><code>(define (char-&gt;string c)
+</code></pre></figure><p>Now we can have one character for every digit in a number. We make a <code>char-&gt;string</code>-function that will turn a character like that into a string. The string will have parentheses that are just as much balanced as the digit was balanced around seven:</p><figure><pre><code>(define (char-&gt;string c)
   (match c
     [#\0 &quot;(((((((&quot;]
     [#\1 &quot;((((((&quot;]
@@ -32,14 +32,14 @@
     [#\8 &quot;)&quot;]
     [#\9 &quot;))&quot;]
     [_ &quot;horses&quot;]))
-</code></pre><figcaption></figcaption></figure><p>So, in order to turn a number into a good string, we use <code>number-&gt;chars</code>, then <code>char-&gt;string</code> each digit-character. And then adjust as necessary: We will sort the characters in the string so that any left parentheses come before any right parentheses. <code>number-&gt;string</code> does:</p><figure><pre><code>(define (number-&gt;string n)
+</code></pre></figure><p>So, in order to turn a number into a good string, we use <code>number-&gt;chars</code>, then <code>char-&gt;string</code> each digit-character. And then adjust as necessary: We will sort the characters in the string so that any left parentheses come before any right parentheses. <code>number-&gt;string</code> does:</p><figure><pre><code>(define (number-&gt;string n)
   (define char-list
     (map char-&gt;string (number-&gt;chars n)))
 
   (list-&gt;string
    (sort (append* (map string-&gt;list char-list))
          char&lt;?)))
-</code></pre><figcaption></figcaption></figure><p>Now all that remains is to pick the numbers we care about, then feed to <code>read-string</code> the strings we get by applying <code>number-&gt;string</code>. <code>read-string</code> should return one if things are balanced and zero if not, so if we add together all those zeroes and ones we’re good.</p><figure><pre><code>(for/sum ([n (in-range 1000000)])
+</code></pre></figure><p>Now all that remains is to pick the numbers we care about, then feed to <code>read-string</code> the strings we get by applying <code>number-&gt;string</code>. <code>read-string</code> should return one if things are balanced and zero if not, so if we add together all those zeroes and ones we’re good.</p><figure><pre><code>(for/sum ([n (in-range 1000000)])
   (read-string (number-&gt;string n)))
-</code></pre><figcaption></figcaption></figure><p>You can get the full program at blah. Put it into your DrRacket, press F5 or so, and voi—some 20 seconds wait—là, you will have an answer.</p></body>
+</code></pre></figure><p>You can get the full program at blah. Put it into your DrRacket, press F5 or so, and voi—some 20 seconds wait—là, you will have an answer.</p></body>
 </html>

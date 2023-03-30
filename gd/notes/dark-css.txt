@@ -1,4 +1,4 @@
-# Dark, unless light
+# Dark
 :blurb henlo ol frien
 
 After looking into dark mode stuff, I have this in my CSS:

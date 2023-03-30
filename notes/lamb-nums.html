@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Some numbery functions</title>
     <link rel="icon" type="image/x-icon" href="./../assets/icon.png">
     <link rel="stylesheet" href="./../style.css">
@@ -19,13 +19,13 @@
     <script src="./../lambs/repl.js" defer></script>
     <script src="./../lambs/editor.js" defer></script>
   </head>
-  <body class="page"><p><a href="./../index.html">Index</a></p><p><time>2017-07-06</time></p><h1>Some numbery functions</h1><p><a href="./lambs.html">(There's a list with all the lambda notes here.)</a></p><p>Somewhat a test-post, for having not-dead lambda calculus within a post. If you're viewing this in a web browser and it runs the JavaScript and so on, it should be interactive.</p><p><a href="./../lambdas.html">(There’s also kind of a lambda playground over here.)</a></p><p>To try, put cursor on line below and do ctrl+enter couple of times:</p><figure class="repl"><pre><code>(λx.λy.y x) bar foo
-</code></pre></figure><p>If it works (if the ctrl+enter-business leads to a line that goes <code>foo bar</code>), we can make a few numbers... (ctrl+enter each line).</p><figure class="repl"><pre><code>0 ≜ λf.λx.x
+  <body class="page"><p><a href="./../index.html">Index</a></p><p><time>2017-07-06</time></p><h1>Some numbery functions</h1><p><a href="./lambs.html">(There's a list with all the lambda notes here.)</a></p><p>Somewhat a test-post, for having not-dead lambda calculus within a post. If you're viewing this in a web browser and it runs the JavaScript and so on, it should be interactive.</p><p><a href="./../lambdas.html">(There’s also kind of a lambda playground over here.)</a></p><p>To try, put cursor on line below and do ctrl+enter couple of times:</p><figure><pre class="repl"><code>(λx.λy.y x) bar foo
+</code></pre></figure><p>If it works (if the ctrl+enter-business leads to a line that goes <code>foo bar</code>), we can make a few numbers... (ctrl+enter each line).</p><figure><pre class="repl"><code>0 ≜ λf.λx.x
 1 ≜ λf.λx.f x
 2 ≜ λf.λx.f (f x)
 5 ≜ λf.λx.f (f (f (f (f x))))
-</code></pre></figure><p>The idea, or at least one way to look at it, is that the number five is the function that does something five times. So, if we want to <code>foo</code> a <code>bar</code> five times, then we can... (ctrl+r to replace <code>5</code> with the lambdas from the definition we did above. Then ctrl+enter a couple of times.)</p><figure class="repl"><pre><code>5 foo bar
-</code></pre></figure><p>Which maybe evaluated to <code>foo (foo (foo (foo (foo bar))))</code>. Five <code>foo</code>s.</p><p>Okay. Addition is pretty numbery. Below is a function that takes arguments <code>a</code> and <code>b</code>, and gives back, uh, a <code>λf.λx.</code>-function. This function applies <code>f</code> to <code>x</code> and it will do that “<code>b</code> times.” And it will apply <code>f</code> to the result of that “<code>a</code> times.” Hopefully that amounts to <code>f</code> being applied  “<code>a</code> + <code>b</code> times” to <code>x</code> (ctrl+enter on line below)</p><figure class="repl"><pre><code>+ ≜ λa.λb.λf.λx.a f (b f x)
-</code></pre></figure><p>If things seem fine so far, we can try to use it. ctrl+r on line below to replace the names of the things we’ve defined with their lambdas. Then ctrl+enter a bunch of times to evaluate. (Or ctrl+shift+enter one time.)</p><figure class="repl"><pre><code>5 (+ 5 2)
+</code></pre></figure><p>The idea, or at least one way to look at it, is that the number five is the function that does something five times. So, if we want to <code>foo</code> a <code>bar</code> five times, then we can... (ctrl+r to replace <code>5</code> with the lambdas from the definition we did above. Then ctrl+enter a couple of times.)</p><figure><pre class="repl"><code>5 foo bar
+</code></pre></figure><p>Which maybe evaluated to <code>foo (foo (foo (foo (foo bar))))</code>. Five <code>foo</code>s.</p><p>Okay. Addition is pretty numbery. Below is a function that takes arguments <code>a</code> and <code>b</code>, and gives back, uh, a <code>λf.λx.</code>-function. This function applies <code>f</code> to <code>x</code> and it will do that “<code>b</code> times.” And it will apply <code>f</code> to the result of that “<code>a</code> times.” Hopefully that amounts to <code>f</code> being applied  “<code>a</code> + <code>b</code> times” to <code>x</code> (ctrl+enter on line below)</p><figure><pre class="repl"><code>+ ≜ λa.λb.λf.λx.a f (b f x)
+</code></pre></figure><p>If things seem fine so far, we can try to use it. ctrl+r on line below to replace the names of the things we’ve defined with their lambdas. Then ctrl+enter a bunch of times to evaluate. (Or ctrl+shift+enter one time.)</p><figure><pre class="repl"><code>5 (+ 5 2)
 </code></pre></figure><p>It’s maybe twelve! (Hopefully.)</p></body>
 </html>

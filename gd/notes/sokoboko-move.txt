@@ -7,9 +7,8 @@
 
 => gd sokoboko-gfx In previous post we drew a level.
 
-We ended up with almost this code:
-
-``` repl
++++ Mostly the code from last time.
+``` prelude
 const canvas = outElement.appendChild(document.createElement("canvas"));
 const scale = 3;
 const ctx = canvas.getContext("2d");
@@ -81,6 +80,7 @@ const drawLevel = () => {
 
 spriteSheet.onload = () => setLevel(level1);
 ```
++++
 
 ## Some vectors
 

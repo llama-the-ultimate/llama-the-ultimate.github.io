@@ -1,31 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Land of some other order</title>
     <link rel="icon" type="image/x-icon" href="./../assets/icon.png">
     <link rel="stylesheet" href="./../style.css">
   </head>
   <body class="page"><p><a href="./../index.html">Index</a></p><p><time>2019-06-09</time></p><h1>Land of some other order</h1><p>We start with</p><figure><pre><code>#lang racket
-</code></pre><figcaption></figcaption></figure><p>or</p><figure><pre><code>#lang lazy
-</code></pre><figcaption></figcaption></figure><p>And make some natural and/or unnatural numbers:</p><figure><pre><code>(struct zero () #:transparent)
+</code></pre></figure><p>or</p><figure><pre><code>#lang lazy
+</code></pre></figure><p>And make some natural and/or unnatural numbers:</p><figure><pre><code>(struct zero () #:transparent)
 (struct succ (pred) #:transparent)
 
 (define one (succ (zero)))
 (define two (succ one))
 (define (inf) (succ (inf)))
-</code></pre><figcaption></figcaption></figure><p>And a less-than-or-equal-to function:</p><figure><pre><code>(define (&lt;= a b)
+</code></pre></figure><p>And a less-than-or-equal-to function:</p><figure><pre><code>(define (&lt;= a b)
   (cond
     [(zero? a) #t]
     [(zero? b) #f]
     [else (&lt;= (succ-pred a) (succ-pred b))]))
-</code></pre><figcaption></figcaption></figure><p>(<code>&lt;=</code> is a function with parameters <code>a</code> and <code>b</code>: If <code>a</code> is zero then true else if <code>b</code> is zero then false else try with one-less-than-<code>a</code> and one-less-than-<code>b</code> instead.)</p><p>Okay. We can try to apply the function to some arguments. The following are are fine and evaluate to <code>#t</code> and <code>#f</code>.</p><figure><pre><code>(&lt;= one two)
+</code></pre></figure><p>(<code>&lt;=</code> is a function with parameters <code>a</code> and <code>b</code>: If <code>a</code> is zero then true else if <code>b</code> is zero then false else try with one-less-than-<code>a</code> and one-less-than-<code>b</code> instead.)</p><p>Okay. We can try to apply the function to some arguments. The following are are fine and evaluate to <code>#t</code> and <code>#f</code>.</p><figure><pre><code>(&lt;= one two)
 
 (&lt;= two one)
-</code></pre><figcaption></figcaption></figure><p>If we started with <code>#lang racket</code> the next two will run forever and we won’t get values back. If we started with <code>#lang lazy</code> they’re fine and evaluate to <code>#t</code> and <code>#f</code>.</p><figure><pre><code>(&lt;= two (inf))
+</code></pre></figure><p>If we started with <code>#lang racket</code> the next two will run forever and we won’t get values back. If we started with <code>#lang lazy</code> they’re fine and evaluate to <code>#t</code> and <code>#f</code>.</p><figure><pre><code>(&lt;= two (inf))
 
 (&lt;= (inf) two)
-</code></pre><figcaption></figcaption></figure><p>The next one will run forever in both <code>#lang racket</code> and <code>#lang lazy</code>.</p><figure><pre><code>(&lt;= (inf) (inf))
-</code></pre><figcaption></figcaption></figure><p>(Forever means until we are out of memory or something.)</p><p>Anyway. We can choose:</p><ul><li>If we want as many expressions as possible to give back values, we might prefer <code>#lang lazy</code></li><li>If we want as many applications as possible of <code>&lt;=</code> to give back values, we might prefer <code>#lang racket</code></li></ul><p>(In <code>#lang racket</code> the forever happens when evaluating the <code>(inf)</code>-arguments before the <code>&lt;=</code>-function is applied. In <code>#lang lazy</code> we might have to decide: Is it the <code>(inf)</code> or the <code>&lt;=</code> that causes forever? Is it reasonably to expect there to be a base case?)</p></body>
+</code></pre></figure><p>The next one will run forever in both <code>#lang racket</code> and <code>#lang lazy</code>.</p><figure><pre><code>(&lt;= (inf) (inf))
+</code></pre></figure><p>(Forever means until we are out of memory or something.)</p><p>Anyway. We can choose:</p><ul><li>If we want as many expressions as possible to give back values, we might prefer <code>#lang lazy</code></li><li>If we want as many applications as possible of <code>&lt;=</code> to give back values, we might prefer <code>#lang racket</code></li></ul><p>(In <code>#lang racket</code> the forever happens when evaluating the <code>(inf)</code>-arguments before the <code>&lt;=</code>-function is applied. In <code>#lang lazy</code> we might have to decide: Is it the <code>(inf)</code> or the <code>&lt;=</code> that causes forever? Is it reasonably to expect there to be a base case?)</p></body>
 </html>

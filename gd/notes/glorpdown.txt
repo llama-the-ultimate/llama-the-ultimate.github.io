@@ -105,7 +105,27 @@ code here
 not turned off yet so things are still code
 ````
 
-Like in Gemtext you can write some stuff after the <start> of a line that turns preformatted text _on_ and have that be “alt text,” which is sometimes used for stuff.
+In Gemtext you can write some stuff after the <start> of a line that turns preformatted text _on_ and have that be “alt text.” In Glorpdown this text is instead potentially used when rendering. E.g. for marking some preformatted text as a “repl,” so that later code can turn it into a editable textare or something.
+
+If there’s text after the <start> of a line that turns preformatted text _off_, then that’s used as a caption for the preformatted text.
+
+### Details
+
+Not in gemtext. This it “toggled,” kind of like with the preformatted text. Lines that start with `+++`. The text after the first `+++` becomes the summary. The content between a first and second `+++`-line is details (the stuff you see if you click to expand or something).
+
+```
++++ Things
+* One thing
+* Another thing
+* A third thing
++++
+```
+
++++ Things
+* One thing
+* Another thing
+* A third thing
++++
 
 ### Key-value pairs
 

@@ -1,0 +1,267 @@
+# Sokoban: Winning the game
+:special js
+:blurb Maybe feature-complete.
+:date 2023-03-30
+
+(Best viewed in a browser with JavaScript enabled. You can click the play/run-buttons to run the JavaScript in the embedded editors. It should behave mostly like running the same code in the JavaScript console. (Hitting F12 or something and finding the console might also be useful if you wanna look around and inspect stuff more or something.))
+
+=> gd sokoboko-move Previously we made the cat move.
+
++++ Mostly the code from last time.
+``` prelude
+const canvas = outElement.appendChild(document.createElement("canvas"));
+const scale = 3;
+const ctx = canvas.getContext("2d");
+
+let level;
+let moveList;
+
+const moveListP = outElement.appendChild(document.createElement("p"));
+
+const setLevel = (str) => {
+  level = str.split("\n").map((x) => x.split(""));
+  if (level[0].every((x) => x === " ")) {
+    level.shift();
+  }
+  if (level[level.length - 1].every((x) => x === " ")) {
+    level.pop();
+  }
+  moveList = "";
+  canvas.width = level[0].length * 16 * scale;
+  canvas.height = level.length * 16 * scale;
+  ctx.imageSmoothingEnabled = false;
+  drawLevel();
+};
+const level1 = `
+#########
+#  $ @..#
+# $ $   #
+#  ###  #
+# $     #
+##  ##..#
+#########
+`;
+
+const levelGet = (position) => level[position.y][position.x];
+const levelSet = (position, value) => level[position.y][position.x] = value;
+
+const spriteSheet = document.createElement("img");
+spriteSheet.src = "./../assets/soko-sprites.png"
+spriteSheet.alt = "sprite sheet";
+
+const vector = (x, y) => ({ x: x, y: y });
+const plus = (a, b) => vector(a.x + b.x, a.y + b.y);
+const directions = {
+  u: vector(0, -1),
+  d: vector(0, 1),
+  l: vector(-1, 0),
+  r: vector(1, 0),  
+};
+
+const sprites = {
+  " ": vector(0, 0), // top left is empty floor
+  "#": vector(1, 0), // top right is wall
+  "@": vector(0, 1), // middle left is player
+  "+": vector(0, 1), // same sprite for player on goal square
+  "$": vector(1, 1), // middle right is “box”
+  ".": vector(0, 2), // bottom left is goal square
+  "*": vector(1, 2), // middle left is “bosdx” on a goal square
+};
+
+const drawSquare = (square, position) => {
+  const sprite = sprites[square];
+  ctx.drawImage(
+    spriteSheet,
+    sprite.x * 16,
+    sprite.y * 16,
+    16,
+    16,
+    position.x * 16 * scale,
+    position.y * 16 * scale,
+    16 * scale,
+    16 * scale
+  );
+};
+
+const drawLevel = () => {
+  level.forEach((row, y) => row.forEach((square, x) => drawSquare(square, vector(x, y))));
+  moveListP.innerText = moveList;
+};
+
+spriteSheet.onload = () => setLevel(level1);
+
+const playerPosition = () => {
+  for ([y, row] of level.entries()) {
+    for ([x, square] of row.entries()) {
+      if (square === "@" || square === "+") {
+        return vector(x, y);
+      }
+    }
+  }
+};
+
+const player = ["@", "+"];
+const box = ["$", "*"];
+const floor = [" ", "."];
+
+const move = (thing, from, direction) => {
+  const fromIdx = thing.indexOf(levelGet(from));
+  if (fromIdx < 0) {
+    return false;
+  }
+  const to = plus(from, direction);
+  const toIdx = floor.indexOf(levelGet(to));
+  if (toIdx < 0) {
+    return false;
+  }
+  levelSet(from, floor[fromIdx]);
+  levelSet(to, thing[toIdx]);
+  return true;
+};
+
+const movePlayer = (directionLetter) => () => {
+  const direction = directions[directionLetter];
+  const position = playerPosition();
+  const movedBox = move(box, plus(position, direction), direction);
+  const movedPlayer = move(player, position, direction);
+  if (!movedPlayer) {
+    return false;
+  }
+  moveList += movedBox ? directionLetter.toUpperCase() : directionLetter;
+  return true;
+};
+
+const commands = new Map([
+  ["w", movePlayer("u")],
+  ["a", movePlayer("l")],
+  ["s", movePlayer("d")],
+  ["d", movePlayer("r")]
+]);
+
+const doCommand = (key) => {
+  if (commands.has(key)) {
+    commands.get(key)();
+    drawLevel();
+  }
+};
+canvas.tabIndex = 0;
+canvas.onkeydown = event => doCommand(event.key.toLowerCase());
+
+const button = (key) => {
+  const element= outElement.appendChild(document.createElement("button"));
+  element.innerText = key;
+  element.style.fontSize = "2rem";
+  element.style.width = "3rem";
+  element.onclick = () => doCommand(key);
+};
+
+const space = outElement.appendChild(document.createElement("div"));
+space.style.float = "left";
+space.style.height = "1px";
+space.style.width = "3rem";
+button("w");
+outElement.appendChild(document.createElement("br"));
+"asd".split("").forEach(button);
+```
+Very playable.
++++
+
+## Win condition
+
+You’ve won the game if every goal has a box on it. So if there are no goal squares left with either nothing on them or player on them:
+
+``` repl
+const won = () =>
+  !level.some((row) => row.some((square) => square === "." || square === "+"));
+
+console.log(won());
+```
+
+We’ll test it with a won level:
+
+``` repl
+setLevel(`
+######
+# @  #
+#*  *#
+######
+`);
+console.log(won());
+```
+
+Seems fine. Let’s fix the commands so they take winning into account, and switch to very winnable level for testing:
+
+``` repl
+const wonP = document.createElement("p");
+moveListP.insertAdjacentElement("beforebegin", wonP);
+
+const takeWinningIntoAccount = (command) => () => {
+  if (!won()) {
+    command();
+    wonP.innerText = won() ? "Yay!" : "";
+  }
+};
+[...commands.entries()].forEach(([key, command]) => commands.set(key, takeWinningIntoAccount(command)));
+
+setLevel(`
+######
+# @  #
+#   $#
+#.$ .#
+######
+`);
+```
+
+Seems fine.
+
+## Undo
+
+Also let’s implement undo. Undoing a move is kind of like moving in the opposite direction:
+
+``` repl
+const opposite = (v) => vector(-v.x, -v.y);
+console.log(opposite(directions.r));
+```
+
+We undo by:
+* Removing the last character from `moveList`.
+* Moving the player in the opposite direction of the move we removed from `moveList`.
+* If the move we removed was in uppercase, “dragging” a box along after the player.
+
+``` repl
+const undo = () => {
+  if (moveList === "") {
+    return;
+  }
+  const moveMade = moveList.slice(-1);
+  moveList = moveList.slice(0, -1);
+  const moveDir = directions[moveMade.toLowerCase()];
+  const undoDir = opposite(moveDir);
+  const playerPos = playerPosition();
+  move(player, playerPos, undoDir);
+  if (moveMade === moveMade.toUpperCase()) {
+    move(box, plus(playerPos, moveDir), undoDir);
+  }
+};
+commands.set("z", undo);
+outElement.appendChild(document.createElement("br"));
+button("z");
+```
+
+We can restart a level by undoing a lot:
+
+``` repl
+const restart = () => {
+  while (moveList !== "") {
+    undo();
+  }
+};
+commands.set("r", restart);
+button("r");
+```
+
+Okay okay. It’s probably a game now...
+
+``` repl
+setLevel(level1);
+```
