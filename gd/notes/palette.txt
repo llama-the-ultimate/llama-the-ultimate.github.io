@@ -1,0 +1,113 @@
+# An 8-bit palette
+:special js
+
+Bla blah. Some JavaScript for treating single bytes as RGB-values. Only works in browser with JavaScript and so on.
+
+=> url https://en.wikipedia.org/wiki/8-bit_color From Wikipedia:
+> The simplest form of quantization is to simply assign 3 bits to red, 3 bits to green and 2 bits to blue, as the human eye is less sensitive to blue light.
+```
+Bit    7  6  5  4  3  2  1  0
+Data   R  R  R  G  G  G  B  B
+```
+
+So that’s like 3-bit values (0-7) for R and G and a 2-bit value (0-3) for B. I multiply the R and G values by 36 and the B values by 85. Because that seems fine.
+
++++ Stylesheet stuff
+``` prelude
+var styleSheet = document.createElement("style");
+styleSheet.innerText = `
+.palette {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.row {
+  display: flex;
+  flex-direction: row;
+}
+.square {
+  box-sizing: border-box;
+  border: none;
+  width: 2rem;
+  height: 2rem;
+}
+.selectedColor {
+  border-style: dashed;
+}
+`;
+document.head.appendChild(styleSheet);
+```
++++
+
++++ Details
+
+`colorFromByte` gets the RGB-values from a byte and returns some hex:
+``` prelude
+const colorFromByte = (b) => {
+  const red = ((b & 0b11100000) >> 5) * 36;
+  const green = ((b & 0b00011100) >> 2) * 36;
+  const blue = (b & 0b00000011) * 85;
+  const hex = (i) => i.toString(16).padStart(2, "0");
+  return `#${hex(red)}${hex(green)}${hex(blue)}`;
+};
+console.log(colorFromByte(15));
+```
+
+``` prelude
+const elem = (type, props, ...children) => {
+  const el = document.createElement(type);
+  Object.assign(el, props);
+  el.replaceChildren(...children);
+  return el;
+};
+
+const palette= () => {
+  const colors = elem("div", { className: "palette" });
+  let selectedColor = 0;
+  const buttons = [];
+  const selectColor = (idx) => {
+    buttons[selectedColor].classList.remove("selectedColor");
+    selectedColor = idx;
+    buttons[selectedColor].classList.add("selectedColor");
+  };
+
+  const rowLength = 4;
+  
+  for (let row = 0; row < 256 / rowLength; row++) {
+    const rowDiv = elem("div", { className: "row" });
+    colors.appendChild(rowDiv);
+    for (let col = 0; col < rowLength; col++) {
+      const byte = (row * rowLength) + col;
+      const button = elem("button", { className: "square" });
+      rowDiv.appendChild(button);
+      buttons.push(button);
+      const color = colorFromByte(byte);
+      button.style.background = color;
+      button.onclick = () => {
+        selectColor(byte);
+        colors.dispatchEvent(
+          new CustomEvent("selectColor", {
+            detail: { byte: byte, color: color },
+          })
+        );
+      };
+    }
+  }
+  colors.selectColor = (idx) => {
+    if (idx >= 0 && idx < colorButtons.length) {
+      selectColor(idx);
+    }
+  };
+  return colors;
+};
+
+```
++++
+
+``` prelude
+const pal = outElement.appendChild(palette());
+const div = outElement.appendChild(document.createElement("div"));
+div.style.width = "10rem";
+div.style.height = "5rem";
+pal.addEventListener("selectColor", (e) => (div.style.background = e.detail.color));
+```

@@ -21,9 +21,8 @@
     return (key, thunk) => tasks.set(key, { time: 10, thunk: thunk });
   })();
 
-  const elem = (type, props, ...children) => {
-    const el = document.createElement(type);
-    Object.assign(el, props);
+  const elem = (tagName, props, ...children) => {
+    const el = Object.assign(document.createElement(tagName), props);
     el.replaceChildren(...children);
     return el;
   };
@@ -97,7 +96,7 @@
         soon(key, preview);
       });
       preview();
-      
+
       const matchSize = () =>
         (previewEl.style.maxHeight = `${div.offsetHeight}px`);
       new ResizeObserver(matchSize).observe(div);

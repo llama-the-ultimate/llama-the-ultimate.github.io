@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>An 8-bit palette</title>
+    <link rel="icon" type="image/x-icon" href="./../assets/icon.png">
+    <link rel="stylesheet" href="./../style.css">
+    <link rel="stylesheet" href="./../js-editor.css">
+    <script src="./../js-editor.js" defer></script>
+  </head>
+  <body class="page"><p><a href="./../index.html">Index</a></p><h1>An 8-bit palette</h1><p>Bla blah. Some JavaScript for treating single bytes as RGB-values. Only works in browser with JavaScript and so on.</p><p><a href="https://en.wikipedia.org/wiki/8-bit_color">From Wikipedia:</a></p><blockquote><p>The simplest form of quantization is to simply assign 3 bits to red, 3 bits to green and 2 bits to blue, as the human eye is less sensitive to blue light.</p></blockquote><figure><pre><code>Bit    7  6  5  4  3  2  1  0
+Data   R  R  R  G  G  G  B  B</code></pre></figure><p>So that’s like 3-bit values (0-7) for R and G and a 2-bit value (0-3) for B. I multiply the R and G values by 36 and the B values by 85. Because that seems fine.</p><details><summary>Stylesheet stuff</summary><figure><pre class="prelude"><code>var styleSheet = document.createElement(&quot;style&quot;);
+styleSheet.innerText = `
+.palette {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.row {
+  display: flex;
+  flex-direction: row;
+}
+.square {
+  box-sizing: border-box;
+  border: none;
+  width: 2rem;
+  height: 2rem;
+}
+.selectedColor {
+  border-style: dashed;
+}
+`;
+document.head.appendChild(styleSheet);</code></pre></figure></details><details><summary>Details</summary><p><code>colorFromByte</code> gets the RGB-values from a byte and returns some hex:</p><figure><pre class="prelude"><code>const colorFromByte = (b) =&gt; {
+  const red = ((b &amp; 0b11100000) &gt;&gt; 5) * 36;
+  const green = ((b &amp; 0b00011100) &gt;&gt; 2) * 36;
+  const blue = (b &amp; 0b00000011) * 85;
+  const hex = (i) =&gt; i.toString(16).padStart(2, &quot;0&quot;);
+  return `#${hex(red)}${hex(green)}${hex(blue)}`;
+};
+console.log(colorFromByte(15));</code></pre></figure><figure><pre class="prelude"><code>const elem = (type, props, ...children) =&gt; {
+  const el = document.createElement(type);
+  Object.assign(el, props);
+  el.replaceChildren(...children);
+  return el;
+};
+
+const palette= () =&gt; {
+  const colors = elem(&quot;div&quot;, { className: &quot;palette&quot; });
+  let selectedColor = 0;
+  const buttons = [];
+  const selectColor = (idx) =&gt; {
+    buttons[selectedColor].classList.remove(&quot;selectedColor&quot;);
+    selectedColor = idx;
+    buttons[selectedColor].classList.add(&quot;selectedColor&quot;);
+  };
+
+  const rowLength = 4;
+  
+  for (let row = 0; row &lt; 256 / rowLength; row++) {
+    const rowDiv = elem(&quot;div&quot;, { className: &quot;row&quot; });
+    colors.appendChild(rowDiv);
+    for (let col = 0; col &lt; rowLength; col++) {
+      const byte = (row * rowLength) + col;
+      const button = elem(&quot;button&quot;, { className: &quot;square&quot; });
+      rowDiv.appendChild(button);
+      buttons.push(button);
+      const color = colorFromByte(byte);
+      button.style.background = color;
+      button.onclick = () =&gt; {
+        selectColor(byte);
+        colors.dispatchEvent(
+          new CustomEvent(&quot;selectColor&quot;, {
+            detail: { byte: byte, color: color },
+          })
+        );
+      };
+    }
+  }
+  colors.selectColor = (idx) =&gt; {
+    if (idx &gt;= 0 &amp;&amp; idx &lt; colorButtons.length) {
+      selectColor(idx);
+    }
+  };
+  return colors;
+};
+</code></pre></figure></details><figure><pre class="prelude"><code>const pal = outElement.appendChild(palette());
+const div = outElement.appendChild(document.createElement(&quot;div&quot;));
+div.style.width = &quot;10rem&quot;;
+div.style.height = &quot;5rem&quot;;
+pal.addEventListener(&quot;selectColor&quot;, (e) =&gt; (div.style.background = e.detail.color));</code></pre></figure></body>
+</html>

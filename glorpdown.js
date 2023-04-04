@@ -402,7 +402,9 @@
     };
     const summaryFrom = (data, line) => {
       const html = textHtml(line.text);
-      return `<summary>${html.length === 0 ? data.defaultSummary : html}</summary>`;
+      return `<summary>${
+        html.length === 0 ? data.defaultSummary : html
+      }</summary>`;
     };
 
     const renderInclude = (data, line) => {
@@ -489,19 +491,31 @@
         : nothing(data, res)(line);
 
     const pre = (data, end, res) => (line) => {
-      switch (line.type) {
-        case "pre":
-          return pre(data, end, res + `${escapeHtml(line.full)}\n`);
-        case "toggle":
-          return nothing(
-            data,
-            res + end(captionFrom(line))
-          );
-        case "end":
-          return nothing(data, end, res + end(""))(line);
-        default:
-          throw "oh no";
+      const start = (res, line) => {
+        switch (line.type) {
+          case "pre":
+            return rest(res + `${escapeHtml(line.full)}`);
+          case "toggle":
+            return nothing(data, res + end(captionFrom(line)));
+          case "end":
+            return nothing(data, end, res + end(""))(line);
+          default:
+            throw "oh no";
+        }
+      };
+      const rest = (res) => (line) => {
+        switch (line.type) {
+          case "pre":
+            return rest(res + `\n${escapeHtml(line.full)}`);
+          case "toggle":
+            return nothing(data, res + end(captionFrom(line)));
+          case "end":
+            return nothing(data, end, res + end(""))(line);
+          default:
+            throw "oh no";
+        }
       }
+      return start(res, line);
     };
 
     const nothing = (data, res) => (line) => {
@@ -545,12 +559,20 @@
       }
     };
 
-    const preHtml =  str => [`<figure><pre><code>`, caption => `</code></pre>${caption}</figure>`];
-    
+    const preHtml = (str) => [
+      `<figure><pre><code>`,
+      (caption) => `</code></pre>${caption}</figure>`,
+    ];
+
     const render = (list, config) => {
       let state = nothing(
         Object.assign(
-          { url: (url) => url, preHtml: preHtml, details: false , defaultSummary: "Details" },
+          {
+            url: (url) => url,
+            preHtml: preHtml,
+            details: false,
+            defaultSummary: "Details",
+          },
           config
         ),
         ""

@@ -19,11 +19,9 @@
 #########
 `;
 const level = levelString.slice(1, -1).split(&quot;\n&quot;).map(x =&gt; x.split(&quot;&quot;));
-console.log(level);
-</code></pre></figure><h2>Image onto a canvas</h2><p>We have a variable called <code>outElement</code> here. <code>outElement</code> is just some <code>div</code>, and like it’d also work to just do <code>document.body.appendChild(...)</code> or something, but <code>outElement</code> is automatically moved to where we’re at when we run some code:</p><figure><pre class="repl"><code>const spriteSheet = outElement.appendChild(document.createElement(&quot;img&quot;));
+console.log(level);</code></pre></figure><h2>Image onto a canvas</h2><p>We have a variable called <code>outElement</code> here. <code>outElement</code> is just some <code>div</code>, and like it’d also work to just do <code>document.body.appendChild(...)</code> or something, but <code>outElement</code> is automatically moved to where we’re at when we run some code:</p><figure><pre class="repl"><code>const spriteSheet = outElement.appendChild(document.createElement(&quot;img&quot;));
 spriteSheet.src = &quot;./../assets/soko-sprites.png&quot;
-spriteSheet.alt = &quot;sprite sheet&quot;;
-</code></pre></figure><p>The sprite sheet is a set of 8 sprites. Each sprite is 16×16 pixels.</p><p>We’ll create a canvas and put it in the <code>outElement</code>.<br><a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage">Then we can get a <code>CanvasRenderingContext2D</code> and use <code>drawImage</code> on that.</a><br>Also we turn off image smoothing because pixels. Also also, we multiply some numbers by 3, because more pixels.</p><figure><pre class="repl"><code>const canvas = document.createElement(&quot;canvas&quot;);
+spriteSheet.alt = &quot;sprite sheet&quot;;</code></pre></figure><p>The sprite sheet is a set of 8 sprites. Each sprite is 16×16 pixels.</p><p>We’ll create a canvas and put it in the <code>outElement</code>.<br><a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage">Then we can get a <code>CanvasRenderingContext2D</code> and use <code>drawImage</code> on that.</a><br>Also we turn off image smoothing because pixels. Also also, we multiply some numbers by 3, because more pixels.</p><figure><pre class="repl"><code>const canvas = document.createElement(&quot;canvas&quot;);
 outElement.replaceChildren(canvas);
 const scale = 3;
 canvas.width = spriteSheet.width  * scale;
@@ -37,10 +35,8 @@ ctx.drawImage(
   0,
   spriteSheet.width * scale,
   spriteSheet.height * scale
-);
-</code></pre></figure><h2>Drawing one square</h2><p>We’re going to need objects with <code>x</code> and <code>y</code> properties for a bunch of stuff. First for positions of sprites. Later for positions in the level and also for directions the player can move in. We make a <code>vector</code> data structure:</p><figure><pre class="repl"><code>const vector = (x, y) =&gt; ({ x: x, y: y });
-console.log(vector(4, 2));
-</code></pre></figure><p>We’ll create an object for keeping track of where in the sprite sheet the different sprites are. Then, by passing a bunch of arguments to <code>drawImage</code> we can specify coordinates and width/height both for the part of the source image we want to draw and for the destination in the canvas. (The last 4 arguments are “destination” arguments. The ones that are multiplied by <code>scale</code>.)</p><figure><pre class="repl"><code>const sprites = {
+);</code></pre></figure><h2>Drawing one square</h2><p>We’re going to need objects with <code>x</code> and <code>y</code> properties for a bunch of stuff. First for positions of sprites. Later for positions in the level and also for directions the player can move in. We make a <code>vector</code> data structure:</p><figure><pre class="repl"><code>const vector = (x, y) =&gt; ({ x: x, y: y });
+console.log(vector(4, 2));</code></pre></figure><p>We’ll create an object for keeping track of where in the sprite sheet the different sprites are. Then, by passing a bunch of arguments to <code>drawImage</code> we can specify coordinates and width/height both for the part of the source image we want to draw and for the destination in the canvas. (The last 4 arguments are “destination” arguments. The ones that are multiplied by <code>scale</code>.)</p><figure><pre class="repl"><code>const sprites = {
   &quot; &quot;: vector(0, 0), // top left is empty floor
   &quot;#&quot;: vector(1, 0), // top right is wall
   &quot;@&quot;: vector(0, 1), // middle left is player
@@ -66,10 +62,8 @@ const drawSquare = (square, position) =&gt; {
 };
 
 ctx.clearRect(0, 0, canvas.width, canvas.height);
-drawSquare(&quot;@&quot;, vector(1, 2));
-</code></pre></figure><h2>Drawing the level</h2><figure><pre class="repl"><code>canvas.width = level[0].length * 16 * scale;
+drawSquare(&quot;@&quot;, vector(1, 2));</code></pre></figure><h2>Drawing the level</h2><figure><pre class="repl"><code>canvas.width = level[0].length * 16 * scale;
 canvas.height = level.length * 16 * scale;
 ctx.imageSmoothingEnabled = false;
-level.forEach((row, y) =&gt; row.forEach((square, x) =&gt; drawSquare(square, vector(x, y))));
-</code></pre></figure><p>Is level.</p></body>
+level.forEach((row, y) =&gt; row.forEach((square, x) =&gt; drawSquare(square, vector(x, y))));</code></pre></figure><p>Is level.</p></body>
 </html>

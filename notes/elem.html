@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JavaScript DOM framework</title>
+    <link rel="icon" type="image/x-icon" href="./../assets/icon.png">
+    <link rel="stylesheet" href="./../style.css">
+    <link rel="stylesheet" href="./../js-editor.css">
+    <script src="./../js-editor.js" defer></script>
+  </head>
+  <body class="page"><p><a href="./../index.html">Index</a></p><p><time>2023-04-04</time></p><h1>JavaScript DOM framework</h1><p>I tend to write a helper function for making a DOM element and these days it tend to end up looking kind of like this:</p><figure><pre class="prelude"><code>const elem = (tagName, props, ...children) =&gt; {
+  const el = Object.assign(document.createElement(tagName), props);
+  el.replaceChildren(...children);
+  return el;
+};</code></pre></figure><ul><li><code>tagName</code> is the tag name.</li><li><code>Object.assign</code> copies all the <code>props</code> over, so I can pass in <code>className</code> and such through that.</li><li><code>replaceChildren</code> puts the rest of the arguments in there.</li></ul><p>So uh we can use it for things. Beep boop:</p><figure><pre class="repl"><code>const styles = `
+.red {
+  background-color: red;
+}
+.blue {
+  background-color: blue;
+}
+.green {
+  background-color: green;
+}
+`;
+document.head.appendChild(elem(&quot;style&quot;, {}, styles));
+
+outElement.appendChild(
+  elem(
+    &quot;div&quot;,
+    {},
+    elem(&quot;p&quot;, { className: &quot;red&quot; }, &quot;blue&quot;),
+    elem(&quot;p&quot;, { className: &quot;blue&quot; }, &quot;red&quot;),
+    elem(
+      &quot;p&quot;,
+      {
+        onclick: (e) =&gt; e.target.classList.toggle(&quot;green&quot;),
+      },
+      &quot;green?&quot;
+    )
+  )
+);</code></pre></figure></body>
+</html>

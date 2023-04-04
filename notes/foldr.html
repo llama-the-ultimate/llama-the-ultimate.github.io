@@ -16,14 +16,5 @@ nonfix ::
 - :: (1, :: (2, :: (3, nil)));
 val it = [1,2,3] : int list
 - foldr + 0 (:: (1, :: (2, :: (3, nil))));
-val it = 6 : int
-</code></pre></figure><p>(We removed the infix thing from <code>+</code> and <code>::</code> (the plus function and the list “cons”). They take tupled arguments. Infix <code>1 + 2</code> is nonfix <code>+ (1, 2)</code>, and so on.)</p><p>Here, I guess we can say that</p><figure><pre><code>foldr + 0 (:: (1, :: (2, :: (3, nil))))
-</code></pre></figure><p>is kind of equivalent to</p><figure><pre><code>+ (1, + (2, + (3, 0))).
-</code></pre></figure><p>And it is maybe more clear how</p><figure><pre><code>+ (1, + (2, + (3, 0)))
-</code></pre></figure><p>is similar to the list</p><figure><pre><code>0 (:: (1, :: (2, :: (3, nil)))
-</code></pre></figure><p>It is like the list we but with the list constructors, <code>::</code> and <code>nil</code>, replaced with <code>+</code> and <code>0</code> (the first two values we gave to <code>foldr</code>).</p><p>Also maybe unsurprising that</p><figure><pre><code>foldr :: nil (:: (1, :: (2, :: (3, nil))))
-</code></pre></figure><p>will be equivalent to</p><figure><pre><code>:: (1, :: (2, :: (3, nil)))
-</code></pre></figure><p>and evaluate to a list that looks like the one we started with?</p><hr><p>(At least, more clear than when saying that</p><figure><pre><code>foldr (op +) 0 [1, 2, 3]
-</code></pre></figure><p>is equivalent to</p><figure><pre><code>1 + (2 + (3 + 0))?)
-</code></pre></figure><hr><p>And also like maybe not I dunno.</p></body>
+val it = 6 : int</code></pre></figure><p>(We removed the infix thing from <code>+</code> and <code>::</code> (the plus function and the list “cons”). They take tupled arguments. Infix <code>1 + 2</code> is nonfix <code>+ (1, 2)</code>, and so on.)</p><p>Here, I guess we can say that</p><figure><pre><code>foldr + 0 (:: (1, :: (2, :: (3, nil))))</code></pre></figure><p>is kind of equivalent to</p><figure><pre><code>+ (1, + (2, + (3, 0))).</code></pre></figure><p>And it is maybe more clear how</p><figure><pre><code>+ (1, + (2, + (3, 0)))</code></pre></figure><p>is similar to the list</p><figure><pre><code>0 (:: (1, :: (2, :: (3, nil)))</code></pre></figure><p>It is like the list we but with the list constructors, <code>::</code> and <code>nil</code>, replaced with <code>+</code> and <code>0</code> (the first two values we gave to <code>foldr</code>).</p><p>Also maybe unsurprising that</p><figure><pre><code>foldr :: nil (:: (1, :: (2, :: (3, nil))))</code></pre></figure><p>will be equivalent to</p><figure><pre><code>:: (1, :: (2, :: (3, nil)))</code></pre></figure><p>and evaluate to a list that looks like the one we started with?</p><hr><p>(At least, more clear than when saying that</p><figure><pre><code>foldr (op +) 0 [1, 2, 3]</code></pre></figure><p>is equivalent to</p><figure><pre><code>1 + (2 + (3 + 0))?)</code></pre></figure><hr><p>And also like maybe not I dunno.</p></body>
 </html>
