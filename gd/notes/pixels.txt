@@ -1,0 +1,40 @@
+# Pixels
+:special js
+
++++ Stylesheet stuff
+=> gd elem (With `elem` function from other post.)
+``` prelude
+const elem = (tagName, props, ...children) => {
+  const el = Object.assign(document.createElement(tagName), props);
+  el.replaceChildren(...children);
+  return el;
+};
+
+const styles = `
+.palette {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.row {
+  display: flex;
+  flex-direction: row;
+}
+.square {
+  box-sizing: border-box;
+  border: none;
+  width: 2rem;
+  height: 2rem;
+}
+.selectedColor {
+  border-style: dashed;
+}
+`;
+document.head.appendChild(elem("style", {}, styles));
+```
++++
+
++++ Palette
+=> gd palette (Palette from other post.)
+``` prelude
+```

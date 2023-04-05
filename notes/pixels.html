@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pixels</title>
+    <link rel="icon" type="image/x-icon" href="./../assets/icon.png">
+    <link rel="stylesheet" href="./../style.css">
+    <link rel="stylesheet" href="./../js-editor.css">
+    <script src="./../js-editor.js" defer></script>
+  </head>
+  <body class="page"><p><a href="./../index.html">Index</a></p><h1>Pixels</h1><details><summary>Stylesheet stuff</summary><p><a href="./elem.html">(With <code>elem</code> function from other post.)</a></p><figure><pre class="prelude"><code>const elem = (tagName, props, ...children) =&gt; {
+  const el = Object.assign(document.createElement(tagName), props);
+  el.replaceChildren(...children);
+  return el;
+};
+
+const styles = `
+.palette {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.row {
+  display: flex;
+  flex-direction: row;
+}
+.square {
+  box-sizing: border-box;
+  border: none;
+  width: 2rem;
+  height: 2rem;
+}
+.selectedColor {
+  border-style: dashed;
+}
+`;
+document.head.appendChild(elem(&quot;style&quot;, {}, styles));</code></pre></figure></details><details><summary>Palette</summary><p><a href="./palette.html">(Palette from other post.)</a></p><figure><pre class="prelude"><code></code></pre></figure></details></body>
+</html>
