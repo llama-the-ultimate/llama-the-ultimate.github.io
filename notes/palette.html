@@ -40,9 +40,9 @@ document.head.appendChild(elem(&quot;style&quot;, {}, styles));</code></pre></fi
 let gFactor = 36;
 let bFactor = 85;
 const colorFromByte = (byte) =&gt; {
-  const r= ((byte &amp; 0b11100000) &gt;&gt; 5) * rFactor;
-  const g= ((byte &amp; 0b00011100) &gt;&gt; 2) * gFactor;
-  const b= (byte &amp; 0b00000011) * bFactor;
+  const r = ((byte &amp; 0b11100000) &gt;&gt; 5) * rFactor;
+  const g = ((byte &amp; 0b00011100) &gt;&gt; 2) * gFactor;
+  const b = (byte &amp; 0b00000011) * bFactor;
   const hex = (i) =&gt; i.toString(16).padStart(2, &quot;0&quot;);
   return `#${hex(r)}${hex(g)}${hex(b)}`;
 };

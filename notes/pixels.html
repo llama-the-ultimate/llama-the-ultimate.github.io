@@ -35,5 +35,54 @@ const styles = `
   border-style: dashed;
 }
 `;
-document.head.appendChild(elem(&quot;style&quot;, {}, styles));</code></pre></figure></details><details><summary>Palette</summary><p><a href="./palette.html">(Palette from other post.)</a></p><figure><pre class="prelude"><code></code></pre></figure></details></body>
+document.head.appendChild(elem(&quot;style&quot;, {}, styles));</code></pre></figure></details><details><summary>Palette</summary><p><a href="./palette.html">(Palette from other post.)</a></p><figure><pre class="prelude"><code>const rFactor = 36;
+const gFactor = 36;
+const bFactor = 85;
+const colorFromByte = (byte) =&gt; {
+  const r= ((byte &amp; 0b11100000) &gt;&gt; 5) * rFactor;
+  const g= ((byte &amp; 0b00011100) &gt;&gt; 2) * gFactor;
+  const b= (byte &amp; 0b00000011) * bFactor;
+  const hex = (i) =&gt; i.toString(16).padStart(2, &quot;0&quot;);
+  return `#${hex(r)}${hex(g)}${hex(b)}`;
+};
+
+const palette = () =&gt; {
+  const colors = elem(&quot;div&quot;, { className: &quot;palette&quot; });
+  let selectedColor = 0;
+  const buttons = [];
+  const selectColor = (idx) =&gt; {
+    buttons[selectedColor].classList.remove(&quot;selectedColor&quot;);
+    selectedColor = idx;
+    buttons[selectedColor].classList.add(&quot;selectedColor&quot;);
+  };
+
+  const rowLength = 4;
+  
+  for (let row = 0; row &lt; 256 / rowLength; row++) {
+    const rowDiv = elem(&quot;div&quot;, { className: &quot;row&quot; });
+    colors.appendChild(rowDiv);
+    for (let col = 0; col &lt; rowLength; col++) {
+      const byte = (row * rowLength) + col;
+      const button = elem(&quot;button&quot;, { className: &quot;square&quot; });
+      rowDiv.appendChild(button);
+      buttons.push(button);
+      const color = colorFromByte(byte);
+      button.style.background = color;
+      button.onclick = () =&gt; {
+        selectColor(byte);
+        colors.dispatchEvent(
+          new CustomEvent(&quot;selectColor&quot;, {
+            detail: { byte: byte, color: color },
+          })
+        );
+      };
+    }
+  }
+  colors.selectColor = (idx) =&gt; {
+    if (idx &gt;= 0 &amp;&amp; idx &lt; colorButtons.length) {
+      selectColor(idx);
+    }
+  };
+  return colors;
+};</code></pre></figure></details></body>
 </html>
