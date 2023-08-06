@@ -45,7 +45,7 @@ t 34 69 foo
 l 55 59 63 63
 t 65 65 (reference)
 t 66 69 a
-```
+``` Syntax tree for `(λa.a (foo a)) bar`
 
 (So really, syntax is mostly like in an ML family language or a Haskell or something. Only instead of like, `fn x => foo` or `fun x -> foo` or `\x -> foo`), we do `λx.foo`. Andalso there’s never any infix stuff for function application.)
 
