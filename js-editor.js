@@ -120,10 +120,10 @@ const outElement = (() => {
         );
       }
     };
-    for (const el of [...document.querySelectorAll(".prelude")]) {
+    for (const el of [...document.querySelectorAll(".js-prelude")]) {
       create(el, true);
     }
-    for (const el of [...document.querySelectorAll(".repl")]) {
+    for (const el of [...document.querySelectorAll(".js-repl")]) {
       create(el, false);
     }
   });

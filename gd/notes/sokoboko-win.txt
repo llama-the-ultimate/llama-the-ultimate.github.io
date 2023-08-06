@@ -8,7 +8,7 @@
 => gd sokoboko-move Previously we made the cat move.
 
 +++ Mostly the code from last time.
-``` prelude
+``` js prelude
 const canvas = outElement.appendChild(document.createElement("canvas"));
 const scale = 3;
 const ctx = canvas.getContext("2d");
@@ -170,7 +170,7 @@ Very playable.
 
 You’ve won the game if every goal has a box on it. So if there are no goal squares left with either nothing on them or player on them:
 
-``` repl
+``` js
 const won = () =>
   !level.some((row) => row.some((square) => square === "." || square === "+"));
 
@@ -179,7 +179,7 @@ console.log(won());
 
 We’ll test it with a won level:
 
-``` repl
+``` js
 setLevel(`
 ######
 # @  #
@@ -191,7 +191,7 @@ console.log(won());
 
 Seems fine. Let’s fix the commands so they take winning into account, and switch to very winnable level for testing:
 
-``` repl
+``` js
 const wonP = document.createElement("p");
 moveListP.insertAdjacentElement("beforebegin", wonP);
 
@@ -218,7 +218,7 @@ Seems fine.
 
 Also let’s implement undo. Undoing a move is kind of like moving in the opposite direction:
 
-``` repl
+``` js
 const opposite = (v) => vector(-v.x, -v.y);
 console.log(opposite(directions.r));
 ```
@@ -228,7 +228,7 @@ We undo by:
 * Moving the player in the opposite direction of the move we removed from `moveList`.
 * If the move we removed was in uppercase, “dragging” a box along after the player.
 
-``` repl
+``` js
 const undo = () => {
   if (moveList === "") {
     return;
@@ -250,7 +250,7 @@ button("z");
 
 We can restart a level by undoing a lot:
 
-``` repl
+``` js
 const restart = () => {
   while (moveList !== "") {
     undo();
@@ -262,6 +262,6 @@ button("r");
 
 Okay okay. It’s probably a game now...
 
-``` repl
+``` js
 setLevel(level1);
 ```

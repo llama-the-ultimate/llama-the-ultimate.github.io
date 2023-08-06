@@ -8,7 +8,7 @@
 Assuming you're viewing this in a web browser with JavaScript and so on...
 
 Some editors are readonly. Its content is evaluated when page loads or so. Mostly for adding definitions to toplevel so they can be used later in the post:
-``` prelude
+``` lambs prelude
 id ≜ λx.x
 0 ≜ λf.λx.x
 ω ≜ λx.x x
@@ -17,7 +17,7 @@ id ≜ λx.x
 ----
 
 In the regular editors we can do stuff.
-``` repl
+``` lambs
 (can do stuff here)
 ```
 
@@ -35,36 +35,36 @@ ctrl+enter, ctrl+shift+enter and ctrl+r all work on the line the cursor is on. R
 
 So, normally, if we have written some term that uses some of the toplevel defintions, we do ctrl+r and then either ctrl+enter a few times, or ctrl+shift+enter once.
 
-``` repl
+``` lambs
 (λa.λb.b a) 0 ω 0
 ```
 
 Lines with `≜` (or `:=` are for definitons). ctrl+enter on a line that goes like <identifier> ≜ <term> adds a definition.
 
-``` repl
+``` lambs
 S ≜ λn.λf.λx.f (n f x)
 ```
 
 (Most characters can be used in identifiers. But not whitespace ones, and not the ones that are used for other stuff: `:`, `\`, `≜`, `λ`, `.`, `(`, `)`.)
 
 The terms used in definitions can use the names of definitions that already exist. We can define `2` like this now, as long as we have defined `0` and `S` first: (ctrl+enter)
-``` repl
+``` lambs
 2 ≜ S (S 0)
 ```
 
 (We can evaluate it to check that the result looks reasonably twoish. Two applications of f is very two-like, so the result should look like `λf.λx.f (f x)`. (ctrl+r, then ctrl+shift+enter))
 
-``` repl
+``` lambs
 2
 ```
 
-If we wanna get rid of a definition we can do `<identifier> ≜ :(`, or just `<identifier> ≜`. We’ll remove `ω` (it’s scary): (ctrl+enter)
-``` repl
-ω ≜ :(
+If we wanna get rid of a definition we can do `<identifier> ≜`. We’ll remove `ω` (it’s scary): (ctrl+enter)
+``` lambs
+ω ≜
 ```
 
 If we try to evaluate the thing we did earler, we won’t get the same result now, since `ω` will just be treated as some free variable... (ctrl+r, then ctrl+shift+enter)
-``` repl
+``` lambs
 (λa.λb.b a) 0 ω 0
 ```
 

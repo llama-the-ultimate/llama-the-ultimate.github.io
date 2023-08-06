@@ -101,11 +101,11 @@
       PreLine: PreLine,
       ErrorLine: ErrorLine,
       Insert: Insert,
-      end: { type: "end" },
+      end: { type: "end", text: new Text([], "") },
     };
   })();
 
-  const parse = (() => {
+  const parser = (() => {
     const strws = (str, ws) => new syntax.StrWs(str, ws);
 
     const isWs = (s) => s === " " || s == "\t";
@@ -199,6 +199,26 @@
       return new syntax.Line(type, first, words, restText(str, pos));
     };
 
+    const wordsParser = (typetest) => (str) => {
+      const res = typetest(str);
+      if (res === null) {
+        return null;
+      }
+      const type = res.type;
+      const first = res.strws;
+
+      const words = [];
+      let pos = first.length;
+      while (true) {
+        const current = word(str, pos);
+        if (current === null) {
+          return new syntax.Line(type, first, words, new syntax.Text([], ""));
+        }
+        pos += current.length;
+        words.push(current);
+      }
+    };
+
     const lparser = (type, startString, args) =>
       parser(start(startString, type), args);
 
@@ -227,7 +247,8 @@
       return { type: type, strws: strws("", rest) };
     };
 
-    const toggleParser = parser(toggleStart);
+    const toggleStartParser = wordsParser(toggleStart);
+    const toggleEndParser = parser(toggleStart);
     const textParser = parser(textStart);
     const quoteParser = parser(quoteStart);
     const parsers = [
@@ -274,21 +295,22 @@
 
       let pre = null;
       const line = () => {
-        const tg = toggleParser(buf);
-        if (tg !== null) {
-          if (pre === null) {
+        if (pre === null) {
+          const tg = toggleStartParser(buf);
+          if (tg === null) {
+            push(lineFrom(buf));
+          } else {
             pre = tg.start.str;
             push(tg);
-          } else if (tg.start.str === pre) {
+          }
+        } else {
+          const tg = toggleEndParser(buf);
+          if (tg === null || tg.start.str !== pre) {
+            push(new syntax.PreLine(buf));
+          } else {
             pre = null;
             push(tg);
-          } else {
-            push(new syntax.PreLine(buf));
           }
-        } else if (pre) {
-          push(new syntax.PreLine(buf));
-        } else {
-          push(lineFrom(buf));
         }
         buf = "";
       };
@@ -316,8 +338,84 @@
       };
     };
 
-    return parse;
+    return {
+      parse: parse,
+      wordsParser: wordsParser,
+      start: start,
+      lparser: lparser,
+    };
   })();
+
+  const linesPreHtml = (line) => {
+    const readNum = (str) => {
+      const res = parseInt(str);
+      if (isNaN(res)) {
+        return null;
+      }
+      return res;
+    };
+
+    const linesParser = parser.wordsParser(parser.start("l", "lines"));
+    const textParser = parser.lparser("text", "t", 2);
+
+    let w = 240;
+    let h = 120;
+    if (line.args.length > 2) {
+      const newX = readNum(line.args[1].str);
+      const newY = readNum(line.args[2].str);
+      if (newX !== null && newY !== null) {
+        w = newX;
+        h = newY;
+      }
+    }
+    const x = (v) => `${v * (100 / w)}%`;
+    const y = (v) => `${v * (100 / h)}%`;
+
+    let str = `<figure><svg width="${w / 4}em" height="${h / 4}em">`;
+    str += `<style>svg {stroke: currentColor;fill: none;}`;
+    str += `text {stroke: none;dominant-baseline: middle;text-anchor: middle;fill: currentColor;}</style>`;
+
+    return {
+      str: str,
+      process: (line) => {
+        if (line.type === "toggle") {
+          return `</svg>${html.captionFrom(line)}</figure>`;
+        }
+        const lines = linesParser(line.full);
+        if (lines !== null) {
+          let prev = null;
+          let res = "";
+          const args = lines.args;
+          for (let i = 0; i + 1 < args.length; i = i + 2) {
+            const curX = readNum(args[i].str);
+            const curY = readNum(args[i + 1].str);
+            if (curX === null || curY === null) {
+              continue;
+            }
+            if (prev !== null) {
+              res += `<line x1="${x(prev.x)}" y1="${y(prev.y)}" x2="${x(
+                curX
+              )}" y2="${y(curY)}" />`;
+            }
+            prev = { x: curX, y: curY };
+          }
+          return res;
+        }
+        const text = textParser(line.full);
+        if (text !== null) {
+          const posX = readNum(text.args[0].str);
+          const posY = readNum(text.args[1].str);
+          if (posX === null || posY === null) {
+            return "";
+          }
+          return `<text x="${x(posX)}" y="${y(posY)}">${html.escapeHtml(
+            text.text.full
+          )}</text>`;
+        }
+        return "";
+      },
+    };
+  };
 
   const html = (() => {
     const escapeMap = new Map([
@@ -397,6 +495,9 @@
     };
 
     const captionFrom = (line) => {
+      if (line === null) {
+        return "";
+      }
       const html = textHtml(line.text);
       return html.length === 0 ? "" : `<figcaption>${html}</figcaption>`;
     };
@@ -490,15 +591,17 @@
         ? emptyline(data, res + "<br>")
         : nothing(data, res)(line);
 
-    const pre = (data, end, res) => (line) => {
-      const start = (res, line) => {
+    const pre = (data, preHtml, res, line) => {
+      const firstRes = preHtml(line);
+      const process = firstRes.process;
+      const start = (res) => (line) => {
         switch (line.type) {
           case "pre":
-            return rest(res + `${escapeHtml(line.full)}`);
+            return rest(res + process(line));
           case "toggle":
-            return nothing(data, res + end(captionFrom(line)));
+            return nothing(data, res + process(line));
           case "end":
-            return nothing(data, end, res + end(""))(line);
+            return nothing(data, res + process(line))(line);
           default:
             throw "oh no";
         }
@@ -506,16 +609,16 @@
       const rest = (res) => (line) => {
         switch (line.type) {
           case "pre":
-            return rest(res + `\n${escapeHtml(line.full)}`);
+            return rest(res + `\n${process(line)}`);
           case "toggle":
-            return nothing(data, res + end(captionFrom(line)));
+            return nothing(data, res + process(line));
           case "end":
-            return nothing(data, end, res + end(""))(line);
+            return nothing(data, res + process(line))(line);
           default:
             throw "oh no";
         }
-      }
-      return start(res, line);
+      };
+      return start(res + firstRes.str);
     };
 
     const nothing = (data, res) => (line) => {
@@ -535,10 +638,14 @@
         case "hr":
           return nothing(data, res + "<hr>");
         case "toggle":
-          const alts = line.text.str.split(/\s+/).filter((s) => s.length > 0);
-          const classes = alts.filter((s) => s !== "details");
-          const [start, end] = data.preHtml(line.text.str);
-          return pre(data, end, res + start);
+          let preHtml = basePreHtml;
+          if (line.args.length > 0) {
+            const preType = line.args[0].str;
+            if (data.pre.has(preType)) {
+              preHtml = data.pre.get(preType);
+            }
+          }
+          return pre(data, preHtml, res, line);
         case "details":
           const newData = Object.assign({}, data, { details: !data.details });
           const str = newData.details
@@ -559,24 +666,32 @@
       }
     };
 
-    const preHtml = (str) => [
-      `<figure><pre><code>`,
-      (caption) => `</code></pre>${caption}</figure>`,
-    ];
+    const basePreHtml = (line) => ({
+      str: `<figure><pre><code>`,
+      process: (line) => {
+        if (line.type === "pre") {
+          return escapeHtml(line.full);
+        }
+        return `</code></pre>${captionFrom(line)}</figure>`;
+      },
+    });
 
     const render = (list, config) => {
-      let state = nothing(
-        Object.assign(
-          {
-            url: (url) => url,
-            preHtml: preHtml,
-            details: false,
-            defaultSummary: "Details",
-          },
-          config
-        ),
-        ""
+      let data = Object.assign(
+        {
+          url: (url) => url,
+          pre: new Map(),
+          details: false,
+          defaultSummary: "Details",
+        },
+        config
       );
+      if (!data.pre.has("lines")) {
+        data.pre = new Map(data.pre);
+        data.pre.set("lines", linesPreHtml);
+      }
+
+      let state = nothing(data, "");
       for (const line of list) {
         state = state(line);
       }
@@ -587,14 +702,15 @@
       escapeHtml: escapeHtml,
       textHtml: textHtml,
       render: render,
-      preHtml: preHtml,
+      captionFrom: captionFrom,
+      preHtml: basePreHtml,
       relify: relify,
     };
   })();
 
   module.exports = {
     syntax: syntax,
-    parse: parse,
+    parser: parser,
     html: html,
   };
 })();

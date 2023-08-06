@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="./../js-editor.css">
     <script src="./../js-editor.js" defer></script>
   </head>
-  <body class="page"><p><a href="./../index.html">Index</a></p><p><time>2023-03-30</time></p><h1>Sokoban: Winning the game</h1><p>(Best viewed in a browser with JavaScript enabled. You can click the play/run-buttons to run the JavaScript in the embedded editors. It should behave mostly like running the same code in the JavaScript console. (Hitting F12 or something and finding the console might also be useful if you wanna look around and inspect stuff more or something.))</p><p><a href="./sokoboko-move.html">Previously we made the cat move.</a></p><details><summary>Mostly the code from last time.</summary><figure><pre class="prelude"><code>const canvas = outElement.appendChild(document.createElement(&quot;canvas&quot;));
+  <body class="page"><p><a href="./../index.html">Index</a></p><p><time>2023-03-30</time></p><h1>Sokoban: Winning the game</h1><p>(Best viewed in a browser with JavaScript enabled. You can click the play/run-buttons to run the JavaScript in the embedded editors. It should behave mostly like running the same code in the JavaScript console. (Hitting F12 or something and finding the console might also be useful if you wanna look around and inspect stuff more or something.))</p><p><a href="./sokoboko-move.html">Previously we made the cat move.</a></p><details><summary>Mostly the code from last time.</summary><figure><pre class="js-prelude"><code>const canvas = outElement.appendChild(document.createElement(&quot;canvas&quot;));
 const scale = 3;
 const ctx = canvas.getContext(&quot;2d&quot;);
 
@@ -161,16 +161,16 @@ space.style.height = &quot;1px&quot;;
 space.style.width = &quot;3rem&quot;;
 button(&quot;w&quot;);
 outElement.appendChild(document.createElement(&quot;br&quot;));
-&quot;asd&quot;.split(&quot;&quot;).forEach(button);</code></pre></figure><p>Very playable.</p></details><h2>Win condition</h2><p>You’ve won the game if every goal has a box on it. So if there are no goal squares left with either nothing on them or player on them:</p><figure><pre class="repl"><code>const won = () =&gt;
+&quot;asd&quot;.split(&quot;&quot;).forEach(button);</code></pre></figure><p>Very playable.</p></details><h2>Win condition</h2><p>You’ve won the game if every goal has a box on it. So if there are no goal squares left with either nothing on them or player on them:</p><figure><pre class="js-repl"><code>const won = () =&gt;
   !level.some((row) =&gt; row.some((square) =&gt; square === &quot;.&quot; || square === &quot;+&quot;));
 
-console.log(won());</code></pre></figure><p>We’ll test it with a won level:</p><figure><pre class="repl"><code>setLevel(`
+console.log(won());</code></pre></figure><p>We’ll test it with a won level:</p><figure><pre class="js-repl"><code>setLevel(`
 ######
 # @  #
 #*  *#
 ######
 `);
-console.log(won());</code></pre></figure><p>Seems fine. Let’s fix the commands so they take winning into account, and switch to very winnable level for testing:</p><figure><pre class="repl"><code>const wonP = document.createElement(&quot;p&quot;);
+console.log(won());</code></pre></figure><p>Seems fine. Let’s fix the commands so they take winning into account, and switch to very winnable level for testing:</p><figure><pre class="js-repl"><code>const wonP = document.createElement(&quot;p&quot;);
 moveListP.insertAdjacentElement(&quot;beforebegin&quot;, wonP);
 
 const takeWinningIntoAccount = (command) =&gt; () =&gt; {
@@ -187,8 +187,8 @@ setLevel(`
 #   $#
 #.$ .#
 ######
-`);</code></pre></figure><p>Seems fine.</p><h2>Undo</h2><p>Also let’s implement undo. Undoing a move is kind of like moving in the opposite direction:</p><figure><pre class="repl"><code>const opposite = (v) =&gt; vector(-v.x, -v.y);
-console.log(opposite(directions.r));</code></pre></figure><p>We undo by:</p><ul><li>Removing the last character from <code>moveList</code>.</li><li>Moving the player in the opposite direction of the move we removed from <code>moveList</code>.</li><li>If the move we removed was in uppercase, “dragging” a box along after the player.</li></ul><figure><pre class="repl"><code>const undo = () =&gt; {
+`);</code></pre></figure><p>Seems fine.</p><h2>Undo</h2><p>Also let’s implement undo. Undoing a move is kind of like moving in the opposite direction:</p><figure><pre class="js-repl"><code>const opposite = (v) =&gt; vector(-v.x, -v.y);
+console.log(opposite(directions.r));</code></pre></figure><p>We undo by:</p><ul><li>Removing the last character from <code>moveList</code>.</li><li>Moving the player in the opposite direction of the move we removed from <code>moveList</code>.</li><li>If the move we removed was in uppercase, “dragging” a box along after the player.</li></ul><figure><pre class="js-repl"><code>const undo = () =&gt; {
   if (moveList === &quot;&quot;) {
     return;
   }
@@ -204,11 +204,11 @@ console.log(opposite(directions.r));</code></pre></figure><p>We undo by:</p><ul>
 };
 commands.set(&quot;z&quot;, undo);
 outElement.appendChild(document.createElement(&quot;br&quot;));
-button(&quot;z&quot;);</code></pre></figure><p>We can restart a level by undoing a lot:</p><figure><pre class="repl"><code>const restart = () =&gt; {
+button(&quot;z&quot;);</code></pre></figure><p>We can restart a level by undoing a lot:</p><figure><pre class="js-repl"><code>const restart = () =&gt; {
   while (moveList !== &quot;&quot;) {
     undo();
   }
 };
 commands.set(&quot;r&quot;, restart);
-button(&quot;r&quot;);</code></pre></figure><p>Okay okay. It’s probably a game now...</p><figure><pre class="repl"><code>setLevel(level1);</code></pre></figure></body>
+button(&quot;r&quot;);</code></pre></figure><p>Okay okay. It’s probably a game now...</p><figure><pre class="js-repl"><code>setLevel(level1);</code></pre></figure></body>
 </html>

@@ -25,8 +25,8 @@ val larger_tree = Split (Flat (Apple, Flat (Lemon, Bud)), Flat (Peach, Bud))</co
 val it = 2 : int
 
 - height larger_tree;
-val it = 3 : int</code></pre></figure><p>Okay.</p><hr><p>So JavaScript is a pretty nonstandard ML. If you view this in a web browser you should be able to click the play/run buttons to run the JavaScript.</p><p>In the book we use sums for the tree-stuff. Sums are also sometimes called tagged unions. We will make a <code>tag</code>-function for tagging some stuff and then try to tag something:</p><figure><pre class="repl"><code>const tag = t =&gt; (...args) =&gt; ({ tag: t, values: [...args] });
-console.log(tag(&quot;label&quot;)(1, &quot;horse&quot;, [2,3]));</code></pre></figure><p>Which gives us an object with <code>&quot;label&quot;</code> for its <code>tag</code> and <code>[1, &quot;horse&quot;, [2, 3]]</code> for its <code>values</code>. That is the tag and the stuff we passed in. Good. We can make constructors and some trees now:</p><figure><pre class="repl"><code>// fruit constructors:
+val it = 3 : int</code></pre></figure><p>Okay.</p><hr><p>So JavaScript is a pretty nonstandard ML. If you view this in a web browser you should be able to click the play/run buttons to run the JavaScript.</p><p>In the book we use sums for the tree-stuff. Sums are also sometimes called tagged unions. We will make a <code>tag</code>-function for tagging some stuff and then try to tag something:</p><figure><pre class="js-repl"><code>const tag = t =&gt; (...args) =&gt; ({ tag: t, values: [...args] });
+console.log(tag(&quot;label&quot;)(1, &quot;horse&quot;, [2,3]));</code></pre></figure><p>Which gives us an object with <code>&quot;label&quot;</code> for its <code>tag</code> and <code>[1, &quot;horse&quot;, [2, 3]]</code> for its <code>values</code>. That is the tag and the stuff we passed in. Good. We can make constructors and some trees now:</p><figure><pre class="js-repl"><code>// fruit constructors:
 const Peach = tag(&quot;Peach&quot;)();
 const Apple = tag(&quot;Apple&quot;)();
 const Pear = tag(&quot;Pear&quot;)();
@@ -45,7 +45,7 @@ console.log(smol_tree);</code></pre></figure><p>So we have half the sum stuff no
   Peach: // what to do if it is a peach
   Apple: // what to do if it is an apple
   // and so on...
-}</code></pre></figure><p>Then we can use the tag from the sum-thing to look up the “what to do” in the product-thing. We will make a <code>match</code>-function for destructing sums:</p><figure><pre class="repl"><code>const match = cases =&gt; x =&gt; cases[x.tag](...x.values);
+}</code></pre></figure><p>Then we can use the tag from the sum-thing to look up the “what to do” in the product-thing. We will make a <code>match</code>-function for destructing sums:</p><figure><pre class="js-repl"><code>const match = cases =&gt; x =&gt; cases[x.tag](...x.values);
 
 const is_apple =
   match(
@@ -59,7 +59,7 @@ const is_apple =
   );
 
 console.log(is_apple(Apple));
-console.log(is_apple(Fig));</code></pre></figure><p>Gives us <code>true</code> and <code>false</code>. Seems fine.</p><p><code>height</code> then:</p><figure><pre class="repl"><code>const height =
+console.log(is_apple(Fig));</code></pre></figure><p>Gives us <code>true</code> and <code>false</code>. Seems fine.</p><p><code>height</code> then:</p><figure><pre class="js-repl"><code>const height =
   match(
     {
       Bud: () =&gt; 0,

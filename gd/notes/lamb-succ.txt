@@ -14,12 +14,12 @@ We can do something similar but with the lambdas.
 ---
 
 We already know what zero looks like:
-``` repl
+``` lambs
 0 ≜ λf.λx.x
 ```
 
 We do not know that successor looks like:
-``` repl
+``` lambs
 S ≜ λn.λf.λx.f (n f x)
 ```
 It takes a number, `n`, as its argument. `S` applied to `n` should return a number that is one larger than `n`.
@@ -29,7 +29,7 @@ It takes a number, `n`, as its argument. `S` applied to `n` should return a numb
 So, `S` takes a number, `n`, as its argument, and returns one of those `λf.λx.`-functions. Within that function we do `n f x` (we apply `n` to `f` and `x`). This should amount to applying `f` “`n` times” to `x`. And then we apply `f` to the result of `n f x”, so that in total `f` should be applied “`n`+1 times” to `x`.
 
 We can test it some and see if it looks right:
-``` repl
+``` lambs
 S 0
 
 S (S 0)

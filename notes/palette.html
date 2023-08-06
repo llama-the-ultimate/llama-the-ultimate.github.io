@@ -10,7 +10,7 @@
     <script src="./../js-editor.js" defer></script>
   </head>
   <body class="page"><p><a href="./../index.html">Index</a></p><p><time>2023-04-05</time></p><h1>An 8-bit palette</h1><p>Bla blah. Some JavaScript for treating single bytes as RGB-values. Only works in browser with JavaScript and so on.</p><p><a href="https://en.wikipedia.org/wiki/8-bit_color">From Wikipedia:</a></p><blockquote><p>The simplest form of quantization is to simply assign 3 bits to red, 3 bits to green and 2 bits to blue, as the human eye is less sensitive to blue light.</p></blockquote><figure><pre><code>Bit    7  6  5  4  3  2  1  0
-Data   R  R  R  G  G  G  B  B</code></pre></figure><p>So that’s like 3-bit values (0-7) for R and G and a 2-bit value (0-3) for B. I multiply the R and G values by 36 and the B values by 85. Because that seems fine.</p><details><summary>Stylesheet stuff</summary><p><a href="./elem.html">(With <code>elem</code> function from other post.)</a></p><figure><pre class="prelude"><code>const elem = (tagName, props, ...children) =&gt; {
+Data   R  R  R  G  G  G  B  B</code></pre></figure><p>So that’s like 3-bit values (0-7) for R and G and a 2-bit value (0-3) for B. I multiply the R and G values by 36 and the B values by 85. Because that seems fine.</p><details><summary>Stylesheet stuff</summary><p><a href="./elem.html">(With <code>elem</code> function from other post.)</a></p><figure><pre><code>const elem = (tagName, props, ...children) =&gt; {
   const el = Object.assign(document.createElement(tagName), props);
   el.replaceChildren(...children);
   return el;
@@ -36,7 +36,7 @@ const styles = `
   border-style: dashed;
 }
 `;
-document.head.appendChild(elem(&quot;style&quot;, {}, styles));</code></pre></figure></details><details><summary>Implementation details</summary><p><code>colorFromByte</code> gets the RGB-values from a byte and returns some hex:</p><figure><pre class="prelude"><code>let rFactor = 36;
+document.head.appendChild(elem(&quot;style&quot;, {}, styles));</code></pre></figure></details><details><summary>Implementation details</summary><p><code>colorFromByte</code> gets the RGB-values from a byte and returns some hex:</p><figure><pre><code>let rFactor = 36;
 let gFactor = 36;
 let bFactor = 85;
 const colorFromByte = (byte) =&gt; {
@@ -46,7 +46,7 @@ const colorFromByte = (byte) =&gt; {
   const hex = (i) =&gt; i.toString(16).padStart(2, &quot;0&quot;);
   return `#${hex(r)}${hex(g)}${hex(b)}`;
 };
-console.log(colorFromByte(15));</code></pre></figure><p>Which is <em>kind of</em> it. But also code for making palette that can be put on page:</p><figure><pre class="prelude"><code>const palette = () =&gt; {
+console.log(colorFromByte(15));</code></pre></figure><p>Which is <em>kind of</em> it. But also code for making palette that can be put on page:</p><figure><pre><code>const palette = () =&gt; {
   const colors = elem(&quot;div&quot;, { className: &quot;palette&quot; });
   let selectedColor = 0;
   const buttons = [];
@@ -86,7 +86,7 @@ console.log(colorFromByte(15));</code></pre></figure><p>Which is <em>kind of</em
   return colors;
 };
 let pal;
-let div;</code></pre></figure></details><p>Anyway run the code below to get a palette with clickable colours. Can also adjust some values and things in the code:</p><figure><pre class="repl"><code>rFactor = 36;
+let div;</code></pre></figure></details><p>Anyway run the code below to get a palette with clickable colours. Can also adjust some values and things in the code:</p><figure><pre><code>rFactor = 36;
 gFactor = 36;
 bFactor = 85;
 pal = palette();

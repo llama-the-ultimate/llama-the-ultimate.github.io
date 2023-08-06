@@ -9,7 +9,7 @@ Bit of prelude first.
 
 => gd lamb-nums Some stuff from an earlier numbery post:
 
-``` prelude
+``` lambs prelude
 0 ≜ λf.λx.x
 1 ≜ λf.λx.f x
 2 ≜ λf.λx.f (f x)
@@ -21,7 +21,7 @@ Bit of prelude first.
 
 We can do multiplication as well before moving on. Multiplication is like addition, just more. We will make a function that, if given the numbers `a` and `b` as arguments will start with the number zero, and add `a` “`b` times” to it:
 
-``` repl
+``` lambs
 * ≜ λa.λb.b (+ a) 0
 
 * 5 2
@@ -35,7 +35,7 @@ Booleans are used for if-then-else. We have a stuff we maybe wanna do and anothe
 
 We will make the two boolean values be functions. (A reasonably easy choice, so long as we can only make functions in our language.) `true` will, if given two arguments, return the first one. `false`, if given two arguments, will return the second one.
 
-``` repl
+``` lambs
 true ≜ λa.λb.a
 false ≜ λa.λb.b
 
@@ -46,7 +46,7 @@ false stuff otherstuff
 
 Okay so it looks like `true stuff otherstuff` evaluates to `stuff` just fine on its own, and `false stuff otherstuff` evaluates to `otherstuff`, and we don’t really need `if`. But if we want an `if` we can have one. It can take a boolean as its first argument and then two more arguments, and then just hand those two last arguments over to the boolean.
 
-``` repl
+``` lambs
 if ≜ λb.λt.λe.b t e
 
 if true stuff otherstuff
@@ -64,7 +64,7 @@ Okay, some boolean logic bits:
 * `and` takes two booleans, `a` and `b`. If `a` is `true`, we return `b`. If `a` is `false`, we return `false`.
 * `or` takes two booleans, `a` and `b`. If `a` is `true`, we return `true`. If `a` is `false`, we return `b`.
 
-``` repl
+``` lambs
 not ≜ λb.if b false true
 and ≜ λa.λb.if a b false
 or ≜ λa.λb.if a true b
@@ -74,7 +74,7 @@ if (and (or true false) (not false)) stuff otherstuff
 
 We’ll do some boolean stuff with numbers. We can check if a number is zero by giving it two arguments. The first argument is a function that always returns false: `λ_.false`. If the number is not zero this function will be applied to something and we’ll get `false` back. The second argument is `true`. If the number is zero this `true` will be returned, without any applying of the `λ_.false` function.
 
-``` repl
+``` lambs
 zero? ≜ λn.n (λ_.false) true
 
 zero? 0
@@ -84,7 +84,7 @@ zero? 2
 
 Good. Now we can do everyday business logic things. Like you know when boss is like hey we need a program that checks if the number of monies times the number of products is zero and if it is zero we should add five to the number of monies and if it is not zero we should multiply the number of products by 2. No problem:
 
-``` repl
+``` lambs
 do-business ≜ λmonies.λproducts.if (zero? (* monies products)) (+ 2 monies) (* 2 products)
 
 do-business 2 5

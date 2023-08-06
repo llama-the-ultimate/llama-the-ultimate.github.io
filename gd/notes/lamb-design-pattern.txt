@@ -6,7 +6,7 @@
 => gd lambs (There's a list with all the lambda notes here.)
 
 => gd lamb-succ Previously we made zero and successor:
-``` prelude
+``` lambs prelude
 0 ≜ λf.λx.x
 
 S ≜ λn.λf.λx.f (n f x)
@@ -19,21 +19,21 @@ One thing is: We can think that any natural number must necessarily be built fro
 Another thing is: A number like this is a function. And that function kind of is the “eliminator function” for that number. An “eliminator function” like this is similar to the foldr-function for lists: We can think of it as a function for doing “constructor replacement.”
 
 If we have a number built from `S (S 0)`, and we wanna replace the `S`es with `foo`s and the `0` with `bar`, we can apply the number to `foo` and `bar`:
-``` repl
+``` lambs
 (S (S 0)) foo bar
 ```
 
 ----
 
 Let's say we have the numbers 2 and 3:
-``` repl
+``` lambs
 S (S 0)
 
 S (S (S 0))
 ```
 
 Reduced to normal form:
-``` repl
+``` lambs
 2 ≜ λf.λx.f (f x)
 
 3 ≜ λf.λx.f (f (f x))
@@ -42,14 +42,14 @@ Reduced to normal form:
 And let's say we want to add them together. If we want the sum, we can take the number 2 and do the “constructor replacement” thing. The number 2 is built from the `0`-constructor and 2 `S`-contructors: `S (S 0)`. We should be able to get sum by taking that number and, keeping all the `S`es, replacing the 0 with 3: `S (S 3)`.
 
 We'll try. Taking the number 2, we replace `S` with `S`, which should let us “keep” all the `S`es, and we replace 0 with 3:
-``` repl
+``` lambs
 2 S 3
 ```
 
 We get 5 :)
 
 A bit of abstraction and we will have a +-function.
-``` repl
+``` lambs
 + ≜ λa.λb.a S b
 
 + 2 3
@@ -60,14 +60,14 @@ A bit of abstraction and we will have a +-function.
 Or maybe we want to multiply 2 by 3.
 
 This time the idea is that we want to replace things so that we turn the number 2, or `S (S 0)`, into `+ 3 (+ 3 0)`. We replace the `S`es with a function that adds 3 to something, and we replace 0 with 0:
-``` repl
+``` lambs
 2 (+ 3) 0
 ```
 
 6!
 
 Again, abstraction:
-``` repl
+``` lambs
 * ≜ λa.λb.a (+ b) 0
 
 * 2 3

@@ -8,7 +8,7 @@
 => gd sokoboko-gfx In previous post we drew a level.
 
 +++ Mostly the code from last time.
-``` prelude
+``` js prelude
 const canvas = outElement.appendChild(document.createElement("canvas"));
 const scale = 3;
 const ctx = canvas.getContext("2d");
@@ -86,7 +86,7 @@ spriteSheet.onload = () => setLevel(level1);
 
 We want to move the cat. We can make a function that returns its position, so that we know where to move it from. (Cats tend to move from where they are.)
 
-``` repl
+``` js
 const playerPosition = () => {
   for ([y, row] of level.entries()) {
     for ([x, square] of row.entries()) {
@@ -104,7 +104,7 @@ console.log(playerPosition());
 
 We will make vectors for the directions the cat can move in, and a plus-function that we can use for adding a direction to a position. We’ll use the (lowercase) letters that are used in Sokoban solutions as property names.
 
-``` repl
+``` js
 const directions = {
   u: vector(0, -1),
   d: vector(0, 1),
@@ -122,7 +122,7 @@ Should be the position of the square to the left of the cat.
 ## Stupid is fun
 
 Okay the array with the arrays with the characters is not a _great_ way to model things, but I like using the symbols from the level format. Like this is fun:
-``` repl
+``` js
 console.log(level.map(x => x.join("")).join("\n"));
 ```
 But it _is_ awkward having more than one symbol for one thing (it’s the player if it’s a `@` _or_ a `+`, and so on). Something that takes different “collision layers” or something into account probably makes it easier to implement some things.
@@ -133,7 +133,7 @@ Also, instead of one move being a functional update of the game state or somethi
 
 ## Moving one thing
 
-``` repl
+``` js
 const levelGet = (position) => level[position.y][position.x];
 const levelSet = (position, value) => level[position.y][position.x] = value;
 
@@ -181,7 +181,7 @@ Anyway: We attempted to move things four times. First the box near the top one m
 * If the player moved and no box was moved we add the direction letter in lowercase.
 * It can’t be the case that a box was moved and the player did not move. If a box was moved that must have made room for the player to make its move too.
 
-``` repl
+``` js
 
 const movePlayer = (directionLetter) => () => {
   const direction = directions[directionLetter];
@@ -208,7 +208,7 @@ The movelist says `LDl`: We pushed a box to the left, then pushed a box down, th
 
 That’s pretty much it for movement. If we make so we can push some buttons to call the `movePlayer` function things will be pretty gamelike:
 
-``` repl
+``` js
 const commands = new Map([
   ["w", movePlayer("u")],
   ["a", movePlayer("l")],
@@ -246,7 +246,7 @@ The `tabIndex` thing makes it so that the canvas can have focus and send `keydow
 
 Can restart with `setLevel`:
 
-``` repl
+``` js
 setLevel(level1);
 ```
 

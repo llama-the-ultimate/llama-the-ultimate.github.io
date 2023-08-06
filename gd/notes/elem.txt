@@ -5,7 +5,7 @@
 
 I tend to write a helper function for making a DOM element and these days it tend to end up looking kind of like this:
 
-``` prelude
+``` js prelude
 const elem = (tagName, props, ...children) => {
   const el = Object.assign(document.createElement(tagName), props);
   el.replaceChildren(...children);
@@ -19,7 +19,7 @@ const elem = (tagName, props, ...children) => {
 
 So uh we can use it for things. Beep boop:
 
-``` repl
+``` js
 const styles = `
 .red {
   background-color: red;

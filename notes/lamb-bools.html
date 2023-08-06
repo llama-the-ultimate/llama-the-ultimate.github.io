@@ -6,43 +6,36 @@
     <title>Some booly functions</title>
     <link rel="icon" type="image/x-icon" href="./../assets/icon.png">
     <link rel="stylesheet" href="./../style.css">
-    <link rel="stylesheet" href="./../lambs/cm/codemirror.css">
-    <script src="./../lambs/cm/codemirror.js" defer></script>
-    <script src="./../lambs/match.js" defer></script>
-    <script src="./../lambs/maybe.js" defer></script>
-    <script src="./../lambs/exp.js" defer></script>
-    <script src="./../lambs/parse.js" defer></script>
-    <script src="./../lambs/unparse.js" defer></script>
-    <script src="./../lambs/path.js" defer></script>
-    <script src="./../lambs/redex.js" defer></script>
-    <script src="./../lambs/eval.js" defer></script>
-    <script src="./../lambs/repl.js" defer></script>
-    <script src="./../lambs/editor.js" defer></script>
+    <link rel="stylesheet" href="./../cm/codemirror.css">
+    <script src="./../cm/codemirror.js" defer></script>
+    <script src="./../require.js" defer></script>
+    <script src="./../lambs.js" defer></script>
+    <script src="./../lambs-editor.js" defer></script>
   </head>
-  <body class="page"><p><a href="./../index.html">Index</a></p><p><time>2017-07-27</time></p><h1>Some booly functions</h1><p><a href="./lambs.html">(There's a list with all the lambda notes here.)</a></p><p>Bit of prelude first.</p><p><a href="./lamb-nums.html">Some stuff from an earlier numbery post:</a></p><figure><pre class="prelude"><code>0 ≜ λf.λx.x
+  <body class="page"><p><a href="./../index.html">Index</a></p><p><time>2017-07-27</time></p><h1>Some booly functions</h1><p><a href="./lambs.html">(There's a list with all the lambda notes here.)</a></p><p>Bit of prelude first.</p><p><a href="./lamb-nums.html">Some stuff from an earlier numbery post:</a></p><figure><pre class="lambs-prelude"><code>0 ≜ λf.λx.x
 1 ≜ λf.λx.f x
 2 ≜ λf.λx.f (f x)
 5 ≜ λf.λx.f (f (f (f (f x))))
-+ ≜ λa.λb.λf.λx.a f (b f x)</code></pre></figure><p>(And in the earlier post we said something like: The number n is a function that, if given two arguments, applies the first argument n times to the second. The +-function takes the numbers <code>a</code> and <code>b</code> as arguments and gives back a new <code>λf.λx.</code>-function that applies <code>f</code> “<code>a</code> times” to the result of applying <code>f</code> “<code>b</code> times” to <code>x</code>.)</p><p>We can do multiplication as well before moving on. Multiplication is like addition, just more. We will make a function that, if given the numbers <code>a</code> and <code>b</code> as arguments will start with the number zero, and add <code>a</code> “<code>b</code> times” to it:</p><figure><pre class="repl"><code>* ≜ λa.λb.b (+ a) 0
++ ≜ λa.λb.λf.λx.a f (b f x)</code></pre></figure><p>(And in the earlier post we said something like: The number n is a function that, if given two arguments, applies the first argument n times to the second. The +-function takes the numbers <code>a</code> and <code>b</code> as arguments and gives back a new <code>λf.λx.</code>-function that applies <code>f</code> “<code>a</code> times” to the result of applying <code>f</code> “<code>b</code> times” to <code>x</code>.)</p><p>We can do multiplication as well before moving on. Multiplication is like addition, just more. We will make a function that, if given the numbers <code>a</code> and <code>b</code> as arguments will start with the number zero, and add <code>a</code> “<code>b</code> times” to it:</p><figure><pre class="lambs-repl"><code>* ≜ λa.λb.b (+ a) 0
 
-* 5 2</code></pre></figure><hr><p>Soo. We have several numbers and also a couple of ways to make more numbers. So we pretty much have business: We can decide that one of the numbers is the number of monies and another one is the number of products. If we also have booleans we can do business logic.</p><p>Booleans are used for if-then-else. We have a stuff we maybe wanna do and another stuff we maybe wanna do instead, and we use a boolean to pick one of the stuffs. So, we would like to have a true-value and a false-value, and we wanna set things up so that something like <code>if true stuff otherstuff</code> will evaluate to <code>stuff</code>, and something like <code>if false stuff otherstuff</code> will evalute to <code>otherstuff</code>.</p><p>We will make the two boolean values be functions. (A reasonably easy choice, so long as we can only make functions in our language.) <code>true</code> will, if given two arguments, return the first one. <code>false</code>, if given two arguments, will return the second one.</p><figure><pre class="repl"><code>true ≜ λa.λb.a
+* 5 2</code></pre></figure><hr><p>Soo. We have several numbers and also a couple of ways to make more numbers. So we pretty much have business: We can decide that one of the numbers is the number of monies and another one is the number of products. If we also have booleans we can do business logic.</p><p>Booleans are used for if-then-else. We have a stuff we maybe wanna do and another stuff we maybe wanna do instead, and we use a boolean to pick one of the stuffs. So, we would like to have a true-value and a false-value, and we wanna set things up so that something like <code>if true stuff otherstuff</code> will evaluate to <code>stuff</code>, and something like <code>if false stuff otherstuff</code> will evalute to <code>otherstuff</code>.</p><p>We will make the two boolean values be functions. (A reasonably easy choice, so long as we can only make functions in our language.) <code>true</code> will, if given two arguments, return the first one. <code>false</code>, if given two arguments, will return the second one.</p><figure><pre class="lambs-repl"><code>true ≜ λa.λb.a
 false ≜ λa.λb.b
 
 true stuff otherstuff
 
-false stuff otherstuff</code></pre></figure><p>Okay so it looks like <code>true stuff otherstuff</code> evaluates to <code>stuff</code> just fine on its own, and <code>false stuff otherstuff</code> evaluates to <code>otherstuff</code>, and we don’t really need <code>if</code>. But if we want an <code>if</code> we can have one. It can take a boolean as its first argument and then two more arguments, and then just hand those two last arguments over to the boolean.</p><figure><pre class="repl"><code>if ≜ λb.λt.λe.b t e
+false stuff otherstuff</code></pre></figure><p>Okay so it looks like <code>true stuff otherstuff</code> evaluates to <code>stuff</code> just fine on its own, and <code>false stuff otherstuff</code> evaluates to <code>otherstuff</code>, and we don’t really need <code>if</code>. But if we want an <code>if</code> we can have one. It can take a boolean as its first argument and then two more arguments, and then just hand those two last arguments over to the boolean.</p><figure><pre class="lambs-repl"><code>if ≜ λb.λt.λe.b t e
 
 if true stuff otherstuff
 
-if false stuff otherstuff</code></pre></figure><p>Should get same results as with just the booleans. (If we want to, we can redefine <code>if</code> to be the identity function, <code>λx.x</code>. Will work fine.)</p><hr><p>Okay, some boolean logic bits:</p><ul><li><code>not</code> takes one boolean, <code>b</code>. If <code>b</code> is <code>true</code>, we return <code>false</code>. If <code>b</code> is <code>false</code>, we return <code>true</code>.</li><li><code>and</code> takes two booleans, <code>a</code> and <code>b</code>. If <code>a</code> is <code>true</code>, we return <code>b</code>. If <code>a</code> is <code>false</code>, we return <code>false</code>.</li><li><code>or</code> takes two booleans, <code>a</code> and <code>b</code>. If <code>a</code> is <code>true</code>, we return <code>true</code>. If <code>a</code> is <code>false</code>, we return <code>b</code>.</li></ul><figure><pre class="repl"><code>not ≜ λb.if b false true
+if false stuff otherstuff</code></pre></figure><p>Should get same results as with just the booleans. (If we want to, we can redefine <code>if</code> to be the identity function, <code>λx.x</code>. Will work fine.)</p><hr><p>Okay, some boolean logic bits:</p><ul><li><code>not</code> takes one boolean, <code>b</code>. If <code>b</code> is <code>true</code>, we return <code>false</code>. If <code>b</code> is <code>false</code>, we return <code>true</code>.</li><li><code>and</code> takes two booleans, <code>a</code> and <code>b</code>. If <code>a</code> is <code>true</code>, we return <code>b</code>. If <code>a</code> is <code>false</code>, we return <code>false</code>.</li><li><code>or</code> takes two booleans, <code>a</code> and <code>b</code>. If <code>a</code> is <code>true</code>, we return <code>true</code>. If <code>a</code> is <code>false</code>, we return <code>b</code>.</li></ul><figure><pre class="lambs-repl"><code>not ≜ λb.if b false true
 and ≜ λa.λb.if a b false
 or ≜ λa.λb.if a true b
 
-if (and (or true false) (not false)) stuff otherstuff</code></pre></figure><p>We’ll do some boolean stuff with numbers. We can check if a number is zero by giving it two arguments. The first argument is a function that always returns false: <code>λ_.false</code>. If the number is not zero this function will be applied to something and we’ll get <code>false</code> back. The second argument is <code>true</code>. If the number is zero this <code>true</code> will be returned, without any applying of the <code>λ_.false</code> function.</p><figure><pre class="repl"><code>zero? ≜ λn.n (λ_.false) true
+if (and (or true false) (not false)) stuff otherstuff</code></pre></figure><p>We’ll do some boolean stuff with numbers. We can check if a number is zero by giving it two arguments. The first argument is a function that always returns false: <code>λ_.false</code>. If the number is not zero this function will be applied to something and we’ll get <code>false</code> back. The second argument is <code>true</code>. If the number is zero this <code>true</code> will be returned, without any applying of the <code>λ_.false</code> function.</p><figure><pre class="lambs-repl"><code>zero? ≜ λn.n (λ_.false) true
 
 zero? 0
 
-zero? 2</code></pre></figure><p>Good. Now we can do everyday business logic things. Like you know when boss is like hey we need a program that checks if the number of monies times the number of products is zero and if it is zero we should add five to the number of monies and if it is not zero we should multiply the number of products by 2. No problem:</p><figure><pre class="repl"><code>do-business ≜ λmonies.λproducts.if (zero? (* monies products)) (+ 2 monies) (* 2 products)
+zero? 2</code></pre></figure><p>Good. Now we can do everyday business logic things. Like you know when boss is like hey we need a program that checks if the number of monies times the number of products is zero and if it is zero we should add five to the number of monies and if it is not zero we should multiply the number of products by 2. No problem:</p><figure><pre class="lambs-repl"><code>do-business ≜ λmonies.λproducts.if (zero? (* monies products)) (+ 2 monies) (* 2 products)
 
 do-business 2 5
 

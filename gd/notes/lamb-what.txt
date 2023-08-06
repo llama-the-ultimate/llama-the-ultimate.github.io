@@ -21,7 +21,31 @@ For example, can take a look at expression `(λa.a (foo a)) bar` and its sub-exp
 * `a (foo a)` is a function application with a function `a` and argument `foo a`
 * `foo a` is a function application with a function `foo` and argument `a`
 
-<= img /assets/lambdatree.svg An expression tree for `(λa.a (foo a)) bar`
+``` lines 104 80
+t 59 8 (application)
+t 59 12 (λa.a (foo a)) bar
+l 52 15 36 22
+t 36 25 (abstraction)
+t 35 29 λa.a (foo a)
+l 65 15 81 22
+t 82 24 (reference)
+t 82 28 bar
+l 34 32 34 35
+t 35 38 (application)
+t 34 43 a (foo a)
+l 29 46 18 49
+t 16 52 (reference)
+t 15 56 a
+l 37 46 48 49
+t 51 52 (application)
+t 50 56 foo a
+l 46 59 36 63
+t 35 65 (reference)
+t 34 69 foo
+l 55 59 63 63
+t 65 65 (reference)
+t 66 69 a
+```
 
 (So really, syntax is mostly like in an ML family language or a Haskell or something. Only instead of like, `fn x => foo` or `fun x -> foo` or `\x -> foo`), we do `λx.foo`. Andalso there’s never any infix stuff for function application.)
 
@@ -41,13 +65,13 @@ And if we have a reducible expression, then we can do “beta reduction”: Subs
 
 Can try. With the expression `(λz.z bar) foo`, the parameter `𝐱` is `z`, the body `𝐁` is `z bar`, and the argument `𝐀` is `foo`. So for this “instance” of `(λ𝐱.𝐁) 𝐀 ⟶ [𝐀/𝐱]𝐁` we get `(λz.z bar) foo ⟶ [foo/z]z bar`. It should evaluate to the body `z bar` with every free `z` replaced by the argument `foo`: `foo bar`.
 
-``` repl
+``` lambs
 (λz.z bar) foo
 ```
 
 A variable reference is free if it is not bound by a parameter in a function abstraction. With the expression `(λz.z (λz.bar z) bar) foo`, the parameter `𝐱` is `z`, the body `𝐁` is `z (λz.bar z) bar`, and the argument `𝐀` is `foo`. Here, only the first `z` in the body `z (λz.bar z) bar` is free, so only that one is replaced with `foo`.
 
-``` repl
+``` lambs
 (λz.z (λz.bar z) bar) foo
 ```
 
@@ -55,7 +79,7 @@ A variable reference is free if it is not bound by a parameter in a function abs
 
 Sometimes we have to change the names of some variables before doing beta reduction, in order to avoid having “variable capture” change the meaning of our expression. With the expression `(λx.λy.y x) y`, the parameter `𝐱` is `x`, the body `𝐁` is `λy.y x`, and the argument `𝐀` is `y`. If we just replace the `x` in `λy.y x` with y, we get `λy.y y`. Our argument-y becomes bound (“captured”) by the parameter of the lambda within the body. Since we should be able to keep referring the outer `y`, we change the name of the parameter of the lambda (and all references to it) before we do beta reduction. (ctrl+enter two times, since the first one will just rename the parameter)
 
-``` repl
+``` lambs
 (λx.λy.y x) y
 ```
 
@@ -74,6 +98,6 @@ Typically we want to evaluate something down to normal form. So we run through t
 
 Can do (ctrl+shift+enter) to evaluate the following until it’s on normal form:
 
-``` repl
+``` lambs
 (λz.z foo) (λx.λy.x bar y) quux
 ```

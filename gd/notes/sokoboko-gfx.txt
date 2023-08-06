@@ -18,7 +18,7 @@ Anyway, this is best viewed in a browser with JavaScript enabled. You can click 
 * `@` is player, or `+` if the player is on a goal square
 * `$` is box, or `*` if the box is on a goal square
 
-``` repl
+``` js
 const levelString = `
 #########
 #  $ @..#
@@ -35,7 +35,7 @@ console.log(level);
 ## Image onto a canvas
 We have a variable called `outElement` here. `outElement` is just some `div`, and like it’d also work to just do `document.body.appendChild(...)` or something, but `outElement` is automatically moved to where we’re at when we run some code:
 
-``` repl
+``` js
 const spriteSheet = outElement.appendChild(document.createElement("img"));
 spriteSheet.src = "./../assets/soko-sprites.png"
 spriteSheet.alt = "sprite sheet";
@@ -47,7 +47,7 @@ We’ll create a canvas and put it in the `outElement`.
 => url https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage Then we can get a `CanvasRenderingContext2D` and use `drawImage` on that.
 Also we turn off image smoothing because pixels. Also also, we multiply some numbers by 3, because more pixels.
 
-``` repl
+``` js
 const canvas = document.createElement("canvas");
 outElement.replaceChildren(canvas);
 const scale = 3;
@@ -69,14 +69,14 @@ ctx.drawImage(
 
 We’re going to need objects with `x` and `y` properties for a bunch of stuff. First for positions of sprites. Later for positions in the level and also for directions the player can move in. We make a `vector` data structure:
 
-``` repl
+``` js
 const vector = (x, y) => ({ x: x, y: y });
 console.log(vector(4, 2));
 ```
 
 We’ll create an object for keeping track of where in the sprite sheet the different sprites are. Then, by passing a bunch of arguments to `drawImage` we can specify coordinates and width/height both for the part of the source image we want to draw and for the destination in the canvas. (The last 4 arguments are “destination” arguments. The ones that are multiplied by `scale`.)
 
-``` repl
+``` js
 const sprites = {
   " ": vector(0, 0), // top left is empty floor
   "#": vector(1, 0), // top right is wall
@@ -108,7 +108,7 @@ drawSquare("@", vector(1, 2));
 
 ## Drawing the level
 
-``` repl
+``` js
 canvas.width = level[0].length * 16 * scale;
 canvas.height = level.length * 16 * scale;
 ctx.imageSmoothingEnabled = false;

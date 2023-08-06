@@ -1,7 +1,8 @@
 "use strict";
+
 const [module, require] = (() => {
-  const stuff = new Map();
   const t = {};
+  const stuff = new Map();
 
   const scriptSrc = () => {
     const scr = document.currentScript;
@@ -22,9 +23,6 @@ const [module, require] = (() => {
   const module = {
     get exports() {
       const str = scriptSrc();
-      if (str === null) {
-        throw "oh no";
-      }
       if (!stuff.has(str)) {
         stuff.set(str, {});
       }
@@ -36,14 +34,13 @@ const [module, require] = (() => {
         throw "oh no";
       }
       stuff.set(str, obj);
-    }
+    },
   };
 
   const require = (str) => {
-    const path = currentdir();
+    const path = str[0] === "/" ? [] : currentdir();
     for (const s of str.split("/")) {
       if (s === ".") {
-
       } else if (s === "..") {
         path.pop();
       } else {
@@ -52,7 +49,7 @@ const [module, require] = (() => {
     }
     const pathstr = path.join("/");
     if (!stuff.has(pathstr)) {
-      throw "oh no";
+      throw `oh no, can't find "${pathstr}"`;
     }
     return stuff.get(pathstr);
   };
