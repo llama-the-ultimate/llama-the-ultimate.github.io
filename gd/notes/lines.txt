@@ -436,6 +436,10 @@ class State {
     this.position = new Vector(0, 0);
     this.selection = new Selection();
   }
+  setDrawing(drawing) {
+    this.drawing = drawing;
+    this.selection.limit = drawing.things.length;
+  }
   selectedThings() {
     return this.selection.itemsFrom(this.drawing.things);
   }
@@ -528,9 +532,7 @@ const drawToSvg = (state, svg) => {
 A bunch of code:
 
 ``` js prelude
-const editor = () => {
-  const state = new State();
-
+const editor = (state) => {
   const posEl = document.createElementNS(
     "http://www.w3.org/2000/svg",
     "circle"
@@ -712,7 +714,18 @@ const editor = () => {
 We’ll make one and put it somewhere near the top:
 
 ``` js prelude
+const state = new State();
+state.setDrawing(parse.drawing(
+`
+\`\`\` lines 32 32
+l 7 8 7 12
+l 23 8 23 13
+l 3 19 3 19 8 24 20 25 28 19
+t 14 17 o
+\`\`\`
+`
+));
 const h1 = document.getElementsByTagName("h1")[0];
-h1.parentNode.insertBefore(editor(), h1.nextSibling);
+h1.parentNode.insertBefore(editor(state), h1.nextSibling);
 ```
 +++

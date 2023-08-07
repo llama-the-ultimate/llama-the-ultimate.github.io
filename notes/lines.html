@@ -336,6 +336,10 @@ const parse = new (class {
     this.position = new Vector(0, 0);
     this.selection = new Selection();
   }
+  setDrawing(drawing) {
+    this.drawing = drawing;
+    this.selection.limit = drawing.things.length;
+  }
   selectedThings() {
     return this.selection.itemsFrom(this.drawing.things);
   }
@@ -410,9 +414,7 @@ const drawToSvg = (state, svg) =&gt; {
     });
   });
   svg.innerHTML = res;
-};</code></pre></figure></details><details><summary>Making an editor</summary><p>A bunch of code:</p><figure><pre class="js-prelude"><code>const editor = () =&gt; {
-  const state = new State();
-
+};</code></pre></figure></details><details><summary>Making an editor</summary><p>A bunch of code:</p><figure><pre class="js-prelude"><code>const editor = (state) =&gt; {
   const posEl = document.createElementNS(
     &quot;http://www.w3.org/2000/svg&quot;,
     &quot;circle&quot;
@@ -588,6 +590,17 @@ const drawToSvg = (state, svg) =&gt; {
   render.text();
   render.buttons();
   return div;
-};</code></pre></figure><p>We’ll make one and put it somewhere near the top:</p><figure><pre class="js-prelude"><code>const h1 = document.getElementsByTagName(&quot;h1&quot;)[0];
-h1.parentNode.insertBefore(editor(), h1.nextSibling);</code></pre></figure></details></body>
+};</code></pre></figure><p>We’ll make one and put it somewhere near the top:</p><figure><pre class="js-prelude"><code>const state = new State();
+state.setDrawing(parse.drawing(
+`
+\`\`\` lines 32 32
+l 7 8 7 12
+l 23 8 23 13
+l 3 19 3 19 8 24 20 25 28 19
+t 14 17 o
+\`\`\`
+`
+));
+const h1 = document.getElementsByTagName(&quot;h1&quot;)[0];
+h1.parentNode.insertBefore(editor(state), h1.nextSibling);</code></pre></figure></details></body>
 </html>
