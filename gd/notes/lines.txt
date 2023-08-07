@@ -66,6 +66,8 @@ t 66 69 a
 
 ## Implementation
 
+(The code below is picked up and executed when this page is loaded.)
+
 +++ Style
 
 => gd elem (With `elem` function from other post.)

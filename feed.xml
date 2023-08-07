@@ -41,7 +41,7 @@ t 34 69 foo
 l 55 59 63 63
 t 65 65 (reference)
 t 66 69 a
-```</code></pre></figure><h2>Implementation</h2><details><summary>Style</summary><p><a href="https://llama-the-ultimate.org/notes/elem.html">(With <code>elem</code> function from other post.)</a></p><p>To make the svg-element more self-contained: Adding <code>svgStyle</code> to the svg-element later instead of to head.</p><figure><pre><code>const elem = (tagName, props, ...children) =&gt; {
+```</code></pre></figure><h2>Implementation</h2><p>(The code below is picked up and executed when this page is loaded.)</p><details><summary>Style</summary><p><a href="https://llama-the-ultimate.org/notes/elem.html">(With <code>elem</code> function from other post.)</a></p><p>To make the svg-element more self-contained: Adding <code>svgStyle</code> to the svg-element later instead of to head.</p><figure><pre><code>const elem = (tagName, props, ...children) =&gt; {
   const el = Object.assign(document.createElement(tagName), props);
   el.replaceChildren(...children);
   return el;
