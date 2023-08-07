@@ -601,11 +601,11 @@ const drawToSvg = (state, svg) =&gt; {
 };</code></pre></figure><p>We’ll make one and put it somewhere near the top:</p><figure><pre><code>const state = new State();
 state.setDrawing(parse.drawing(
 `
-\`\`\` lines 32 32
-l 7 8 7 12
-l 23 8 23 13
-l 3 19 3 19 8 24 20 25 28 19
-t 14 17 o
+\`\`\` lines 100 60
+l 35 21 35 25
+l 51 21 51 26
+l 31 32 31 32 36 37 48 38 56 32
+t 42 30 o
 \`\`\`
 `
 ));
