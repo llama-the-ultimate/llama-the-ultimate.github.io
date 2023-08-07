@@ -13,6 +13,9 @@ Controls:
 * Select things to edit: Click, ctrl-click or shift-click the buttons. Also ctrl+arrow keys. Also ctrl+A.
 * Move selected things: Arrow keys.
 * Resize drawing: Edit the numbers at the end of the `\`\`\` lines`-line in the textarea.
+* Remove selected things: Delete.
+
+(Things got a little single-page application here. Some browser keyboard shortcuts are broken. Sorry.)
 
 Text-format:
 * `\`\`\` lines <w h>`: opening with `w×h`-dimensions.
