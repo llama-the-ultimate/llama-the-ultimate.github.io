@@ -1,0 +1,35 @@
+# Scratch
+
+## Nice things
+Getting stuff done without writing a ton of code is nice. TBH he subset of JavaScript that I’m using is fine and has pretty okay ergonomics. Garbage collection, somewhat functional functions and not too cumbersome data structure stuff is convenient.
+
+Being able to distribute something small that can be run on fairly arbitrary machines without a lot of setting up. I don’t think tens or hundreds of megabytes of runtime is worth it for the stuff I’m typically building. I don’t usually want to build large things or solve complex problems.
+
+Simple “build toolchain.” I like pressing F5 in DrRacket. I like editing a .js-file, saving it and pressing F5 in my browser. I’m okay with running a more buildy and compily thing that maybe produces a file, particularly if the result is very easily distributable.
+
+I ran into Kartik Agaram’s Freewheeling a month or two ago:
+
+=> url http://akkartik.name/freewheeling Using computers more freely and safely
+=> url http://akkartik.name/post/roundup22 A year of freewheeling apps
+=> url http://akkartik.name/lines.html Plain text. With lines.
+
+He’s using Lua and LÖVE and, as far as I can tell, building “desktop apps.” I think I have pretty similar views on software and it’s like really cool stuff.
+
+## Some things to look at
+
+=> url https://bellard.org/quickjs/ QuickJS
+=> url https://duktape.org/ Duktape
+=> url https://mujs.com/ MuJS
+
+My impression is that QuickJS is more popular than the others, but I’m not sure (and I don’t know if that implies anything I care about).
+
+=> url https://github.com/endojs/Jessie Jessie
+
+Jessie doesn’t seem to be particularly implemented or anything.
+
+I would be interested in something like an implementation of only a subset of JavaScript, maybe something along the lines of Jessie. (One of the nice thing
+
+APEs are cool.
+=> url https://justine.lol/ape.html Actually Portable Executable
+=> url https://redbean.dev/ redbean
+Also I think QuickJS exists as an APE somewhere...

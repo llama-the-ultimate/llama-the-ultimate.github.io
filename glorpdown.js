@@ -378,7 +378,7 @@
     return {
       str: str,
       process: (line) => {
-        if (line.type === "toggle") {
+        if (line.type === "end" || line.type === "toggle") {
           return `</svg>${html.captionFrom(line)}</figure>`;
         }
         const lines = linesParser(line.full);

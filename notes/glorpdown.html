@@ -14,7 +14,19 @@ code here
 not turned off yet so things are still code
 ````</code></pre></figure><p>Becomes:</p><figure><pre><code>code here
 ```
-not turned off yet so things are still code</code></pre></figure><p>In Gemtext you can write some stuff after the &lt;start&gt; of a line that turns preformatted text <em>on</em> and have that be “alt text.” In Glorpdown this text is instead potentially used when rendering. E.g. for marking some preformatted text as a “repl,” so that later code can turn it into a editable textare or something.</p><p>If there’s text after the &lt;start&gt; of a line that turns preformatted text <em>off</em>, then that’s used as a caption for the preformatted text.</p><h3>Details</h3><p>Not in gemtext. This it “toggled,” kind of like with the preformatted text. Lines that start with <code>+++</code>. The text after the first <code>+++</code> becomes the summary. The content between a first and second <code>+++</code>-line is details (the stuff you see if you click to expand or something).</p><figure><pre><code>+++ Things
+not turned off yet so things are still code</code></pre></figure><p>In Gemtext you can write some stuff after the &lt;start&gt; of a line that turns preformatted text <em>on</em> and have that be “alt text.” In Glorpdown this text is instead potentially used when rendering. E.g. for marking some preformatted text as a “repl,” so that later code can turn it into a editable textare or something.</p><p>If there’s text after the &lt;start&gt; of a line that turns preformatted text <em>off</em>, then that’s used as a caption for the preformatted text.</p><h3>Lines</h3><p>A section of preformatted text where the text after the &lt;start&gt; if the line that turns it on goes like <code>lines &lt;w h&gt;</code>.</p><p><a href="./lines.html">More lines-stuff, including an editor.</a></p><figure><pre><code>``` lines 40 36
+t 33 5 oh no
+l 20 14 19 8 11 8 10 14 3 18 4 21 10 20 9 31 12 31 15 24 17 30 21 31 19 20 25 21 25 17 20 14
+l 13 10 13 11
+l 17 10 17 11
+l 14 14 16 14
+l 23 11 29 8
+```</code></pre></figure><figure><svg width="10em" height="9em"><style>svg {stroke: currentColor;fill: none;}text {stroke: none;dominant-baseline: middle;text-anchor: middle;fill: currentColor;}</style><text x="82.5%" y="13.88888888888889%">oh no</text>
+<line x1="50%" y1="38.888888888888886%" x2="47.5%" y2="22.22222222222222%" /><line x1="47.5%" y1="22.22222222222222%" x2="27.5%" y2="22.22222222222222%" /><line x1="27.5%" y1="22.22222222222222%" x2="25%" y2="38.888888888888886%" /><line x1="25%" y1="38.888888888888886%" x2="7.5%" y2="50%" /><line x1="7.5%" y1="50%" x2="10%" y2="58.33333333333333%" /><line x1="10%" y1="58.33333333333333%" x2="25%" y2="55.55555555555556%" /><line x1="25%" y1="55.55555555555556%" x2="22.5%" y2="86.11111111111111%" /><line x1="22.5%" y1="86.11111111111111%" x2="30%" y2="86.11111111111111%" /><line x1="30%" y1="86.11111111111111%" x2="37.5%" y2="66.66666666666666%" /><line x1="37.5%" y1="66.66666666666666%" x2="42.5%" y2="83.33333333333333%" /><line x1="42.5%" y1="83.33333333333333%" x2="52.5%" y2="86.11111111111111%" /><line x1="52.5%" y1="86.11111111111111%" x2="47.5%" y2="55.55555555555556%" /><line x1="47.5%" y1="55.55555555555556%" x2="62.5%" y2="58.33333333333333%" /><line x1="62.5%" y1="58.33333333333333%" x2="62.5%" y2="47.22222222222222%" /><line x1="62.5%" y1="47.22222222222222%" x2="50%" y2="38.888888888888886%" />
+<line x1="32.5%" y1="27.77777777777778%" x2="32.5%" y2="30.555555555555554%" />
+<line x1="42.5%" y1="27.77777777777778%" x2="42.5%" y2="30.555555555555554%" />
+<line x1="35%" y1="38.888888888888886%" x2="40%" y2="38.888888888888886%" />
+<line x1="57.5%" y1="30.555555555555554%" x2="72.5%" y2="22.22222222222222%" /></svg></figure><h3>Details</h3><p>Not in gemtext. This it “toggled,” kind of like with the preformatted text. Lines that start with <code>+++</code>. The text after the first <code>+++</code> becomes the summary. The content between a first and second <code>+++</code>-line is details (the stuff you see if you click to expand or something).</p><figure><pre><code>+++ Things
 * One thing
 * Another thing
 * A third thing

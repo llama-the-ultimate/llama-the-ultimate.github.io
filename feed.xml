@@ -12,6 +12,594 @@
       <link>https://llama-the-ultimate.org</link>
     </image>
     <item>
+      <title>Lines</title>
+      <link>https://llama-the-ultimate.org/notes/lines.html</link>
+      <description>For drawing with.</description>
+      <pubDate>Mon, 07 Aug 2023 00:00:00 GMT</pubDate>
+      <guid>https://llama-the-ultimate.org/notes/lines.html</guid>
+      <content:encoded><![CDATA[<h1>Lines</h1><p>(You need to view this in a browser with JavaScript enabled to use the editor.)</p><p>Controls:</p><ul><li>Add a new lines-point or reposition text: Left-click within the outlined svg-element.</li><li>Deselect: Enter or right-click within the outlined svg-element.</li><li>Add new text: Start writing when no thing is selected.</li><li>Remove last point or character of selected thing(s): Backspace.</li><li>Select things to edit: Click, ctrl-click or shift-click the buttons. Also ctrl+arrow keys. Also ctrl+A.</li><li>Move selected things: Arrow keys.</li><li>Resize drawing: Edit the numbers at the end of the <code>``` lines</code>-line in the textarea.</li></ul><p>Text-format:</p><ul><li><code>``` lines &lt;w h&gt;</code>: opening with <code>w×h</code>-dimensions.</li><li><code>l &lt;x1 y1&gt; ... &lt;xn yn&gt;</code>: Lines from point to point.</li><li><code>t &lt;x y&gt; &lt;text&gt;</code>: &lt;text&gt; centered at <code>x,y</code>.</li><li><code>```</code>: closing line.</li></ul><p>Editing the text updates the drawing. Editing the drawing updates the text. Dimensions of drawing can only be edited as text. If you need to edit/move individual points within a series-of-lines-thing that can (currently?) only be done in text.</p><p>The coordinate system is like based on the font size. When rendering to svg four units make one <code>em</code>.</p><h2>Glorpdown</h2><p>I’d been playing with the idea of putting inline svg or something in my posts.<br><a href="https://llama-the-ultimate.orghttps://akkartik.name/lines.html">Then I saw Kartik Agaram’s “Plain text. With lines.”</a><br>And that looked like a better fit for my markup language: A small language for drawings with lines in them. Also I was already using similar <code>```</code>-toggling for various stuff :)</p><p>I want to have stuff like text with lines or arrows between them. So my language supports lines and text. It’s also pretty Glorpdown-like, line-oriented and that, and can be parsed in a similar way.</p><p><a href="https://llama-the-ultimate.org/glorpdown.html">Example in Glorpdown-editor here.</a></p><p><a href="https://llama-the-ultimate.org/notes/lamb-what.html">It is currently used for the syntax tree in the “What do the lambdas?”-post. (Was previously separate svg-file.)</a><br>Can copypaste this into the textarea to see:</p><figure><pre><code>``` lines 104 80
+t 59 8 (application)
+t 59 12 (λa.a (foo a)) bar
+l 52 15 36 22
+t 36 25 (abstraction)
+t 35 29 λa.a (foo a)
+l 65 15 81 22
+t 82 24 (reference)
+t 82 28 bar
+l 34 32 34 35
+t 35 38 (application)
+t 34 43 a (foo a)
+l 29 46 18 49
+t 16 52 (reference)
+t 15 56 a
+l 37 46 48 49
+t 51 52 (application)
+t 50 56 foo a
+l 46 59 36 63
+t 35 65 (reference)
+t 34 69 foo
+l 55 59 63 63
+t 65 65 (reference)
+t 66 69 a
+```</code></pre></figure><h2>Implementation</h2><details><summary>Style</summary><p><a href="https://llama-the-ultimate.org/notes/elem.html">(With <code>elem</code> function from other post.)</a></p><p>To make the svg-element more self-contained: Adding <code>svgStyle</code> to the svg-element later instead of to head.</p><figure><pre><code>const elem = (tagName, props, ...children) =&gt; {
+  const el = Object.assign(document.createElement(tagName), props);
+  el.replaceChildren(...children);
+  return el;
+};
+
+const styles = `
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  width: 20rem;
+}
+
+.lines-button {
+  text-align: left;
+  font-size: 1rem;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+.svg-canvas {
+  outline-style: solid;
+  margin: 0.3rem;
+}
+
+.lines-text {
+  width: 25rem;
+}
+.selection-marker {
+  width: 1rem;
+}
+`;
+document.head.appendChild(elem(&quot;style&quot;, {}, styles));
+
+const svgStyle = `
+&lt;style&gt;
+  svg {
+    stroke: currentColor;
+    fill: none;
+  }
+  text {
+    stroke: none;
+    dominant-baseline: middle;
+    text-anchor: middle;
+    fill: currentColor;
+  }
+  .selected {
+    stroke: #00ff00;  
+  }
+  text.selected {
+    stroke: none;
+    fill: #00ff00;
+  }
+&lt;/style&gt;
+`;</code></pre></figure></details><details><summary>Vectors</summary><p>For positions, dimensions, directions. Vectors support addition.</p><figure><pre><code>class Vector {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+  add(v) {
+    return new Vector(this.x + v.x, this.y + v.y);
+  }
+  static get left() {
+    return new Vector(-1, 0);
+  }
+  static get right() {
+    return new Vector(1, 0);
+  }
+  static get up() {
+    return new Vector(0, -1);
+  }
+  static get down() {
+    return new Vector(0, 1);
+  }
+}</code></pre></figure></details><details><summary>A drawing has things in it</summary><p>The content of a drawing is a bunch of things. A thing is some lines or some text. There’s some stuff we can (attempt to) do to things:</p><ul><li>We can move a thing.</li><li>We can add a position to a thing or set the position of a thing.</li><li>We can (attempt to) add a character to a thing.</li><li>We can “go back.” This is vaguely undo-like, but really more backspace-like.</li></ul><figure><pre><code>class Lines {
+  constructor(positions) {
+    this.positions = positions === undefined ? [] : positions;
+  }
+  match(cases) {
+    return cases.lines(this.positions);
+  }
+  move(vec) {
+    this.positions = this.positions.map((pos) =&gt; pos.add(vec));
+  }
+  addPosition(position) {
+    this.positions.push(position);
+  }
+  addCharacter(c) {}
+  back() {
+    this.positions.splice(-1, 1);
+  }
+}
+
+class Text {
+  constructor(position, str) {
+    this.position = position;
+    this.str = str === undefined ? &quot;&quot; : str;
+  }
+  match(cases) {
+    return cases.text(this.position, this.str);
+  }
+  move(vec) {
+    this.position = this.position.add(vec);
+  }
+  addPosition(position) {
+    this.position = position;
+  }
+  addCharacter(c) {
+    this.str += c;
+  }
+  back() {
+    this.str = this.str.slice(0, -1);
+  }
+}</code></pre></figure><p>A drawing is width×height-dimensions and an ordered list of things. Not too objecty, mostly just data. That’s okay.</p><figure><pre><code>class Drawing {
+  constructor() {
+    this.dimensions = new Vector(60, 40);
+    this.things = [];
+  }
+}</code></pre></figure><p>Parsing turns strings into things.</p><figure><pre><code>const regCase = (str, list) =&gt; {
+  for (const [regex, f] of list) {
+    const match = str.match(regex);
+    if (match !== null) {
+      return f(match);
+    }
+  }
+  return null;
+};
+
+const parse = new (class {
+  vec(str) {
+    const match = str.match(/^\s*(\d+)\s+(\d+)\s*$/);
+    return match === null
+      ? null
+      : new Vector(parseInt(match[1]), parseInt(match[2]));
+  }
+  vecs(str) {
+    const res = [];
+    let rest = str;
+    while (true) {
+      const match = rest.match(/^\s*(\d+)\s+(\d+)\s*(.*)$/);
+      if (match === null) {
+        return res;
+      }
+      res.push(new Vector(parseInt(match[1]), parseInt(match[2])));
+      rest = match[3];
+    }
+  }
+  drawing(str) {
+    const res = new Drawing();
+    for (const line of str.split(&quot;\n&quot;)) {
+      regCase(line, [
+        [
+          /^```\s+lines\s+(\d+\s+\d+)\s*$/,
+          (match) =&gt; {
+            res.dimensions = this.vec(match[1]);
+          },
+        ],
+        [
+          /^l(.*)$/,
+          (match) =&gt; {
+            res.things.push(new Lines(this.vecs(match[1])));
+          },
+        ],
+        [
+          /^t\s*(\d+\s+\d+)\s+(.*)$/,
+          (match) =&gt; {
+            res.things.push(new Text(this.vec(match[1]), match[2]));
+          },
+        ],
+      ]);
+    }
+    return res;
+  }
+})();</code></pre></figure><p>And unparsing turns things into strings.</p><figure><pre><code>const unparse = new (class {
+  thing(thing) {
+    return thing.match({
+      text: (position, str) =&gt; `t ${position.x} ${position.y} ${str}`,
+      lines: (positions) =&gt; {
+        let str = &quot;l&quot;;
+        for (const pos of positions) {
+          str += ` ${pos.x} ${pos.y}`;
+        }
+        return str;
+      },
+    });
+  }
+  drawing(drawing) {
+    let res = &quot;``` lines &quot;;
+    res += `${drawing.dimensions.x} ${drawing.dimensions.y}`;
+    drawing.things.forEach((t) =&gt; {
+      res += `\n${this.thing(t)}`;
+    });
+    res += &quot;\n```&quot;;
+    return res;
+  }
+})();</code></pre></figure></details><details><summary>Selection</summary><p>A selection is used for keeping track of which things are selected when editing a drawing. It’s not too concerned with the actual things, just <em>where</em> in the ordered list they are. So it holds onto a set of indexes and the total number of things.</p><figure><pre><code>class Selection {
+  constructor() {
+    this.limit = 0;
+    this.ids = new Set();
+  }
+  isSelected(id) {
+    return this.ids.has(id);
+  }
+  hasSelection() {
+    return this.ids.size &gt; 0;
+  }
+  valid(id) {
+    return id !== null &amp;&amp; id &gt;= 0 &amp;&amp; id &lt; this.limit;
+  }
+  wrap(id) {
+    if (this.limit &lt; 1) {
+      return null;
+    }
+    let res = id;
+    while (res &lt; 0) {
+      res += this.limit;
+    }
+    while (res &gt;= this.limit) {
+      res -= this.limit;
+    }
+    return res;
+  }
+  select(id) {
+    if (this.valid(id)) {
+      this.ids = new Set([id]);
+    }
+  }
+  deselect() {
+    this.ids = new Set();
+  }
+  selectAll() {
+    for (let i = 0; i &lt; this.limit; i++) {
+      this.add(i);
+    }
+  }
+  add(id) {
+    if (!this.valid(id)) {
+      return;
+    }
+    this.ids.add(id);
+  }
+  remove(id) {
+    this.ids.delete(id);
+  }
+  toggle(id) {
+    if (this.isSelected(id)) {
+      this.remove(id);
+    } else {
+      this.add(id);
+    }
+  }
+  expand(id) {
+    const min = Math.min(id, ...this.ids);
+    const max = Math.max(id, ...this.ids);
+    for (let i = min; i &lt;= max; i++) {
+      this.add(i);
+    }
+  }
+  move(num) {
+    if (!this.hasSelection()) {
+      if (num &lt; 0) {
+        this.ids = new Set([0]);
+      } else if (num &gt; 0) {
+        this.ids = new Set([-1]);
+      }
+    }
+    const res = new Set();
+    for (const i of this.ids) {
+      res.add(this.wrap(i + num));
+    }
+    this.ids = res;
+  }
+  resize(limit) {
+    this.limit = limit;
+    for (const id of this.ids) {
+      if (id &gt;= limit) {
+        this.ids.delete(id);
+      }
+    }
+  }
+  itemsFrom(list) {
+    const res = [];
+    for (let i = 0; i &lt; this.limit; i++) {
+      if (this.isSelected(i)) {
+        res.push(list[i]);
+      }
+    }
+    return res;
+  }
+}</code></pre></figure></details><details><summary>State</summary><p>The state ties things together. Keeps track of drawing and selection and has methods for stuff you can do.</p><figure><pre><code>class State {
+  constructor() {
+    this.drawing = new Drawing();
+    this.position = new Vector(0, 0);
+    this.selection = new Selection();
+  }
+  selectedThings() {
+    return this.selection.itemsFrom(this.drawing.things);
+  }
+  pushThing(thing) {
+    this.drawing.things.push(thing);
+    this.selection.resize(this.drawing.things.length);
+    this.selection.select(this.drawing.things.length - 1);
+  }
+  selectedDo(f, orelse = () =&gt; {}) {
+    if (this.selection.hasSelection()) {
+      this.selectedThings().forEach(f);
+    } else {
+      orelse();
+    }
+  }
+  move(vec) {
+    this.selectedDo((thing) =&gt; thing.move(vec));
+  }
+  addPosition() {
+    this.selectedDo(
+      (thing) =&gt; thing.addPosition(this.position),
+      () =&gt; this.pushThing(new Lines([this.position]))
+    );
+  }
+  addCharacter(c) {
+    this.selectedDo(
+      (thing) =&gt; thing.addCharacter(c),
+      () =&gt; this.pushThing(new Text(this.position, c))
+    );
+  }
+  delete() {
+    this.drawing.things = this.drawing.things.filter(
+      (thing, id) =&gt; !this.selection.isSelected(id)
+    );
+    this.selection.deselect();
+    this.selection.resize(this.drawing.things.length);
+  }
+  back() {
+    this.selectedDo((thing) =&gt; thing.back());
+  }
+}</code></pre></figure></details><details><summary>Drawing into svg-element</summary><p>Rendering “into” an existing svg-element instead of returning a new thing. Since we have set up an svg-element, with events hooked up and such, that we want to keep using.</p><p>(Considered returning just the inner svg-stuff, but the scaling of things is kind of tied up to the height and width of the svg-element, so blah blah cohesion maybe.)</p><figure><pre><code>const svgScale = (dimensions)  =&gt; (v) =&gt; {
+  return {
+    x: `${v.x * (100 / dimensions.x)}%`,
+    y: `${v.y * (100 / dimensions.y)}%`,
+  };
+};
+
+const drawToSvg = (state, svg) =&gt; {
+  const drawing = state.drawing;
+  const scale = svgScale(drawing.dimensions);
+  svg.setAttribute(&quot;width&quot;, `${drawing.dimensions.x / 4}em`);
+  svg.setAttribute(&quot;height&quot;, `${drawing.dimensions.y / 4}em`);
+  let res = svgStyle;
+  drawing.things.forEach((thing, id) =&gt; {
+    const selected = state.selection.isSelected(id) ? ` class=&quot;selected&quot;` : &quot;&quot;;
+    thing.match({
+      lines: (positions) =&gt; {
+        let prev = null;
+        for (const current of positions) {
+          if (prev !== null) {
+            const scaledPrev = scale(prev);
+            const scaledCurrent = scale(current);
+            res += `&lt;line${selected} x1=&quot;${scaledPrev.x}&quot; y1=&quot;${scaledPrev.y}&quot; x2=&quot;${scaledCurrent.x}&quot; y2=&quot;${scaledCurrent.y}&quot; /&gt;`;
+          }
+          prev = current;
+        }
+      },
+      text: (position, str) =&gt; {
+        const scaled = scale(position);
+        res += `&lt;text${selected} x=&quot;${scaled.x}&quot; y=&quot;${scaled.y}&quot;&gt;${str}&lt;/text&gt;`;
+      },
+    });
+  });
+  svg.innerHTML = res;
+};</code></pre></figure></details><details><summary>Making an editor</summary><p>A bunch of code:</p><figure><pre><code>const editor = () =&gt; {
+  const state = new State();
+
+  const posEl = document.createElementNS(
+    &quot;http://www.w3.org/2000/svg&quot;,
+    &quot;circle&quot;
+  );
+  posEl.setAttribute(&quot;r&quot;, &quot;2&quot;);
+
+  const div = elem(&quot;div&quot;, { className: &quot;row&quot; });
+  const buttons = div.appendChild(elem(&quot;div&quot;, { className: &quot;buttons&quot; }));
+  const svgCol = div.appendChild(elem(&quot;div&quot;, { className: &quot;column&quot; }));
+
+  const svg = svgCol.appendChild(
+    document.createElementNS(&quot;http://www.w3.org/2000/svg&quot;, &quot;svg&quot;)
+  );
+  svg.classList.add(&quot;svg-canvas&quot;);
+  const p = svgCol.appendChild(elem(&quot;p&quot;));
+
+  const textarea = div.appendChild(elem(&quot;textarea&quot;, { className: &quot;lines-text&quot; }));
+  textarea.oninput = () =&gt; {
+    state.drawing = parse.drawing(textarea.value);
+    state.selection.deselect();
+    state.selection.resize(state.drawing.things.length);
+    render.drawing();
+    render.buttons();
+  };
+
+  const render = new (class {
+    drawing() {
+      drawToSvg(state, svg);
+      render.mouse();
+    }
+    mouse() {
+      const scaled = svgScale(state.drawing.dimensions)(state.position);
+      posEl.setAttribute(&quot;cx&quot;, scaled.x);
+      posEl.setAttribute(&quot;cy&quot;, scaled.y);
+      svg.appendChild(posEl);
+    }
+    buttons() {
+      buttons.replaceChildren();
+      state.drawing.things.forEach((thing, i) =&gt; {
+        const str = unparse.thing(thing);
+        buttons.appendChild(
+          elem(
+            &quot;div&quot;,
+            { className: &quot;row&quot; },
+            elem(
+              &quot;div&quot;,
+              { className: &quot;selection-marker&quot; },
+              state.selection.isSelected(i) ? &quot;&gt;&quot; : &quot;&quot;
+            ),
+            elem(
+              &quot;button&quot;,
+              {
+                className: &quot;lines-button&quot;,
+                onclick: (e) =&gt; {
+                  if (e.shiftKey) {
+                    state.selection.expand(i);
+                  } else if (e.ctrlKey || e.metaKey) {
+                    state.selection.toggle(i);
+                  } else {
+                    state.selection.select(i);
+                  }
+                  render.drawing();
+                  render.buttons();
+                },
+              },
+              str.length &gt; 38 ? str.slice(0, 35) + &quot;...&quot; : str
+            )
+          )
+        );
+      });
+    }
+    text() {
+      textarea.value = unparse.drawing(state.drawing);
+    }
+  })();
+
+  const posFromMouse = (e, dimensions) =&gt; {
+    const point = new DOMPoint(e.clientX, e.clientY);
+    const translated = point.matrixTransform(svg.getScreenCTM().inverse());
+    const box = svg.getBoundingClientRect();
+    const x = Math.round((translated.x / box.width) * dimensions.x);
+    const y = Math.round((translated.y / box.height) * dimensions.y);
+    return new Vector(x, y);
+  };
+
+  svg.onmousemove = (e) =&gt; {
+    state.position = posFromMouse(e, state.drawing.dimensions);
+    render.mouse();
+    p.innerText = `${state.position.x},${state.position.y}`;
+  };
+  svg.oncontextmenu = (e) =&gt; e.preventDefault();
+  svg.onmousedown = (e) =&gt; {
+    state.position = posFromMouse(e, state.drawing.dimensions);
+    render.mouse();
+    if (e.buttons &lt; 2) {
+      state.addPosition();
+    }
+    if (e.buttons == 2) {
+      state.selection.deselect();
+    }
+    render.drawing();
+    render.buttons();
+    render.text();
+  };
+
+  const keyToSelectionOffset = (key) =&gt; {
+    return key === &quot;ArrowUp&quot; ? -1 : key === &quot;ArrowDown&quot; ? 1 : null;
+  };
+  const keyToDir = (key) =&gt; {
+    return key === &quot;ArrowLeft&quot;
+      ? Vector.left
+      : key === &quot;ArrowRight&quot;
+      ? Vector.right
+      : key === &quot;ArrowUp&quot;
+      ? Vector.up
+      : key === &quot;ArrowDown&quot;
+      ? Vector.down
+      : null;
+  };
+
+  document.onkeydown = (e) =&gt; {
+    const active = document.activeElement.tagName;
+    if (active === &quot;INPUT&quot; || active === &quot;TEXTAREA&quot;) {
+      return;
+    }
+    const key = e.key;
+    if (e.ctrlKey || e.metaKey) {
+      const y = keyToSelectionOffset(key);
+      if (y !== null) {
+        e.preventDefault();
+        state.selection.move(y);
+        render.buttons();
+        render.drawing();
+        return;
+      }
+      if (key.toLowerCase() === &quot;a&quot;) {
+        e.preventDefault();
+        state.selection.selectAll();
+        render.buttons();
+        render.drawing();
+        return;
+      }
+      return;
+    }
+    if (state.selected === null) {
+      return;
+    }
+    if (key === &quot;Enter&quot;) {
+      state.selection.deselect();
+    } else if (key === &quot;Delete&quot;) {
+      state.delete();
+    } else if (key === &quot;Backspace&quot;) {
+      state.back();
+    } else {
+      const dir = keyToDir(key);
+      if (dir !== null) {
+        state.move(dir);
+      } else {
+        if (key.length &gt; 1) {
+          return;
+        }
+        state.addCharacter(e.key);
+      }
+    }
+    e.preventDefault();
+    render.drawing();
+    render.buttons();
+    render.text();
+  };
+  
+  render.mouse();
+  render.drawing();
+  render.text();
+  render.buttons();
+  return div;
+};</code></pre></figure><p>We’ll make one and put it somewhere near the top:</p><figure><pre><code>const h1 = document.getElementsByTagName(&quot;h1&quot;)[0];
+h1.parentNode.insertBefore(editor(), h1.nextSibling);</code></pre></figure></details>]]></content:encoded>
+    </item>
+    <item>
       <title>An 8-bit palette</title>
       <link>https://llama-the-ultimate.org/notes/palette.html</link>
       <description>A colourful array of colours.</description>
@@ -614,7 +1202,19 @@ code here
 not turned off yet so things are still code
 ````</code></pre></figure><p>Becomes:</p><figure><pre><code>code here
 ```
-not turned off yet so things are still code</code></pre></figure><p>In Gemtext you can write some stuff after the &lt;start&gt; of a line that turns preformatted text <em>on</em> and have that be “alt text.” In Glorpdown this text is instead potentially used when rendering. E.g. for marking some preformatted text as a “repl,” so that later code can turn it into a editable textare or something.</p><p>If there’s text after the &lt;start&gt; of a line that turns preformatted text <em>off</em>, then that’s used as a caption for the preformatted text.</p><h3>Details</h3><p>Not in gemtext. This it “toggled,” kind of like with the preformatted text. Lines that start with <code>+++</code>. The text after the first <code>+++</code> becomes the summary. The content between a first and second <code>+++</code>-line is details (the stuff you see if you click to expand or something).</p><figure><pre><code>+++ Things
+not turned off yet so things are still code</code></pre></figure><p>In Gemtext you can write some stuff after the &lt;start&gt; of a line that turns preformatted text <em>on</em> and have that be “alt text.” In Glorpdown this text is instead potentially used when rendering. E.g. for marking some preformatted text as a “repl,” so that later code can turn it into a editable textare or something.</p><p>If there’s text after the &lt;start&gt; of a line that turns preformatted text <em>off</em>, then that’s used as a caption for the preformatted text.</p><h3>Lines</h3><p>A section of preformatted text where the text after the &lt;start&gt; if the line that turns it on goes like <code>lines &lt;w h&gt;</code>.</p><p><a href="https://llama-the-ultimate.org/notes/lines.html">More lines-stuff, including an editor.</a></p><figure><pre><code>``` lines 40 36
+t 33 5 oh no
+l 20 14 19 8 11 8 10 14 3 18 4 21 10 20 9 31 12 31 15 24 17 30 21 31 19 20 25 21 25 17 20 14
+l 13 10 13 11
+l 17 10 17 11
+l 14 14 16 14
+l 23 11 29 8
+```</code></pre></figure><figure><svg width="10em" height="9em"><style>svg {stroke: currentColor;fill: none;}text {stroke: none;dominant-baseline: middle;text-anchor: middle;fill: currentColor;}</style><text x="82.5%" y="13.88888888888889%">oh no</text>
+<line x1="50%" y1="38.888888888888886%" x2="47.5%" y2="22.22222222222222%" /><line x1="47.5%" y1="22.22222222222222%" x2="27.5%" y2="22.22222222222222%" /><line x1="27.5%" y1="22.22222222222222%" x2="25%" y2="38.888888888888886%" /><line x1="25%" y1="38.888888888888886%" x2="7.5%" y2="50%" /><line x1="7.5%" y1="50%" x2="10%" y2="58.33333333333333%" /><line x1="10%" y1="58.33333333333333%" x2="25%" y2="55.55555555555556%" /><line x1="25%" y1="55.55555555555556%" x2="22.5%" y2="86.11111111111111%" /><line x1="22.5%" y1="86.11111111111111%" x2="30%" y2="86.11111111111111%" /><line x1="30%" y1="86.11111111111111%" x2="37.5%" y2="66.66666666666666%" /><line x1="37.5%" y1="66.66666666666666%" x2="42.5%" y2="83.33333333333333%" /><line x1="42.5%" y1="83.33333333333333%" x2="52.5%" y2="86.11111111111111%" /><line x1="52.5%" y1="86.11111111111111%" x2="47.5%" y2="55.55555555555556%" /><line x1="47.5%" y1="55.55555555555556%" x2="62.5%" y2="58.33333333333333%" /><line x1="62.5%" y1="58.33333333333333%" x2="62.5%" y2="47.22222222222222%" /><line x1="62.5%" y1="47.22222222222222%" x2="50%" y2="38.888888888888886%" />
+<line x1="32.5%" y1="27.77777777777778%" x2="32.5%" y2="30.555555555555554%" />
+<line x1="42.5%" y1="27.77777777777778%" x2="42.5%" y2="30.555555555555554%" />
+<line x1="35%" y1="38.888888888888886%" x2="40%" y2="38.888888888888886%" />
+<line x1="57.5%" y1="30.555555555555554%" x2="72.5%" y2="22.22222222222222%" /></svg></figure><h3>Details</h3><p>Not in gemtext. This it “toggled,” kind of like with the preformatted text. Lines that start with <code>+++</code>. The text after the first <code>+++</code> becomes the summary. The content between a first and second <code>+++</code>-line is details (the stuff you see if you click to expand or something).</p><figure><pre><code>+++ Things
 * One thing
 * Another thing
 * A third thing

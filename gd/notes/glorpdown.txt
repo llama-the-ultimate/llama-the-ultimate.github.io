@@ -109,6 +109,32 @@ In Gemtext you can write some stuff after the <start> of a line that turns prefo
 
 If there’s text after the <start> of a line that turns preformatted text _off_, then that’s used as a caption for the preformatted text.
 
+### Lines
+
+A section of preformatted text where the text after the <start> if the line that turns it on goes like `lines <w h>`.
+
+=> gd lines More lines-stuff, including an editor.
+
+````
+``` lines 40 36
+t 33 5 oh no
+l 20 14 19 8 11 8 10 14 3 18 4 21 10 20 9 31 12 31 15 24 17 30 21 31 19 20 25 21 25 17 20 14
+l 13 10 13 11
+l 17 10 17 11
+l 14 14 16 14
+l 23 11 29 8
+```
+````
+
+``` lines 40 36
+t 33 5 oh no
+l 20 14 19 8 11 8 10 14 3 18 4 21 10 20 9 31 12 31 15 24 17 30 21 31 19 20 25 21 25 17 20 14
+l 13 10 13 11
+l 17 10 17 11
+l 14 14 16 14
+l 23 11 29 8
+```
+
 ### Details
 
 Not in gemtext. This it “toggled,” kind of like with the preformatted text. Lines that start with `+++`. The text after the first `+++` becomes the summary. The content between a first and second `+++`-line is details (the stuff you see if you click to expand or something).
