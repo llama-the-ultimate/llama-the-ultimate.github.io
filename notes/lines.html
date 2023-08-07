@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="./../js-editor.css">
     <script src="./../js-editor.js" defer></script>
   </head>
-  <body class="page"><p><a href="./../index.html">Index</a></p><p><time>2023-08-07</time></p><h1>Lines</h1><p>(You need to view this in a browser with JavaScript enabled to use the editor.)</p><p>Controls:</p><ul><li>Add a new lines-point or reposition text: Left-click within the outlined svg-element.</li><li>Deselect: Enter or right-click within the outlined svg-element.</li><li>Add new text: Start writing when no thing is selected.</li><li>Remove last point or character of selected thing(s): Backspace.</li><li>Select things to edit: Click, ctrl-click or shift-click the buttons. Also ctrl+arrow keys. Also ctrl+A.</li><li>Move selected things: Arrow keys.</li><li>Resize drawing: Edit the numbers at the end of the <code>``` lines</code>-line in the textarea.</li><li>Remove selected things: Delete.</li></ul><p>(Things got a little single-page application here. Some browser keyboard shortcuts are broken. Sorry.)</p><p>Text-format:</p><ul><li><code>``` lines &lt;w h&gt;</code>: opening with <code>w×h</code>-dimensions.</li><li><code>l &lt;x1 y1&gt; ... &lt;xn yn&gt;</code>: Lines from point to point.</li><li><code>t &lt;x y&gt; &lt;text&gt;</code>: &lt;text&gt; centered at <code>x,y</code>.</li><li><code>```</code>: closing line.</li></ul><p>Editing the text updates the drawing. Editing the drawing updates the text. Dimensions of drawing can only be edited as text. If you need to edit/move individual points within a series-of-lines-thing that can (currently?) only be done in text.</p><p>The coordinate system is like based on the font size. When rendering to svg four units make one <code>em</code>.</p><h2>Glorpdown</h2><p>I’d been playing with the idea of putting inline svg or something in my posts.<br><a href="https://akkartik.name/lines.html">Then I saw Kartik Agaram’s “Plain text. With lines.”</a><br>And that looked like a better fit for my markup language: A small language for drawings with lines in them. Also I was already using similar <code>```</code>-toggling for various stuff :)</p><p>I want to have stuff like text with lines or arrows between them. So my language supports lines and text. It’s also pretty Glorpdown-like, line-oriented and that, and can be parsed in a similar way.</p><p><a href="./../glorpdown.html">Example in Glorpdown-editor here.</a></p><p><a href="./lamb-what.html">It is currently used for the syntax tree in the “What do the lambdas?”-post. (Was previously separate svg-file.)</a><br>Can copypaste this into the textarea to see:</p><figure><pre><code>``` lines 104 80
+  <body class="page"><p><a href="./../index.html">Index</a></p><p><time>2023-08-07</time></p><h1>Lines</h1><p>(You need to view this in a browser with JavaScript enabled to use the editor.)</p><p>Controls:</p><ul><li>Add a new lines-point or reposition text: Click within the outlined svg-element.</li><li>Deselect: Enter or right-click within the outlined svg-element.</li><li>Add new text: Start writing when no thing is selected.</li><li>Select things to edit: Click, ctrl-click or shift-click the buttons. Also ctrl+arrow keys. Also ctrl+A.</li><li>Move selected things: Arrow keys.</li><li>Remove last point or character of selected thing(s): Backspace.</li><li>Remove selected things: Delete.</li><li>Resize drawing: Edit the numbers at the end of the <code>``` lines</code>-line in the textarea.</li></ul><p>(Things got a little single-page application here. Some browser keyboard shortcuts are broken. Sorry.)</p><p>Text-format:</p><ul><li><code>``` lines &lt;w h&gt;</code>: opening with <code>w×h</code>-size.</li><li><code>l &lt;x1 y1&gt; ... &lt;xn yn&gt;</code>: Lines from point to point.</li><li><code>t &lt;x y&gt; &lt;text&gt;</code>: &lt;text&gt; centered at <code>x,y</code>.</li><li><code>```</code>: closing line.</li></ul><p>Editing the text updates the drawing. Editing the drawing updates the text. Size of drawing can only be edited as text. If you need to edit/move individual points within a series-of-lines-thing that can (currently?) only be done in text.</p><p>The coordinate system is like based on the font size. When rendering to svg four units make one <code>em</code>.</p><h2>Glorpdown</h2><p>I’d been playing with the idea of putting inline svg or something in my posts.<br><a href="https://akkartik.name/lines.html">Then I saw Kartik Agaram’s “Plain text. With lines.”</a><br>And that looked like a better fit for my markup language: A small language for drawings with lines in them. Also I was already using similar <code>```</code>-toggling for various stuff :)</p><p>I want to have stuff like text with lines or arrows between them. So my language supports lines and text. It’s also pretty Glorpdown-like, line-oriented and that, and can be parsed in a similar way.</p><p><a href="./../glorpdown.html">Example in Glorpdown-editor here.</a></p><p><a href="./lamb-what.html">It is currently used for the syntax tree in the “What do the lambdas?”-post. (Was previously separate svg-file.)</a><br>Can copypaste this into the textarea to see:</p><figure><pre><code>``` lines 104 80
 t 59 8 (application)
 t 59 12 (λa.a (foo a)) bar
 l 52 15 36 22
@@ -95,7 +95,7 @@ const svgStyle = `
     fill: #00ff00;
   }
 &lt;/style&gt;
-`;</code></pre></figure></details><details><summary>Vectors</summary><p>For positions, dimensions, directions. Vectors support addition.</p><figure><pre class="js-prelude"><code>class Vector {
+`;</code></pre></figure></details><details><summary>Vectors</summary><p>For positions, sizes, directions. Vectors support addition.</p><figure><pre class="js-prelude"><code>class Vector {
   constructor(x, y) {
     this.x = x;
     this.y = y;
@@ -154,9 +154,9 @@ class Text {
   back() {
     this.str = this.str.slice(0, -1);
   }
-}</code></pre></figure><p>A drawing is width×height-dimensions and an ordered list of things. Not too objecty, mostly just data. That’s okay.</p><figure><pre class="js-prelude"><code>class Drawing {
+}</code></pre></figure><p>A drawing is width×height-size and an ordered list of things. Not too objecty, mostly just data. That’s okay.</p><figure><pre class="js-prelude"><code>class Drawing {
   constructor() {
-    this.dimensions = new Vector(60, 40);
+    this.size = new Vector(60, 40);
     this.things = [];
   }
 }</code></pre></figure><p>Parsing turns strings into things.</p><figure><pre class="js-prelude"><code>const regCase = (str, list) =&gt; {
@@ -195,7 +195,7 @@ const parse = new (class {
         [
           /^```\s+lines\s+(\d+\s+\d+)\s*$/,
           (match) =&gt; {
-            res.dimensions = this.vec(match[1]);
+            res.size = this.vec(match[1]);
           },
         ],
         [
@@ -229,7 +229,7 @@ const parse = new (class {
   }
   drawing(drawing) {
     let res = &quot;``` lines &quot;;
-    res += `${drawing.dimensions.x} ${drawing.dimensions.y}`;
+    res += `${drawing.size.x} ${drawing.size.y}`;
     drawing.things.forEach((t) =&gt; {
       res += `\n${this.thing(t)}`;
     });
@@ -376,18 +376,18 @@ const parse = new (class {
   back() {
     this.selectedDo((thing) =&gt; thing.back());
   }
-}</code></pre></figure></details><details><summary>Drawing into svg-element</summary><p>Rendering “into” an existing svg-element instead of returning a new thing. Since we have set up an svg-element, with events hooked up and such, that we want to keep using.</p><p>(Considered returning just the inner svg-stuff, but the scaling of things is kind of tied up to the height and width of the svg-element, so blah blah cohesion maybe.)</p><figure><pre class="js-prelude"><code>const svgScale = (dimensions)  =&gt; (v) =&gt; {
+}</code></pre></figure></details><details><summary>Drawing into svg-element</summary><p>Rendering “into” an existing svg-element instead of returning a new thing. Since we have set up an svg-element, with events hooked up and such, that we want to keep using.</p><p>(Considered returning just the inner svg-stuff, but the scaling of things is kind of tied up to the height and width of the svg-element, so blah blah cohesion maybe.)</p><figure><pre class="js-prelude"><code>const svgScale = (size)  =&gt; (v) =&gt; {
   return {
-    x: `${v.x * (100 / dimensions.x)}%`,
-    y: `${v.y * (100 / dimensions.y)}%`,
+    x: `${v.x * (100 / size.x)}%`,
+    y: `${v.y * (100 / size.y)}%`,
   };
 };
 
 const drawToSvg = (state, svg) =&gt; {
   const drawing = state.drawing;
-  const scale = svgScale(drawing.dimensions);
-  svg.setAttribute(&quot;width&quot;, `${drawing.dimensions.x / 4}em`);
-  svg.setAttribute(&quot;height&quot;, `${drawing.dimensions.y / 4}em`);
+  const scale = svgScale(drawing.size);
+  svg.setAttribute(&quot;width&quot;, `${drawing.size.x / 4}em`);
+  svg.setAttribute(&quot;height&quot;, `${drawing.size.y / 4}em`);
   let res = svgStyle;
   drawing.things.forEach((thing, id) =&gt; {
     const selected = state.selection.isSelected(id) ? ` class=&quot;selected&quot;` : &quot;&quot;;
@@ -444,7 +444,7 @@ const drawToSvg = (state, svg) =&gt; {
       render.mouse();
     }
     mouse() {
-      const scaled = svgScale(state.drawing.dimensions)(state.position);
+      const scaled = svgScale(state.drawing.size)(state.position);
       posEl.setAttribute(&quot;cx&quot;, scaled.x);
       posEl.setAttribute(&quot;cy&quot;, scaled.y);
       svg.appendChild(posEl);
@@ -489,23 +489,23 @@ const drawToSvg = (state, svg) =&gt; {
     }
   })();
 
-  const posFromMouse = (e, dimensions) =&gt; {
+  const posFromMouse = (e, size) =&gt; {
     const point = new DOMPoint(e.clientX, e.clientY);
     const translated = point.matrixTransform(svg.getScreenCTM().inverse());
     const box = svg.getBoundingClientRect();
-    const x = Math.round((translated.x / box.width) * dimensions.x);
-    const y = Math.round((translated.y / box.height) * dimensions.y);
+    const x = Math.round((translated.x / box.width) * size.x);
+    const y = Math.round((translated.y / box.height) * size.y);
     return new Vector(x, y);
   };
 
   svg.onmousemove = (e) =&gt; {
-    state.position = posFromMouse(e, state.drawing.dimensions);
+    state.position = posFromMouse(e, state.drawing.size);
     render.mouse();
     p.innerText = `${state.position.x},${state.position.y}`;
   };
   svg.oncontextmenu = (e) =&gt; e.preventDefault();
   svg.onmousedown = (e) =&gt; {
-    state.position = posFromMouse(e, state.drawing.dimensions);
+    state.position = posFromMouse(e, state.drawing.size);
     render.mouse();
     if (e.buttons &lt; 2) {
       state.addPosition();
