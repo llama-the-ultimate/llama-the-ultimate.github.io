@@ -325,7 +325,7 @@ const unparse = new (class {
 +++
 +++ Selection
 
-A selection is used for keeping track of which things are selected when editing a drawing. It’s not too concerned with the actual things, just _where_ in the ordered list they are. So it holds onto a set of indexes and the total number of things.
+A selection is used for keeping track of which things are selected when editing a drawing. It’s not too concerned with the actual things, just _where_ in the ordered list they are. So it holds onto a set of indices and the total number of things.
 
 ``` js prelude
 class Selection {

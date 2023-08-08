@@ -76,6 +76,9 @@ const outElement = (() => {
     if (prelude) {
       run();
     }
+    return {
+      textarea: ta,
+    };
   };
 
   const thingToString = (level) => (thing) => {
@@ -109,6 +112,9 @@ const outElement = (() => {
     return `${thing}`;
   };
 
+  const editors = [];
+  const getCode = () => editors.map((ed) => ed.textarea.value).join("\n\n");
+
   window.addEventListener("load", (e) => {
     const log = console.log;
     console.log = (...args) => {
@@ -120,11 +126,12 @@ const outElement = (() => {
         );
       }
     };
+
     for (const el of [...document.querySelectorAll(".js-prelude")]) {
-      create(el, true);
+      editors.push(create(el, true));
     }
     for (const el of [...document.querySelectorAll(".js-repl")]) {
-      create(el, false);
+      editors.push(create(el, false));
     }
   });
   return outElement;

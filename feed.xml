@@ -244,7 +244,7 @@ const parse = new (class {
     res += &quot;\n```&quot;;
     return res;
   }
-})();</code></pre></figure></details><details><summary>Selection</summary><p>A selection is used for keeping track of which things are selected when editing a drawing. It’s not too concerned with the actual things, just <em>where</em> in the ordered list they are. So it holds onto a set of indexes and the total number of things.</p><figure><pre><code>class Selection {
+})();</code></pre></figure></details><details><summary>Selection</summary><p>A selection is used for keeping track of which things are selected when editing a drawing. It’s not too concerned with the actual things, just <em>where</em> in the ordered list they are. So it holds onto a set of indices and the total number of things.</p><figure><pre><code>class Selection {
   constructor(limit = 0) {
     this.limit = limit;
     this.ids = new Set();
