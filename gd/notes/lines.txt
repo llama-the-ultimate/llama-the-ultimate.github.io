@@ -227,9 +227,9 @@ A drawing is width×height-size and an ordered list of things. Not too objecty, 
 
 ``` js prelude
 class Drawing {
-  constructor() {
-    this.size = new Vector(60, 40);
-    this.things = [];
+  constructor(size = new Vector(60, 40), things = []) {
+    this.size = size;
+    this.things = things;
   }
 }
 ```
@@ -431,14 +431,10 @@ The state ties things together. Keeps track of drawing and selection and has met
 
 ``` js prelude
 class State {
-  constructor() {
-    this.drawing = new Drawing();
+  constructor(drawing = new Drawing()) {
+    this.drawing = drawing;
     this.position = new Vector(0, 0);
     this.selection = new Selection();
-  }
-  setDrawing(drawing) {
-    this.drawing = drawing;
-    this.selection.limit = drawing.things.length;
   }
   selectedThings() {
     return this.selection.itemsFrom(this.drawing.things);
@@ -714,8 +710,7 @@ const editor = (state) => {
 We’ll make one and put it somewhere near the top:
 
 ``` js prelude
-const state = new State();
-state.setDrawing(parse.drawing(
+const state = new State(parse.drawing(
 `
 \`\`\` lines 100 60
 l 35 21 35 25

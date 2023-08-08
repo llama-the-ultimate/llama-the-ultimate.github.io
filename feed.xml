@@ -163,9 +163,9 @@ class Text {
     this.str = this.str.slice(0, -1);
   }
 }</code></pre></figure><p>A drawing is width×height-size and an ordered list of things. Not too objecty, mostly just data. That’s okay.</p><figure><pre><code>class Drawing {
-  constructor() {
-    this.size = new Vector(60, 40);
-    this.things = [];
+  constructor(size = new Vector(60, 40), things = []) {
+    this.size = size;
+    this.things = things;
   }
 }</code></pre></figure><p>Parsing turns strings into things.</p><figure><pre><code>const regCase = (str, list) =&gt; {
   for (const [regex, f] of list) {
@@ -339,14 +339,10 @@ const parse = new (class {
     return res;
   }
 }</code></pre></figure></details><details><summary>State</summary><p>The state ties things together. Keeps track of drawing and selection and has methods for stuff you can do.</p><figure><pre><code>class State {
-  constructor() {
-    this.drawing = new Drawing();
+  constructor(drawing = new Drawing()) {
+    this.drawing = drawing;
     this.position = new Vector(0, 0);
     this.selection = new Selection();
-  }
-  setDrawing(drawing) {
-    this.drawing = drawing;
-    this.selection.limit = drawing.things.length;
   }
   selectedThings() {
     return this.selection.itemsFrom(this.drawing.things);
@@ -598,8 +594,7 @@ const drawToSvg = (state, svg) =&gt; {
   render.text();
   render.buttons();
   return div;
-};</code></pre></figure><p>We’ll make one and put it somewhere near the top:</p><figure><pre><code>const state = new State();
-state.setDrawing(parse.drawing(
+};</code></pre></figure><p>We’ll make one and put it somewhere near the top:</p><figure><pre><code>const state = new State(parse.drawing(
 `
 \`\`\` lines 100 60
 l 35 21 35 25
