@@ -564,6 +564,7 @@ const editor = (state) => {
       posEl.setAttribute("cx", scaled.x);
       posEl.setAttribute("cy", scaled.y);
       svg.appendChild(posEl);
+      p.innerText = `${state.position.x},${state.position.y}`;
     }
     buttons() {
       buttons.replaceChildren();
@@ -617,7 +618,6 @@ const editor = (state) => {
   svg.onmousemove = (e) => {
     state.position = posFromMouse(e, state.drawing.size);
     render.mouse();
-    p.innerText = `${state.position.x},${state.position.y}`;
   };
   svg.oncontextmenu = (e) => e.preventDefault();
   svg.onmousedown = (e) => {

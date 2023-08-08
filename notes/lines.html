@@ -446,6 +446,7 @@ const drawToSvg = (state, svg) =&gt; {
       posEl.setAttribute(&quot;cx&quot;, scaled.x);
       posEl.setAttribute(&quot;cy&quot;, scaled.y);
       svg.appendChild(posEl);
+      p.innerText = `${state.position.x},${state.position.y}`;
     }
     buttons() {
       buttons.replaceChildren();
@@ -499,7 +500,6 @@ const drawToSvg = (state, svg) =&gt; {
   svg.onmousemove = (e) =&gt; {
     state.position = posFromMouse(e, state.drawing.size);
     render.mouse();
-    p.innerText = `${state.position.x},${state.position.y}`;
   };
   svg.oncontextmenu = (e) =&gt; e.preventDefault();
   svg.onmousedown = (e) =&gt; {
