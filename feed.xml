@@ -245,8 +245,8 @@ const parse = new (class {
     return res;
   }
 })();</code></pre></figure></details><details><summary>Selection</summary><p>A selection is used for keeping track of which things are selected when editing a drawing. It’s not too concerned with the actual things, just <em>where</em> in the ordered list they are. So it holds onto a set of indexes and the total number of things.</p><figure><pre><code>class Selection {
-  constructor() {
-    this.limit = 0;
+  constructor(limit = 0) {
+    this.limit = limit;
     this.ids = new Set();
   }
   isSelected(id) {
@@ -342,7 +342,7 @@ const parse = new (class {
   constructor(drawing = new Drawing()) {
     this.drawing = drawing;
     this.position = new Vector(0, 0);
-    this.selection = new Selection();
+    this.selection = new Selection(drawing.things.length);
   }
   selectedThings() {
     return this.selection.itemsFrom(this.drawing.things);

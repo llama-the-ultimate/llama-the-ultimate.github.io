@@ -329,8 +329,8 @@ A selection is used for keeping track of which things are selected when editing 
 
 ``` js prelude
 class Selection {
-  constructor() {
-    this.limit = 0;
+  constructor(limit = 0) {
+    this.limit = limit;
     this.ids = new Set();
   }
   isSelected(id) {
@@ -434,7 +434,7 @@ class State {
   constructor(drawing = new Drawing()) {
     this.drawing = drawing;
     this.position = new Vector(0, 0);
-    this.selection = new Selection();
+    this.selection = new Selection(drawing.things.length);
   }
   selectedThings() {
     return this.selection.itemsFrom(this.drawing.things);
