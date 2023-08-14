@@ -1,0 +1,359 @@
+# Presentation-mode
+:blurb Sliding.
+:date 2023-08-14
+:special js
+
+If you run this in a browser with JavaScript enabled you should be able to turn the page into kind of a slideshow thing by running this code:
+
+``` js
+init("24px", "40rem");
+```
+
+You can edit the code and change the `"24px"` and `"40rem"` to adjust font-size and width of page/slides.
+
+Some new buttons should show up. You can enter slideshow mode and hop between slides with those, or with the `q`, `w` and e keys. (Also show/hide the bit that shows the current time with `t`.)
+
+If you don’t run the JavaScript, you can still read through the page. There will be some repeated headings that would otherwise be on different slides.
+
+If you want to (modify and) run the JavaScript as you read through the page, you can use use “wait” in the URL query thing:
+=> url /notes/slides.html?wait=true This page, but it lets you edit and run the JavaScript as you go.
+
+## Background
+
+This one time I needed to make some slides for a presentation and I thought:
+
+* I don’t want to use Microsoft PowerPoint or Google Slides.
+* It’d be handy to put the slides somewhere I can point a web browser at.
+
+## Background
+
+There are HTML presentation frameworks.
+
+* They let you create things like “stunning presentations.”
+* They’re frameworks, with probably hundreds or thousands of lines worth of stuff in them.
+
+I didn’t really want either of those things.
+
+## Background
+
+* I decided that what I wanted was a very plain web page with some controls for showing different parts of the page.
+* I cobbled something together, and I’ve kind of remade it once or twice for other presentations.
+* This is me putting a version of it somewhere I’ll remember it.
+* This version has some basics. I can copy and modify it as needed.
+
+## elem
+
+Okay. Some code.
+
+=> gd elem `elem` function from other post:
+
+``` js prelude
+const elem = (tagName, props, ...children) => {
+  const el = Object.assign(document.createElement(tagName), props);
+  el.replaceChildren(...children);
+  return el;
+};
+```
+
+## How much time is left?
+
+Not that much about the _slides_, but: When I give a talk I want to not use more time than I’m supposed to. I think it’s hard to keep track of time. If I put the time on top of the slides it’s a little easier for me.
+
+## How much time is left?
+
+We’ll make an element that stays in a fixed position:
+
+``` js prelude
+document.head.appendChild(elem("style", {}, `
+.time {
+  position: fixed;
+  font-family: monospace;
+  font-size: 2rem;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+`));
+const time = elem("div", { className: "time" }, "it is now");
+document.body.appendChild(time);
+```
+
+## How much time is left?
+
+And we’ll make it show the correct time:
+
+``` js prelude
+let showTime = true;
+
+const refreshTime = () => {
+  const str = new Date().toISOString().slice(-13, -8);
+  time.innerHTML = showTime ? str : "";
+};
+refreshTime();
+```
+
+## How much time is left?
+
+Since what time it is changes every now and then, we’ll `refreshTime` frequently. We’re only showing hours and minutes, so refreshing a couple of times each second should be more than enough:
+
+``` js prelude
+const timer = () => {
+  refreshTime();
+  setTimeout(timer, 500);
+};
+timer();
+```
+
+## Slides then
+
+Idea is:
+
+* Run through the contents of the page and make a list of slides from it.
+* Make stuff for showing a slide, next/previous stuff, entering and leaving slideshow.
+* Add slideshow controls to page.
+* Stuff.
+
+## A list of slides and the currently selected slide.
+
+`current` is the index of the slide we’re showing, or `null` if we’re showing the full page.
+
+``` js prelude
+const slides = [[]];
+let current = null;
+```
+
+## A slide is a list of elements
+
+We’ll just run through the page and add stuff to the current slide. We’ll add a new current slide whenever we run into a heading. (At least H1-H3. I never bother with the other ones.)
+
+``` js prelude
+[...document.body.children].forEach((x, i) => {
+  if (["H1", "H2", "H3"].includes(x.tagName)) {
+      slides.push([]);
+  }
+  slides[slides.length - 1].push(x);
+});
+```
+
+This makes it so the first slide is just the bit with date and index-link, before the first heading. Not the best slide I’ve seen, but I’m okay with it.
+
+## Showing a slide
+
+We show a slide by replacing everything in the `<body>` with the elements from the slide-list:
+
+``` js prelude
+const addSlide = (slide) =>
+  document.body.append(...slide);
+
+const show = (i) => {
+  current = Math.min(slides.length - 1, Math.max(0, i));
+  const slide = slides[current];
+  document.body.replaceChildren(time);
+  addSlide(slide);
+  slide[0].scrollIntoView(true);
+}
+```
+
+## Next and previous slide
+
+`slide` is also a verb. Like you slide in this or that direction.
+
+``` js prelude
+const slide = (offset) => {
+  if (current !== null) {
+    show(current + offset);
+  }
+};
+```
+
+## Entering
+
+If we’re viewing the full page and want to enter slideshow mode, we can find the first slide that is currently within view:
+
+``` js prelude
+const enter = () => {
+  if (current !== null) {
+    return;
+  }
+  const elementInView = el => el.getBoundingClientRect().bottom > 0;
+  const inView = slide => elementInView(slide[slide.length - 1]);
+  const idx = slides.findIndex(inView);
+  show(idx < 0 ? 0 : idx);
+};
+```
+
+## Leaving
+
+We go back to the full page by putting the content of all the slides in the `<body>`. And we scroll the previously shown slide into view so that we end up in kind of the right part of the page.
+
+``` js prelude
+const fullPage = () => {
+  current = null;
+  document.body.replaceChildren(time);
+  slides.forEach(addSlide);
+};
+
+const leave = () => {
+  if (current !== null) {
+    const slide = slides[current];
+    fullPage();
+    slide[0].scrollIntoView(true);
+  }
+};
+```
+
+## Keyboard shortcuts
+
+* `q`/`e` for previous/next slide.
+* `w` toggles between full page and slideshow.
+* `t` turns the element with the time on/off.
+
+``` js prelude
+const commands = new Map([
+  ["q", () => { enter(); slide(-1); }],
+  ["e", () => { enter(); slide(1); }],
+  ["w", () => (current === null ? enter: leave)()],
+  ["t", () => { showTime = !showTime; refreshTime(); }]
+]);
+```
+
+## Keyboard shortcuts
+
+``` js prelude
+const addKeys = () =>
+  document.onkeydown = (e) => {
+    const key = e.key.toLowerCase();
+    if (commands.has(key)) {
+      e.preventDefault();
+      commands.get(key)();
+    }
+  };
+```
+
+## Buttons
+
+We’ll add some clickable buttons to the start of each slide:
+
+``` js prelude
+const button = (text, title, onclick, disabled) =>
+  elem(
+    "button",
+    { title: title, onclick: onclick, disabled: disabled },
+    text
+  );
+```
+
+## Buttons
+``` js prelude
+const addButtons = () =>
+  slides.forEach((slide, i) => {
+    const toggle = () => {
+      if (current === null) {
+        show(i);
+      } else {
+        leave();
+      }
+    };
+    const buttons = elem(
+      "div",
+      {},
+      button("◀", "Previous", () => show(i - 1), i === 0),
+      button("⛶", "Toggle", toggle, false),
+      button("▶", "Next", () => show(i + 1), i === slides.length - 1)
+    );
+    slide.unshift(buttons);
+  });
+```
+
+## Resizing stuff
+
+Slideshows often have larger letters and stuff.
+
+``` js prelude
+const sizeElement = (rem, width) => elem("style", {}, `
+:root {
+  font-size: ${rem};
+}
+.slideshow {
+  max-width: ${width};
+  margin: 0 auto 0 auto;
+}
+`);
+```
+
+## Resizing stuff
+
+Resizing a `textarea` so the content kind of fits is kind of hacky.
+
+``` js prelude
+const resizeTextarea = (ta) => {
+  ta.setAttribute("style", "height: 0;");
+  const height = ta.scrollHeight;
+  ta.setAttribute("style", `height: ${height }px;`);
+  const extra = ta.offsetHeight - ta.clientHeight;
+  ta.setAttribute("style", `height: ${height + extra}px;`);
+};
+```
+
+## Init
+
+`init` does the things. Arguments are passed along to `sizeElement`.
+
+``` js prelude
+let size = null;
+
+const init = (rem, width) => {
+  if (size === null) {
+    addKeys();
+    addButtons();
+    fullPage();
+  } else {
+    size.remove();
+  }
+  size = document.head.appendChild(sizeElement(rem, width));
+  document.body.className = "slideshow";
+  for (const editor of document.getElementsByClassName("editor")) {
+    resizeTextarea(editor);
+  }
+};
+```
+
+## That’s it
+
+That more or less it I guess.
+
+## Variations, considerations
+
+I’ve previously done like a `<div class="slide">` for each slide. Makes it more straightforward to grab the list of slides with code. But a bit more nested stuff when writing the slides. I think I like this way better, but I dunno.
+
+## Variations, considerations
+
+Also I’ve previously used some “container” element instead putting stuff directly into `<body>`. Makes it so I can put the time-element outside of the container instead of making sure I add it whenever I replace the contents of `<body>`.
+
+On a similar note: The buttons could be moved to outside of the actual slides. I kind of like having them all over the place so that you have like a button for entering _this_ slide and a button for entering _that_ slide and so on, but...
+
+## Variations, considerations
+
+It’s easy to change which elements should start new slides. It’s also possible to have separator-elements between slides instead/as well, like if I want slides with no headings. E.g. I could make it so that `<hr>` starts a new slide but is not added to the slide content. (Might wanna change the slide data structure to something that can hold on to the separator in addition to the content of the slide, if I want to restore the separators when I’m doing `fullPage`.)
+
+## Variations, considerations
+
+I’m only dealing with elements when I put stuff into slides. If I also had text nodes directly under `<body>` I’d maybe have to do more stuff.
+
+## Okay that’s actually all of it
+
+Done.
+
+All of the code:
+
+``` js prelude
+const editors = [...document.querySelectorAll(".editor")];
+```
+``` js
+const code = `
+${editors.slice(1, -2).map((e) => e.value).join("\n\n")}
+
+${editors[0].value}
+`;
+console.log(code);
+```
+

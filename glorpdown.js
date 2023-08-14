@@ -434,6 +434,24 @@
       return res;
     };
 
+    const strToId = (str) => {
+      const startChar = (c) => c.match(/^[a-zA-Z]$/) !== null;
+      const validChar = (c) => c.match(/^[a-zA-Z0-9]$/) !== null;
+      const idStr = str.trim();
+      if (idStr === "") {
+        return null;
+      }
+      let res = "";
+      for (const c of idStr) {
+        if (res === "" && !startChar(c)) {
+          res += "A";
+        }
+        res += validChar(c) ? c : "_";
+      }
+
+      return res;
+    };
+
     const textHtml = (text) => {
       let res = "";
       for (const x of text.list) {
@@ -681,6 +699,7 @@
         {
           url: (url) => url,
           pre: new Map(),
+          usedIds: new Set(),
           details: false,
           defaultSummary: "Details",
         },

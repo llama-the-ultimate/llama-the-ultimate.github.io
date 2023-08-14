@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Presentation-mode</title>
+    <link rel="icon" type="image/x-icon" href="./../assets/icon.png">
+    <link rel="stylesheet" href="./../style.css">
+    <link rel="stylesheet" href="./../js-editor.css">
+    <script src="./../js-editor.js" defer></script>
+  </head>
+  <body class="page"><p><a href="./../index.html">Index</a></p><p><time>2023-08-14</time></p><h1>Presentation-mode</h1><p>If you run this in a browser with JavaScript enabled you should be able to turn the page into kind of a slideshow thing by running this code:</p><figure><pre class="js-repl"><code>init(&quot;24px&quot;, &quot;40rem&quot;);</code></pre></figure><p>You can edit the code and change the <code>&quot;24px&quot;</code> and <code>&quot;40rem&quot;</code> to adjust font-size and width of page/slides.</p><p>Some new buttons should show up. You can enter slideshow mode and hop between slides with those, or with the <code>q</code>, <code>w</code> and e keys. (Also show/hide the bit that shows the current time with <code>t</code>.)</p><p>If you don’t run the JavaScript, you can still read through the page. There will be some repeated headings that would otherwise be on different slides.</p><p>If you want to (modify and) run the JavaScript as you read through the page, you can use use “wait” in the URL query thing:<br><a href="./slides.html?wait=true">This page, but it lets you edit and run the JavaScript as you go.</a></p><h2>Background</h2><p>This one time I needed to make some slides for a presentation and I thought:</p><ul><li>I don’t want to use Microsoft PowerPoint or Google Slides.</li><li>It’d be handy to put the slides somewhere I can point a web browser at.</li></ul><h2>Background</h2><p>There are HTML presentation frameworks.</p><ul><li>They let you create things like “stunning presentations.”</li><li>They’re frameworks, with probably hundreds or thousands of lines worth of stuff in them.</li></ul><p>I didn’t really want either of those things.</p><h2>Background</h2><ul><li>I decided that what I wanted was a very plain web page with some controls for showing different parts of the page.</li><li>I cobbled something together, and I’ve kind of remade it once or twice for other presentations.</li><li>This is me putting a version of it somewhere I’ll remember it.</li><li>This version has some basics. I can copy and modify it as needed.</li></ul><h2>elem</h2><p>Okay. Some code.</p><p><a href="./elem.html"><code>elem</code> function from other post:</a></p><figure><pre class="js-prelude"><code>const elem = (tagName, props, ...children) =&gt; {
+  const el = Object.assign(document.createElement(tagName), props);
+  el.replaceChildren(...children);
+  return el;
+};</code></pre></figure><h2>How much time is left?</h2><p>Not that much about the <em>slides</em>, but: When I give a talk I want to not use more time than I’m supposed to. I think it’s hard to keep track of time. If I put the time on top of the slides it’s a little easier for me.</p><h2>How much time is left?</h2><p>We’ll make an element that stays in a fixed position:</p><figure><pre class="js-prelude"><code>document.head.appendChild(elem(&quot;style&quot;, {}, `
+.time {
+  position: fixed;
+  font-family: monospace;
+  font-size: 2rem;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+`));
+const time = elem(&quot;div&quot;, { className: &quot;time&quot; }, &quot;it is now&quot;);
+document.body.appendChild(time);</code></pre></figure><h2>How much time is left?</h2><p>And we’ll make it show the correct time:</p><figure><pre class="js-prelude"><code>let showTime = true;
+
+const refreshTime = () =&gt; {
+  const str = new Date().toISOString().slice(-13, -8);
+  time.innerHTML = showTime ? str : &quot;&quot;;
+};
+refreshTime();</code></pre></figure><h2>How much time is left?</h2><p>Since what time it is changes every now and then, we’ll <code>refreshTime</code> frequently. We’re only showing hours and minutes, so refreshing a couple of times each second should be more than enough:</p><figure><pre class="js-prelude"><code>const timer = () =&gt; {
+  refreshTime();
+  setTimeout(timer, 500);
+};
+timer();</code></pre></figure><h2>Slides then</h2><p>Idea is:</p><ul><li>Run through the contents of the page and make a list of slides from it.</li><li>Make stuff for showing a slide, next/previous stuff, entering and leaving slideshow.</li><li>Add slideshow controls to page.</li><li>Stuff.</li></ul><h2>A list of slides and the currently selected slide.</h2><p><code>current</code> is the index of the slide we’re showing, or <code>null</code> if we’re showing the full page.</p><figure><pre class="js-prelude"><code>const slides = [[]];
+let current = null;</code></pre></figure><h2>A slide is a list of elements</h2><p>We’ll just run through the page and add stuff to the current slide. We’ll add a new current slide whenever we run into a heading. (At least H1-H3. I never bother with the other ones.)</p><figure><pre class="js-prelude"><code>[...document.body.children].forEach((x, i) =&gt; {
+  if ([&quot;H1&quot;, &quot;H2&quot;, &quot;H3&quot;].includes(x.tagName)) {
+      slides.push([]);
+  }
+  slides[slides.length - 1].push(x);
+});</code></pre></figure><p>This makes it so the first slide is just the bit with date and index-link, before the first heading. Not the best slide I’ve seen, but I’m okay with it.</p><h2>Showing a slide</h2><p>We show a slide by replacing everything in the <code>&lt;body&gt;</code> with the elements from the slide-list:</p><figure><pre class="js-prelude"><code>const addSlide = (slide) =&gt;
+  document.body.append(...slide);
+
+const show = (i) =&gt; {
+  current = Math.min(slides.length - 1, Math.max(0, i));
+  const slide = slides[current];
+  document.body.replaceChildren(time);
+  addSlide(slide);
+  slide[0].scrollIntoView(true);
+}</code></pre></figure><h2>Next and previous slide</h2><p><code>slide</code> is also a verb. Like you slide in this or that direction.</p><figure><pre class="js-prelude"><code>const slide = (offset) =&gt; {
+  if (current !== null) {
+    show(current + offset);
+  }
+};</code></pre></figure><h2>Entering</h2><p>If we’re viewing the full page and want to enter slideshow mode, we can find the first slide that is currently within view:</p><figure><pre class="js-prelude"><code>const enter = () =&gt; {
+  if (current !== null) {
+    return;
+  }
+  const elementInView = el =&gt; el.getBoundingClientRect().bottom &gt; 0;
+  const inView = slide =&gt; elementInView(slide[slide.length - 1]);
+  const idx = slides.findIndex(inView);
+  show(idx &lt; 0 ? 0 : idx);
+};</code></pre></figure><h2>Leaving</h2><p>We go back to the full page by putting the content of all the slides in the <code>&lt;body&gt;</code>. And we scroll the previously shown slide into view so that we end up in kind of the right part of the page.</p><figure><pre class="js-prelude"><code>const fullPage = () =&gt; {
+  current = null;
+  document.body.replaceChildren(time);
+  slides.forEach(addSlide);
+};
+
+const leave = () =&gt; {
+  if (current !== null) {
+    const slide = slides[current];
+    fullPage();
+    slide[0].scrollIntoView(true);
+  }
+};</code></pre></figure><h2>Keyboard shortcuts</h2><ul><li><code>q</code>/<code>e</code> for previous/next slide.</li><li><code>w</code> toggles between full page and slideshow.</li><li><code>t</code> turns the element with the time on/off.</li></ul><figure><pre class="js-prelude"><code>const commands = new Map([
+  [&quot;q&quot;, () =&gt; { enter(); slide(-1); }],
+  [&quot;e&quot;, () =&gt; { enter(); slide(1); }],
+  [&quot;w&quot;, () =&gt; (current === null ? enter: leave)()],
+  [&quot;t&quot;, () =&gt; { showTime = !showTime; refreshTime(); }]
+]);</code></pre></figure><h2>Keyboard shortcuts</h2><figure><pre class="js-prelude"><code>const addKeys = () =&gt;
+  document.onkeydown = (e) =&gt; {
+    const key = e.key.toLowerCase();
+    if (commands.has(key)) {
+      e.preventDefault();
+      commands.get(key)();
+    }
+  };</code></pre></figure><h2>Buttons</h2><p>We’ll add some clickable buttons to the start of each slide:</p><figure><pre class="js-prelude"><code>const button = (text, title, onclick, disabled) =&gt;
+  elem(
+    &quot;button&quot;,
+    { title: title, onclick: onclick, disabled: disabled },
+    text
+  );</code></pre></figure><h2>Buttons</h2><figure><pre class="js-prelude"><code>const addButtons = () =&gt;
+  slides.forEach((slide, i) =&gt; {
+    const toggle = () =&gt; {
+      if (current === null) {
+        show(i);
+      } else {
+        leave();
+      }
+    };
+    const buttons = elem(
+      &quot;div&quot;,
+      {},
+      button(&quot;◀&quot;, &quot;Previous&quot;, () =&gt; show(i - 1), i === 0),
+      button(&quot;⛶&quot;, &quot;Toggle&quot;, toggle, false),
+      button(&quot;▶&quot;, &quot;Next&quot;, () =&gt; show(i + 1), i === slides.length - 1)
+    );
+    slide.unshift(buttons);
+  });</code></pre></figure><h2>Resizing stuff</h2><p>Slideshows often have larger letters and stuff.</p><figure><pre class="js-prelude"><code>const sizeElement = (rem, width) =&gt; elem(&quot;style&quot;, {}, `
+:root {
+  font-size: ${rem};
+}
+.slideshow {
+  max-width: ${width};
+  margin: 0 auto 0 auto;
+}
+`);</code></pre></figure><h2>Resizing stuff</h2><p>Resizing a <code>textarea</code> so the content kind of fits is kind of hacky.</p><figure><pre class="js-prelude"><code>const resizeTextarea = (ta) =&gt; {
+  ta.setAttribute(&quot;style&quot;, &quot;height: 0;&quot;);
+  const height = ta.scrollHeight;
+  ta.setAttribute(&quot;style&quot;, `height: ${height }px;`);
+  const extra = ta.offsetHeight - ta.clientHeight;
+  ta.setAttribute(&quot;style&quot;, `height: ${height + extra}px;`);
+};</code></pre></figure><h2>Init</h2><p><code>init</code> does the things. Arguments are passed along to <code>sizeElement</code>.</p><figure><pre class="js-prelude"><code>let size = null;
+
+const init = (rem, width) =&gt; {
+  if (size === null) {
+    addKeys();
+    addButtons();
+    fullPage();
+  } else {
+    size.remove();
+  }
+  size = document.head.appendChild(sizeElement(rem, width));
+  document.body.className = &quot;slideshow&quot;;
+  for (const editor of document.getElementsByClassName(&quot;editor&quot;)) {
+    resizeTextarea(editor);
+  }
+};</code></pre></figure><h2>That’s it</h2><p>That more or less it I guess.</p><h2>Variations, considerations</h2><p>I’ve previously done like a <code>&lt;div class=&quot;slide&quot;&gt;</code> for each slide. Makes it more straightforward to grab the list of slides with code. But a bit more nested stuff when writing the slides. I think I like this way better, but I dunno.</p><h2>Variations, considerations</h2><p>Also I’ve previously used some “container” element instead putting stuff directly into <code>&lt;body&gt;</code>. Makes it so I can put the time-element outside of the container instead of making sure I add it whenever I replace the contents of <code>&lt;body&gt;</code>.</p><p>On a similar note: The buttons could be moved to outside of the actual slides. I kind of like having them all over the place so that you have like a button for entering <em>this</em> slide and a button for entering <em>that</em> slide and so on, but...</p><h2>Variations, considerations</h2><p>It’s easy to change which elements should start new slides. It’s also possible to have separator-elements between slides instead/as well, like if I want slides with no headings. E.g. I could make it so that <code>&lt;hr&gt;</code> starts a new slide but is not added to the slide content. (Might wanna change the slide data structure to something that can hold on to the separator in addition to the content of the slide, if I want to restore the separators when I’m doing <code>fullPage</code>.)</p><h2>Variations, considerations</h2><p>I’m only dealing with elements when I put stuff into slides. If I also had text nodes directly under <code>&lt;body&gt;</code> I’d maybe have to do more stuff.</p><h2>Okay that’s actually all of it</h2><p>Done.</p><p>All of the code:</p><figure><pre class="js-prelude"><code>const editors = [...document.querySelectorAll(&quot;.editor&quot;)];</code></pre></figure><figure><pre class="js-repl"><code>const code = `
+${editors.slice(1, -2).map((e) =&gt; e.value).join(&quot;\n\n&quot;)}
+
+${editors[0].value}
+`;
+console.log(code);</code></pre></figure><br></body>
+</html>

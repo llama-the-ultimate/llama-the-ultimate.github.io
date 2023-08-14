@@ -6,7 +6,8 @@ const outElement = (() => {
     el.replaceChildren(...children);
     return el;
   };
-
+  const params = new URLSearchParams(window.location.search);
+  const wait = params.has("wait") && params.get("wait") !== "false";
   let currentOut = null;
   window.addEventListener("error", (event) => {
     if (currentOut !== null) {
@@ -41,44 +42,17 @@ const outElement = (() => {
     const buttons = prelude
       ? []
       : [
-          elem(
-            "button",
-            {
-              className: "toolbar-button",
-              title: "Run",
-              onclick: run,
-            },
-            "▶"
-          ),
-          elem(
-            "button",
-            {
-              className: "toolbar-button",
-              title: "Clear output",
-              onclick: (e) => {
-                out.replaceChildren();
-              },
-            },
-            "⎚"
-          ),
+          elem("button", { className: "toolbar-button", title: "Run", onclick: run }, "▶"),
+          elem("button", { className: "toolbar-button", title: "Clear output", onclick: (e) => { out.replaceChildren(); }}, "⎚"),
         ];
     const out = elem("pre", { className: "output" });
-    const div = elem(
-      "div",
-      { className: "editor-container" },
-      ta,
-      elem("div", { className: "toolbar" }, ...buttons, out)
-    );
+    const div = elem("div", { className: "editor-container" }, ta, elem("div", { className: "toolbar" }, ...buttons, out));
     document.body.appendChild(div);
     ta.setAttribute("style", "height: 0;");
     ta.setAttribute("style", `height: ${ta.scrollHeight}px;`);
     placeholder.parentElement.replaceChild(div, placeholder);
-    if (prelude) {
-      run();
-    }
-    return {
-      textarea: ta,
-    };
+    if (prelude) {  run(); }
+    return { textarea: ta };
   };
 
   const thingToString = (level) => (thing) => {
@@ -112,26 +86,20 @@ const outElement = (() => {
     return `${thing}`;
   };
 
-  const editors = [];
-  const getCode = () => editors.map((ed) => ed.textarea.value).join("\n\n");
-
   window.addEventListener("load", (e) => {
     const log = console.log;
     console.log = (...args) => {
       log.apply(console, args);
       if (currentOut !== null) {
-        currentOut.append(
-          elem("samp", {}, args.map(thingToString(0)).join(" ")),
-          "\n"
-        );
+        currentOut.append(elem("samp", {}, args.map(thingToString(0)).join(" ")), "\n");
       }
     };
 
-    for (const el of [...document.querySelectorAll(".js-prelude")]) {
-      editors.push(create(el, true));
+    for (const el of document.querySelectorAll(".js-prelude")) {
+      create(el, !wait);
     }
-    for (const el of [...document.querySelectorAll(".js-repl")]) {
-      editors.push(create(el, false));
+    for (const el of document.querySelectorAll(".js-repl")) {
+      create(el, false);
     }
   });
   return outElement;

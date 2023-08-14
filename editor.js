@@ -1,6 +1,5 @@
 "use strict";
 (() => {
-
   const gd = require("./glorpdown.js");
 
   const soon = (() => {
@@ -40,38 +39,38 @@
       elem("div", { className: "toolbar" })
     );
 
+    const insert = (start, end) => {
+      const selStart = editor.selectionStart;
+      const selEnd = editor.selectionEnd;
+      const dir = editor.selectionDirection;
+      const moveSelection = () => {
+        editor.setSelectionRange(
+          selStart + start.length,
+          selEnd + start.length,
+          dir
+        );
+      };
+      if (end === undefined) {
+        editor.setRangeText(start);
+        if (selStart === selEnd) {
+          moveSelection();
+        }
+      } else {
+        editor.setRangeText(start, selStart, selStart);
+        editor.setRangeText(end, selEnd + start.length, selEnd + start.length);
+        moveSelection();
+      }
+      changed();
+      editor.focus();
+    };
+
     const btn = (name, start, end) =>
       toolbar.appendChild(
         elem(
           "button",
           {
             onclick: () => {
-              const selStart = editor.selectionStart;
-              const selEnd = editor.selectionEnd;
-              const dir = editor.selectionDirection;
-              const moveSelection = () => {
-                editor.setSelectionRange(
-                  selStart + start.length,
-                  selEnd + start.length,
-                  dir
-                );
-              };
-              if (end === undefined) {
-                editor.setRangeText(start);
-                if (selStart === selEnd) {
-                  moveSelection();
-                }
-              } else {
-                editor.setRangeText(start, selStart, selStart);
-                editor.setRangeText(
-                  end,
-                  selEnd + start.length,
-                  selEnd + start.length
-                );
-                moveSelection();
-              }
-              changed();
-              editor.focus();
+              insert(start, end);
             },
           },
           name
@@ -111,13 +110,14 @@
       new ResizeObserver(matchSize).observe(div);
       matchSize();
     }
-    
+
     editor.oninput = changed;
     return {
       div: div,
       editor: editor,
       toolbar: toolbar,
       changed: changed,
+      insert: insert,
     };
   };
   const editors = [...document.getElementsByClassName("editor")].map(create);
