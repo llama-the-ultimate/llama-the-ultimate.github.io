@@ -1,7 +1,7 @@
 # Scratch
 
 ## Nice things
-Getting stuff done without writing a ton of code is nice. TBH he subset of JavaScript that I’m using is fine and has pretty okay ergonomics. Garbage collection, somewhat functional functions and not too cumbersome data structure stuff is convenient.
+Getting stuff done without writing a ton of code is nice. TBH the subset of JavaScript that I’m using is fine and has pretty okay ergonomics. Garbage collection, somewhat functional functions and not too cumbersome data structure stuff is convenient.
 
 Being able to distribute something small that can be run on fairly arbitrary machines without a lot of setting up. I don’t think tens or hundreds of megabytes of runtime is worth it for the stuff I’m typically building. I don’t usually want to build large things or solve complex problems.
 
@@ -13,9 +13,9 @@ I ran into Kartik Agaram’s Freewheeling a month or two ago:
 => url http://akkartik.name/post/roundup22 A year of freewheeling apps
 => url http://akkartik.name/lines.html Plain text. With lines.
 
-He’s using Lua and LÖVE and, as far as I can tell, building “desktop apps.” I think I have pretty similar views on software and it’s like really cool stuff.
+=> url https://wiki.xxiivv.com/site/varvara.html Varvara and Uxn also cool.
 
-## Some things to look at
+JS stuff. It would be nice to have like subset-of-a-browser as a smol VM.
 
 => url https://bellard.org/quickjs/ QuickJS
 => url https://duktape.org/ Duktape
@@ -27,7 +27,7 @@ My impression is that QuickJS is more popular than the others, but I’m not sur
 
 Jessie doesn’t seem to be particularly implemented or anything.
 
-I would be interested in something like an implementation of only a subset of JavaScript, maybe something along the lines of Jessie. (One of the nice thing
+I would be interested in something like an implementation of only a subset of JavaScript, maybe something along the lines of Jessie.
 
 APEs are cool.
 => url https://justine.lol/ape.html Actually Portable Executable

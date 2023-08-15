@@ -16,6 +16,11 @@
   padding: 0;
 }
 
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
 .toolbar {
   display: flex;
   flex-direction: row;

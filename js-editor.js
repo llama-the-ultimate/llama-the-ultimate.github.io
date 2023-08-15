@@ -39,20 +39,21 @@ const outElement = (() => {
       script.remove();
       currentOut = null;
     };
-    const buttons = prelude
-      ? []
-      : [
-          elem("button", { className: "toolbar-button", title: "Run", onclick: run }, "▶"),
-          elem("button", { className: "toolbar-button", title: "Clear output", onclick: (e) => { out.replaceChildren(); }}, "⎚"),
-        ];
+    const toolbar = elem("div", { className: "toolbar" });
     const out = elem("pre", { className: "output" });
-    const div = elem("div", { className: "editor-container" }, ta, elem("div", { className: "toolbar" }, ...buttons, out));
+    const div = elem("div", { className: "editor-container" }, ta, elem("div", { className: "row" }, toolbar, out));
     document.body.appendChild(div);
     ta.setAttribute("style", "height: 0;");
-    ta.setAttribute("style", `height: ${ta.scrollHeight}px;`);
+    const height = ta.scrollHeight;
+    ta.setAttribute("style", `height: ${height }px;`);
+    const extra = ta.offsetHeight - ta.clientHeight;
+    ta.setAttribute("style", `height: ${height + extra}px;`);
     placeholder.parentElement.replaceChild(div, placeholder);
-    if (prelude) {  run(); }
-    return { textarea: ta };
+    if (prelude) {
+      run();
+    }
+
+    return { textarea: ta, toolbar: toolbar, out: out, run: run };
   };
 
   const thingToString = (level) => (thing) => {
@@ -91,15 +92,26 @@ const outElement = (() => {
     console.log = (...args) => {
       log.apply(console, args);
       if (currentOut !== null) {
-        currentOut.append(elem("samp", {}, args.map(thingToString(0)).join(" ")), "\n");
+        currentOut.append(
+          elem("samp", {}, args.map(thingToString(0)).join(" ")),
+          "\n"
+        );
       }
     };
 
-    for (const el of document.querySelectorAll(".js-prelude")) {
-      create(el, !wait);
+    const preludes = [...document.querySelectorAll(".js-prelude")].map((el) =>
+      create(el)
+    );
+    const repls = [...document.querySelectorAll(".js-repl")].map((el) =>
+      create(el)
+    );
+    for (const editor of preludes) {
+      editor.run();
     }
-    for (const el of document.querySelectorAll(".js-repl")) {
-      create(el, false);
+    for (const editor of repls) {
+      editor.toolbar.append(
+        elem("button", { className: "toolbar-button", title: "Run", onclick: editor.run }, "▶"),
+        elem("button", { className: "toolbar-button", title: "Clear output", onclick: (e) => { editor.out.replaceChildren(); }}, "⎚"));
     }
   });
   return outElement;
