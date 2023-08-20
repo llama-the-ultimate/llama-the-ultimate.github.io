@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>A base 60 datetime format</title>
+    <link rel="icon" type="image/x-icon" href="./../assets/icon.png">
+    <link rel="stylesheet" href="./../style.css">
+    <link rel="stylesheet" href="./../js-editor.css">
+    <script src="./../js-editor.js" defer></script>
+  </head>
+  <body class="page"><p><a href="./../index.html">Index</a></p><p><time>2023-08-20</time></p><h1>A base 60 datetime format</h1><p><a href="https://github.com/buckket/twtxt">I have run into twtxt a couple of times.</a><br><a href="https://wiki.xxiivv.com/site/time.html">Alos arvelie.</a></p><p>So anyway I was thinking about something like: What if twtxt but more hypertext? Or: If you want more of the basics, like, uh, “retwtxt” or replies, then I guess each twtxt needs an id of some kind. I guess url*timestamp is unique. What if a timestamp was shorter and looked more id-like? Maybe the way arvelie-dates look more id-like to me.</p><p>Playing with that idea. Regular calendar and time system. Just some formatting.</p><h2>Alphabet</h2><p>With a 60-character alphabet I can use one character for minute, one for day, and one for month. (And one for second, but eh, minute-precision seems fine.)</p><p>Also by avoiding base 64 I can use only ASCII letters and digits. Also I don't like the way the normal base 64 alphabet is ordered. Digits then uppercase letters then lowercase letters makes it easier to use regular string comparison stuff for comparing timestamps.</p><p>Trying this: 8 digits, 26 uppercase letters, 26 lowercase letters. Only the first 8 digits since that somehow seems less arbitrary to me than dropping some of the letters.</p><figure><pre class="js-prelude"><code>const alphabet = &quot;01234567ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz&quot;;</code></pre></figure><h2>Numbers to chars and chars to numbers</h2><figure><pre class="js-prelude"><code>const b60FromInt = (i) =&gt; {
+  let rest = i;
+  let res = &quot;&quot;;
+  while (rest &gt;= alphabet.length) {
+    res = alphabet[rest % alphabet.length] + res;
+    rest = (rest / alphabet.length) &gt;&gt;&gt; 0;
+  }
+  return alphabet[rest] + res;
+};
+
+const intFromB60 = (s) =&gt; {
+  let res = 0;
+  for (const c of s) {
+    const idx = alphabet.indexOf(c);
+    res = (res * 60) + (idx &lt; 0 ? 0 : idx);
+  }
+  return res;
+};</code></pre></figure><h2>Datetime</h2><ul><li>Last character is minute.</li><li>The one before that is hour.</li><li>The one before that is day of month.</li><li>The one before that is month of year.</li><li>Everything before that is the year.</li></ul><figure><pre class="js-prelude"><code>const dateFromB60 = (s) =&gt; {
+  const res = new Date();
+  res.setUTCFullYear(intFromB60(s.slice(0, -4)));
+  res.setUTCMonth(intFromB60(s.slice(-4, -3)));
+  res.setUTCDate(intFromB60(s.slice(-3, -2)) + 1);
+  res.setUTCHours(intFromB60(s.slice(-2, -1)));
+  res.setUTCMinutes(intFromB60(s.slice(-1)));
+  res.setUTCSeconds(0);
+  res.setUTCMilliseconds(0);
+  return res;
+};
+
+const b60FromDate = (d, minYLength = 0) =&gt; {
+  const year = b60FromInt(d.getUTCFullYear()).padStart(minYLength , &quot;0&quot;);
+  const month = b60FromInt(d.getUTCMonth());
+  const day = b60FromInt(d.getUTCDate() - 1);
+  const hour = b60FromInt(d.getUTCHours());
+  const minute = b60FromInt(d.getUTCMinutes());
+  return year + month + day + hour + minute;
+};</code></pre></figure><p>Test:</p><figure><pre class="js-repl"><code>console.log(b60FromDate(new Date()));
+console.log(dateFromB60(b60FromDate(new Date())));</code></pre></figure><h2>Stuff</h2><p>It’s all within ASCII, so one byte per character in UTF-8: 4 bytes, or a 32-bit value, for month*day*hour*minute. As many bytes as I’d like for year, depending on which years I’m interested in. 2 bytes goes up to year 3600, 3 and 4 bytes go up to way more. If I want negative-number-years I can introduce a sign-byte.</p><p>I wonder if I should timestamp my posts here with something like this instead of how I currently do it. Mostly just obfuscation: I like the idea of not immediately being able to tell like “this is current, this is old.” I dunno.</p></body>
+</html>

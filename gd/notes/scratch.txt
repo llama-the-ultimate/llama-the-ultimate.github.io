@@ -34,6 +34,15 @@ APEs are cool.
 => url https://redbean.dev/ redbean
 Also I think QuickJS exists as an APE somewhere...
 
+## Hmm
+
+How does “IDE stuff” do the stuff. Syntax highlighting etc. How much happens when a key is pressed. It’s tempting to track “safe spots” in the file. E.g. “at position x, y and z we are at toplevel or similar, so changes between y and z are isolated from surroundings.” But clearly there’s stuff removing a thing defined between y and z that is used after z. Something about: Keeping track of things during editing vs. more batch job read the entire file after doing some edits...
+
+## Best practice
+
+* Rest
+* Changing my mind
+
 ## Blog status
 
 I’m considering more self-containedness. Should I just chuck all the css into the html file? Also the JavaScript? The more JSy posts have the JS within `<code>`-stuff in the HTML anyway, so the only code I’d need to add is the bit that finds and executes the rest of the code. Maybe self-contained version as separate version of page, but multiple files by default. So just a “server thing” that decides between refering to files vs inlining the content. Would have to do some work on and around “require” ot make it work.
@@ -50,3 +59,7 @@ I need to get rid of CodeMirror. A textarea would almost do (and I’m using tha
 => url https://www.npmjs.com/package/codejar codejar npm
 
 codejar (or parts of it) seems a little promising.
+
+Should I add id attributes to headings? I don’t know.
+
+=> url https://rakhim.org/honestly-undefined/19/ Maybe write an elaborate blog setup post at some point.

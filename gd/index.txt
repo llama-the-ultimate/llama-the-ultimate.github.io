@@ -1,7 +1,7 @@
 # Llama the ultimate
 :blurb A blog with some stuff in it.
 
-Blah blah. I’m a Jonas
+Blah blah. I’m a Jonas.
 
 => me https://social.vivaldi.net/@garoof On Mastodon
 => me https://twitter.com/JonasWinje On Twitter

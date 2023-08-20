@@ -20,14 +20,13 @@ const outElement = (() => {
 
   const outElement = elem("div");
 
-  const create = (element, prelude) => {
+  const create = (element) => {
     const placeholder = elem("div", {});
     element.parentElement.replaceChild(placeholder, element);
     document.body.appendChild(element);
 
     const ta = elem("textarea", {
       className: "editor",
-      readOnly: prelude,
       value: element.innerText,
     });
     element.remove();
@@ -49,9 +48,6 @@ const outElement = (() => {
     const extra = ta.offsetHeight - ta.clientHeight;
     ta.setAttribute("style", `height: ${height + extra}px;`);
     placeholder.parentElement.replaceChild(div, placeholder);
-    if (prelude) {
-      run();
-    }
 
     return { textarea: ta, toolbar: toolbar, out: out, run: run };
   };
@@ -71,7 +67,7 @@ const outElement = (() => {
         return `[${list.join(", ")}]`;
       }
     }
-    if (typeof thing === "object") {
+    if (typeof thing === "object" && thing.toString === ({}).toString) {
       const list = Object.keys(thing).map(
         (key) => `${keyString(key)}: ${thingToString(level + 1)(thing[key])}`
       );
@@ -107,6 +103,7 @@ const outElement = (() => {
     );
     for (const editor of preludes) {
       editor.run();
+      editor.textarea.readOnly = true;
     }
     for (const editor of repls) {
       editor.toolbar.append(

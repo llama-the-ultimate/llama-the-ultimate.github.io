@@ -39,7 +39,7 @@
       elem("div", { className: "toolbar" })
     );
 
-    const insert = (start, end) => {
+    const insertOld = (start, end) => {
       const selStart = editor.selectionStart;
       const selEnd = editor.selectionEnd;
       const dir = editor.selectionDirection;
@@ -63,6 +63,32 @@
       changed();
       editor.focus();
     };
+    
+    const insert = (start, end) => {
+      const selStart = editor.selectionStart;
+      const selEnd = editor.selectionEnd;
+      const dir = editor.selectionDirection;
+      const moveSelection = () => {
+        editor.setSelectionRange(
+          selStart + start.length,
+          selEnd + start.length,
+          dir
+        );
+      };
+      if (end === undefined) {
+        editor.focus();
+        document.execCommand('insertText', false, start)
+        if (selStart === selEnd) {
+          moveSelection();
+        }
+      } else {
+        editor.setRangeText(start, selStart, selStart);
+        editor.setRangeText(end, selEnd + start.length, selEnd + start.length);
+        moveSelection();
+      }
+      changed();
+      editor.focus();
+    }
 
     const btn = (name, start, end) =>
       toolbar.appendChild(
